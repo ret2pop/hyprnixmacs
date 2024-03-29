@@ -1,6 +1,5 @@
 { config, lib, nixpkgs, pkgs, wallpapers, scripts, ... }:
 {
-
   home.username = "preston";
   home.homeDirectory = "/home/preston";
   home.packages = with pkgs; [
@@ -15,7 +14,7 @@
     acpilight
     light
     gnupg
-    (pass.withExtensions (ext: with ext; [ pass-audit pass-otp pass-import pass-genphrase pass-update pass-tomb]))
+    (pass.withExtensions (ext: with ext; [ pass-otp pass-import pass-genphrase pass-update pass-tomb]))
     passExtensions.pass-otp
     fira-code
     croc
@@ -46,24 +45,23 @@
     pipes
     cmatrix
     inkscape
-    rnix-lsp
     nixfmt
     podman-desktop
     monero-gui
     electrum
     element-desktop
     iamb
-    veracrypt
     imagemagick
     (nerdfonts.override { fonts = [ "Iosevka" ]; })
     (discord.override {
       withOpenASAR = true;
       withVencord = true;
     })
-    ungoogled-chromium
+    chromium
   ];
   fonts.fontconfig.enable = true;
   xsession.enable = true;
+  home.enableNixpkgsReleaseCheck = false;
   home.stateVersion = "23.11";
 
   services.gpg-agent = {
@@ -818,7 +816,7 @@
         height = 30;
 
         output = [
-          "LVDS-1"
+          "eDP-1"
         ];
 
         modules-left = [ "hyprland/workspaces" ];
@@ -826,7 +824,7 @@
         modules-right = [ "battery" "clock" ];
 
         battery = {
-          bat = "BAT0";
+          bat = "BAT1";
           format = "{capacity}% {icon}";
           format-icons = [ "" "" "" "" "" ];
         };
@@ -1020,12 +1018,14 @@
       windowrule = [
         "workspace 1, ^(.*emacs.*)$"
         "workspace 2, ^(.*firefox.*)$"
+        "workspace 2, ^(.*chromium-browser.*)$"
         "workspace 3, ^(.*discord.*)$"
         "workspace 3, ^(.*element-desktop.*)$"
         "pseudo,fcitx"
       ];
       bind = [
         "$mod, F, exec, firefox"
+        "$mod, W, exec, chromium --oxide-layer=wayland"
         "$mod, Return, exec, kitty"
         "$mod, E, exec, emacs"
         "$mod, B, exec, electrum"
@@ -1093,7 +1093,6 @@
         repeat_rate = 50;
       };
       misc = {
-        force_hypr_chan = false;
         force_default_wallpaper = 0;
         disable_hyprland_logo = true;
       };

@@ -15,6 +15,10 @@
 
   networking.networkmanager.enable = true;
 
+  networking.firewall = {
+    enable = true;
+  };
+
   time.timeZone = "America/Vancouver";
 
   i18n.defaultLocale = "en_CA.UTF-8";
@@ -25,12 +29,29 @@
 
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
+
   services.blueman.enable = true;
 
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+  };
+
   services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-    xkbOptions = "caps:escape";
+    xkb.layout = "us";
+    xkb.variant = "";
+    xkb.options = "caps:escape";
+    videoDrivers = [ "nvidia" ];
+  };
+
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+    open = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   services.ollama = {
@@ -63,7 +84,7 @@
   users.users.preston = {
     isNormalUser = true;
     description = "Preston Pan";
-    extraGroups = [ "networkmanager" "wheel" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "adbusers" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
     ];
@@ -71,11 +92,16 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # environment.memoryAllocator.provider = "graphene-hardened";
   environment.systemPackages = with pkgs; [
     nixpkgs-fmt
-    rnix-lsp
     curl
     git
+    android-tools
+  ];
+
+  services.udev.packages = [
+    pkgs.android-udev-rules
   ];
 
   programs.light.enable = true;
