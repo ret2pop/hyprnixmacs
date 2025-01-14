@@ -1,0 +1,4 @@
+{
+  diskoCommitHash = "latest";
+  toughnixCommitHash = "HEAD";
+}
