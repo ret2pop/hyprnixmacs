@@ -1,19 +1,15 @@
 { pkgs, config, ... }:
 let
-  commits = ./commits.nix;
+  commits = import ./commits.nix;
 in
 {
-  imports = [
-    ../../modules/default.nix
-  ];
-
-  monorepo.profiles.home.enable = false;
-  monorepo.vars.userName = "nixos";
-
   users.extraUsers.root.password = "nixos";
+  users.extraUsers.nixos.password = "nixos";
   users.users = {
-    "${config.monorepo.vars.userName}" = {
+    nixos = {
       packages = with pkgs; [
+        git
+        curl
         gum
         (writeShellScriptBin "nix_installer"
           ''
