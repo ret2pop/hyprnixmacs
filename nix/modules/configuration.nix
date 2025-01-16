@@ -1,15 +1,11 @@
-{ pkgs, lib, ... }:
-let
-  vars = import ./vars.nix;
-in
+{ config, pkgs, lib, ... }:
 {
   imports = [];
 
-
   documentation = {
-    enable = true;
-    man.enable = true;
-    dev.enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.documentation.enable;
+    man.enable = lib.mkDefault config.monorepo.profiles.documentation.enable;
+    dev.enable = lib.mkDefault config.monorepo.profiles.documentation.enable;
   };
 
   environment = {
@@ -56,12 +52,12 @@ in
     };
 
     lanzaboote = {
-      enable = vars.secureBoot;
+      enable = config.monorepo.profiles.secureBoot.enable;
       pkiBundle = "/etc/secureboot";
     };
 
     loader = {
-      systemd-boot.enable = lib.mkForce (! vars.secureBoot);
+      systemd-boot.enable = lib.mkForce (! config.monorepo.profiles.secureBoot.enable);
       efi.canTouchEfiVariables = true;
     };
     
@@ -165,7 +161,7 @@ in
 
   networking = {
     useDHCP = lib.mkDefault true;
-    hostName = vars.hostName;
+    hostName = config.monorepo.vars.hostName;
     networkmanager = {
       enable = true;
       # wifi.macAddress = "";
@@ -179,16 +175,13 @@ in
   hardware = {
     enableAllFirmware = true;
     cpu.intel.updateMicrocode = true;
+    graphics.enable = true;
+    pulseaudio.enable = ! config.monorepo.profiles.pipewire.enable;
+
     bluetooth = {
       enable = true;
       powerOnBoot = true;
     };
-
-    graphics = {
-      enable = true;
-    };
-
-    pulseaudio.enable = false;
   };
 
   services = {
@@ -202,97 +195,13 @@ in
     resolved.dnssec = true;
     # usbguard.enable = true;
     usbguard.enable = false;
-    dbus = {
-      apparmor = "enabled";
-    };
+    dbus.apparmor = "enabled";
 
-    tor = {
-      enable = true;
-      openFirewall = true;
-      client = {
-        enable = true;
-        socksListenAddress = {
-          IsolateDestAddr = true;
-          addr = "127.0.0.1";
-          port = 9050;
-        };
-        dns.enable = true;
-      };
-      torsocks = {
-        enable = true;
-        server = "127.0.0.1:9050";
-      };
-    };
-
-    xserver = {
-      displayManager = {
-        startx.enable = true;
-      };
-
-      windowManager = {
-        i3 = {
-          enable = true;
-          package = pkgs.i3-gaps;
-        };
-      };
-
-      desktopManager = {
-        runXdgAutostartIfNone = true;
-      };
-
-      xkb = {
-        layout = "us";
-        variant = "";
-        options = "caps:escape";
-      };
-
-      videoDrivers = vars.videoDrivers;
-      enable = true;
-    };
-
-    pipewire = {
-      enable = true;
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-      pulse.enable = true;
-      jack.enable = true;
-      wireplumber.enable = true;
-      extraConfig.pipewire-pulse."92-low-latency" = {
-        "context.properties" = [
-          {
-            name = "libpipewire-module-protocol-pulse";
-            args = { };
-          }
-        ];
-        "pulse.properties" = {
-          "pulse.min.req" = "32/48000";
-          "pulse.default.req" = "32/48000";
-          "pulse.max.req" = "32/48000";
-          "pulse.min.quantum" = "32/48000";
-          "pulse.max.quantum" = "32/48000";
-        };
-        "stream.properties" = {
-          "node.latency" = "32/48000";
-          "resample.quality" = 1;
-        };
-      };
-    };
-
-    kanata = {
-      enable = true;
-    };
-
-    openssh = {
-      enable = true;
-      settings = {
-        PasswordAuthentication = true;
-        AllowUsers = [ vars.userName ];
-        PermitRootLogin = "no";
-        KbdInteractiveAuthentication = false;
-      };
-    };
+    tor = import ./tor.nix;
+    xserver = import ./xserver.nix;
+    pipewire = import ./pipewire.nix;
+    openssh = import ./ssh.nix;
+    kanata.enable = true;
 
     # Misc.
     udev = {
@@ -319,7 +228,7 @@ in
     hostPlatform = lib.mkDefault "x86_64-linux";
     config = {
       allowUnfree = true;
-      cudaSupport = false;
+      cudaSupport = lib.mkDefault false;
     };
   };
 
@@ -364,40 +273,28 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    cryptsetup
+    tree
     restic
     sbctl
-    linux-manual
-    man-pages
-    man-pages-posix
-    tree
   ];
-
   
   users.users = {
     root.openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINSshvS1N/42pH9Unp3Zj4gjqs9BXoin99oaFWYHXZDJ preston@preston-arch"
     ];
 
-    "${vars.userName}" = {
-      initialPassword = "${vars.userName}";
+    "${config.monorepo.vars.userName}" = {
+      initialPassword = "${config.monorepo.vars.userName}";
       isNormalUser = true;
-      description = vars.fullName;
+      description = config.monorepo.vars.fullName;
       extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" ];
       shell = pkgs.zsh;
       packages = [];
     };
   };
 
-
   nix.settings.experimental-features = "nix-command flakes";
-  time.timeZone = vars.timeZone;
+  time.timeZone = config.monorepo.vars.timeZone;
   i18n.defaultLocale = "en_CA.UTF-8";
-
-  system = {
-    stateVersion = "24.11";
-    nixos = {
-      tags = [ "continuity-2.0" ];
-    };
-  };
+  system.stateVersion = "24.11";
 }

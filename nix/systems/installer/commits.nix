@@ -1,4 +1,4 @@
 {
   diskoCommitHash = "latest";
-  toughnixCommitHash = "HEAD";
+  monorepoCommitHash = "HEAD";
 }

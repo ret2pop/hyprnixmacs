@@ -23,34 +23,21 @@ in
 
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''
-    if [ ! -d "/home/${vars.userName}/org/website/" ]; then
-      mkdir -p /home/${vars.userName}/org/website/
-      ${pkgs.git}/bin/git clone https://git.${vars.remoteHost}/ret2pop-website.git /home/${vars.userName}/org/website/
-    fi
-
     if [ ! -d "/home/${vars.userName}/src/publish-org-roam-ui" ]; then
       mkdir -p /home/${vars.userName}/src
       ${pkgs.git}/bin/git clone https://git.${vars.remoteHost}/publish-org-roam-ui.git /home/${vars.userName}/src/publish-org-roam-ui
     fi
-
-    if [ ! -d "/home/${vars.userName}/.password-store" ]; then
-      ${pkgs.git}/bin/git clone https://git.${vars.remoteHost}/passwords.git /home/${vars.userName}/.password-store
-    fi
-
     if [ ! -d "/home/${vars.userName}/email/ret2pop/" ]; then
       mkdir -p /home/${vars.userName}/email/ret2pop/
     fi
-
     if [ ! -d "/home/${vars.userName}/music" ]; then
       mkdir -p /home/${vars.userName}/music
     fi
-
     if [ ! -d "/home/${vars.userName}/sounds" ]; then
       mkdir -p /home/${vars.userName}/sounds
     fi
     touch /home/${vars.userName}/org/agenda.org
     touch /home/${vars.userName}/org/notes.org
-
     if [ ! -f "/home/${vars.userName}/.toughnix" ]; then
       echo "Don't delete this file. Autogen by home manager" > "/home/${vars.userName}/.toughnix"
     fi
@@ -62,7 +49,6 @@ in
     stateVersion = "24.11";
 
     packages = with pkgs; [
-      # kicad
       age
       acpilight
       alsa-utils
@@ -91,9 +77,9 @@ in
       (writeShellScriptBin "post-install" ''
 cd $HOME
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the post-install..." || nmtui
-sudo chown -R "$(whoami)":users toughnix
+sudo chown -R "$(whoami)":users ./monorepo
 
-sudo nixos-rebuild switch --flake ./toughnix#continuity
+sudo nixos-rebuild switch --flake ./monorepo/nix#continuity
 echo "Post install done! Now install your ssh and gpg keys. Log in again."
 sleep 3
 exit
@@ -1078,7 +1064,7 @@ on-notify=exec mpv /home/${vars.userName}/sounds/notification.wav --no-config --
       extraConfig = ''
       (setq debug-on-error t)
       (org-babel-load-file
-        (expand-file-name "~/org/website/config/emacs.org"))'';
+        (expand-file-name "~/monorepo/config/emacs.org"))'';
       extraPackages = epkgs: [
         epkgs.all-the-icons
         epkgs.auctex

@@ -1,14 +1,15 @@
-{ sops-nix, ... }:
-let
-  vars = import ./vars.nix;
-in
+{ config, sops-nix, ... }:
 {
+  imports = [
+    ../default.nix
+  ];
+
   home-manager = {
     sharedModules = [
       sops-nix.homeManagerModules.sops
     ];
     useGlobalPkgs = true;
     useUserPackages = true;
-    users."${vars.userName}" = import ./user.nix;
+    users."${config.monorepo.vars.userName}" = import ./user.nix;
   };
 }

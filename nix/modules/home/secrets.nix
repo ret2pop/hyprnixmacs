@@ -1,19 +1,18 @@
-{ lib, config, pkgs, inputs, ... }:
+{ config, ... }:
 {
-  imports = [
-    ../vars.nix
-  ];
-
-  options = {
-    secrets.enable = lib.mkEnableOption "enables encrypted secrets on system";
+  defaultSopsFile = ../../secrets/secrets.yaml;
+  age = {
+    keyFile = "/home/${config.vars.userName}/.ssh/keys.txt";
+  };
+  secrets.mail = {
+    format = "yaml";
+    path = "${config.sops.defaultSymlinkPath}/mail";
+  };
+  secrets.digikey = {
+    format = "yaml";
+    path = "${config.sops.defaultSymlinkPath}/digikey";
   };
 
-  config = lib.mkIf config.secrets.enable {
-    home-manager = {
-      sharedModules = [
-        inputs.sops-nix.homeManagerModules.sops
-      ];
-      users."${user.user}" = {};
-    };
-  };
+  defaultSymlinkPath = "/run/user/1000/secrets";
+  defaultSecretsMountPoint = "/run/user/1000/secrets.d";
 }

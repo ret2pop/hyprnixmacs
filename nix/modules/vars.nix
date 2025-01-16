@@ -1,48 +1,50 @@
-# Change the following variables
-{}:
+{ lib, ... }:
 {
-  options = {
-    # set your host name.
-    hostName = "continuity";
+  hostName = lib.mkOption {
+    type = lib.types.str;
+    default = "continuity";
+    example = "hostname";
+    description = "system hostname";
+  };
 
-    user = {
-      userName = "preston";
-      fullName = "Preston Pan";
-      gpgKey = "AEC273BF75B6F54D81343A1AC1FE6CED393AE6C1";
-    };
+  userName = lib.mkOption {
+    type = lib.types.str;
+    default = "preston";
+    example = "myUser";
+    description = "system username";
+  };
 
-    servers = {
-      # email used for `From` and also as your login email.
-      email = "ret2pop@gmail.com";
-      # IMAPS server. Must be encrypted.
-      imapsServer = "imap.gmail.com";
-      # SMTPS server. Must be encrypted.
-      smtpsServer = "smtp.gmail.com";
+  fullName = lib.mkOption {
+    type = lib.types.str;
+    default = "Preston Pan";
+    example = "John Doe";
+    description = "Full Name";
+  };
 
-      # Used for referencing the remote host in config. This mostly shouldn't matter if you are not
-      # using my website.
-      remoteHost = "nullring.xyz";
-    };
+  gpgKey = lib.mkOption {
+    type = lib.types.str;
+    default = "AEC273BF75B6F54D81343A1AC1FE6CED393AE6C1";
+    example = "1234567890ABCDEF...";
+    description = "GPG key fingerprint";
+  };
 
-    # Change to your timezone
-    timeZone = "America/Vancouver";
+  remoteHost = lib.mkOption {
+    type = lib.types.str;
+    default = "nullring.xyz";
+    example = "example.com";
+    description = "Address to push to and pull from for website and git repos";
+  };
 
-    # After rebooting, use the command `hyprctl monitors` in order to check which monitor
-    # you are using. This is so that waybar knows which monitors to appear in.
-    monitors = [
-      "HDMI-A-1"
-      "eDP-1"
-      "DP-2"
-      "DP-3"
-      "LVDS-1"
-    ];
-
-    # enable video drivers based on your system.
-    # Example:
-    # videoDrivers = [
-    #   "nvidia"
-    #   "amdgpu"
-    # ]
-    videoDrivers = [];
+  timeZone = lib.mkOption {
+    type = lib.types.str;
+    default = "America/Vancouver";
+    example = "America/Chicago";
+    description = "Linux timezone";
+  };
+  disk = lib.mkOption {
+    type = lib.types.str;
+    default = "/dev/sda";
+    example = "/dev/nvme0n1";
+    description = "Disk to install NixOS to";
   };
 }
