@@ -5,6 +5,7 @@
     ./ssh.nix
     ./pipewire.nix
     ./tor.nix
+    ./kubo.nix
   ];
 
   documentation = {

@@ -3,6 +3,18 @@ let
   commits = import ./commits.nix;
 in
 {
+  networking = {
+    hostName = "nixos";
+    networkmanager = {
+      enable = true;
+    };
+    firewall = {
+      allowedTCPPorts = [ ];
+      allowedUDPPorts = [ ];
+    };
+    wireless.enable = false;
+  };
+
   users.extraUsers.root.password = "nixos";
   users.extraUsers.nixos.password = "nixos";
   users.users = {
@@ -31,7 +43,7 @@ vim "$HOME/monorepo/nix/systems/continuity/default.nix"
 sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/modules/sda-simple.nix"
 cd /mnt
 sudo nixos-install --flake $HOME/monorepo/nix#continuity
-sudo cp $HOME/monorepo "/mnt/home/$(ls /mnt/home/)/"
+sudo cp -r $HOME/monorepo "/mnt/home/$(ls /mnt/home/)/"
 echo "rebooting..."; sleep 3; reboot
 '')
       ];

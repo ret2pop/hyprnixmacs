@@ -1,16 +1,8 @@
-{ config, lib, ... }:
 {
-  options.monorepo.vars.disk = lib.mkOption {
-    type = lib.types.str;
-    default = "/dev/sda";
-    example = "/dev/nvme0n1";
-    description = "Disk to install NixOS to";
-  };
-
-  config.disko.devices = {
+  disko.devices = {
     disk = {
       my-disk = {
-        device = config.monorepo.vars.disk;
+        device = "/dev/sda";
         type = "disk";
         content = {
           type = "gpt";
