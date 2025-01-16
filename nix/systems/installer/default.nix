@@ -44,7 +44,7 @@ echo "rebooting..."; sleep 3; reboot
   };
 
   systemd = {
-    services.sshd.wantedBy = pkgs.lib.mkForce ["multi-user.target"];
+    services.sshd.wantedBy = pkgs.lib.mkForce [ "multi-user.target" ];
     targets = {
       sleep.enable = false;
       suspend.enable = false;
