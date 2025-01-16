@@ -38,7 +38,7 @@
               imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
             }
           )
-          ./systems/installer/iso.nix
+          ./systems/installer/default.nix
         ];
       };
 
@@ -46,15 +46,14 @@
         system = "x86_64-linux";
         specialArgs = attrs;
         modules = [
-          { nixpkgs.overlays = [ nur.overlays.default ]; }
-          { home-manager.extraSpecialArgs = attrs; }
           lanzaboote.nixosModules.lanzaboote
           disko.nixosModules.disko
           home-manager.nixosModules.home-manager
           sops-nix.nixosModules.sops
-          ./systems/desktop/configuration.nix
-          ./systems/desktop/sda-simple.nix
-          ./systems/desktop/home.nix
+          { nixpkgs.overlays = [ nur.overlays.default ]; }
+          { home-manager.extraSpecialArgs = attrs; }
+
+          ./systems/continuity/default.nix
         ];
       };
 

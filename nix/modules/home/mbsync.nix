@@ -1,10 +1,11 @@
 { lib, config, ... }:
 {
-  enable = lib.mkDefault config.profiles.home.email.enable;
-  extraConfig = ''
+  programs.mbsync = {
+    enable = lib.mkDefault config.monorepo.profiles.email.enable;
+    extraConfig = ''
       IMAPAccount ret2pop
-      Host ${config.profiles.home.email.imapsServer}
-      User ${config.profiles.email.email}
+      Host ${config.monorepo.profiles.email.imapsServer}
+      User ${config.monorepo.profiles.email.email}
       PassCmd "cat ${config.sops.secrets.mail.path}"
       Port 993
       TLSType IMAPS
@@ -28,4 +29,5 @@
       Expunge None
       SyncState *
     '';
+  };
 }

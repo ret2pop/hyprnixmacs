@@ -1,7 +1,8 @@
 { lib, config, ... }:
 {
-  enable = lib.mkDefault config.monorepo.profiles.home.email.enable;
-  extraConfig = ''
+  programs.msmtp = {
+    enable = lib.mkDefault config.monorepo.profiles.email.enable;
+    extraConfig = ''
       # Set default values for all following accounts.
       defaults
       auth           on
@@ -12,14 +13,15 @@
 
       # Gmail
       account        ${config.monorepo.vars.userName}
-      host           ${config.monorepo.profiles.home.email.smtpsServer}
+      host           ${config.monorepo.profiles.email.smtpsServer}
       port           587
-      from           ${config.monorepo.profiles.home.email.email}
-      user           ${config.monorepo.profiles.home.email.email}
+      from           ${config.monorepo.profiles.email.email}
+      user           ${config.monorepo.profiles.email.email}
       passwordeval   "cat ${config.sops.secrets.mail.path}"
 
 
       # Set a default account
       account default : ${config.monorepo.vars.userName}
     '';
+  };
 }

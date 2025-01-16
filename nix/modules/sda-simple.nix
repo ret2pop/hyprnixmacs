@@ -1,6 +1,13 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
-  disko.devices = {
+  options.monorepo.vars.disk = lib.mkOption {
+    type = lib.types.str;
+    default = "/dev/sda";
+    example = "/dev/nvme0n1";
+    description = "Disk to install NixOS to";
+  };
+
+  config.disko.devices = {
     disk = {
       my-disk = {
         device = config.monorepo.vars.disk;

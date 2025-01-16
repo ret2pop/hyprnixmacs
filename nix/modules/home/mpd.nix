@@ -1,11 +1,12 @@
 { lib, config, ... }:
 {
-  enable = lib.mkDefault config.monorepo.profiles.home.music.enable;
-  dbFile = "/home/${config.vars.userName}/.config/mpd/db";
-  dataDir = "/home/${config.vars.userName}/.config/mpd/";
+  services.mpd = {
+  enable = lib.mkDefault config.monorepo.profiles.music.enable;
+  dbFile = "/home/${config.monorepo.vars.userName}/.config/mpd/db";
+  dataDir = "/home/${config.monorepo.vars.userName}/.config/mpd/";
   network.port = 6600;
-  musicDirectory = "/home/${config.vars.userName}/music";
-  playlistDirectory = "/home/${config.vars.userName}/.config/mpd/playlists";
+  musicDirectory = "/home/${config.monorepo.vars.userName}/music";
+  playlistDirectory = "/home/${config.monorepo.vars.userName}/.config/mpd/playlists";
   network.listenAddress = "0.0.0.0";
   extraConfig = ''
       audio_output {
@@ -24,4 +25,5 @@
         tags            "yes"			# httpd supports sending tags to listening streams.
       }
     '';
+  };
 }

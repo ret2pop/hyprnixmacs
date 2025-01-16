@@ -1,7 +1,8 @@
 { lib, config, ... }:
 {
-  enable = lib.mkDefault config.monorepo.profiles.hyprland.enable;
-  style = ''
+  programs.waybar = {
+    enable = lib.mkDefault config.monorepo.profiles.hyprland.enable;
+    style = ''
       * {
           border: none;
           border-radius: 0px;
@@ -247,25 +248,26 @@
           font-weight: bold;
       }
     '';
-  settings = {
-    mainBar = {
-      layer = "top";
-      position = "top";
-      height = 50;
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 50;
 
-      output = config.vars.monitors;
+        output = config.monorepo.vars.monitors;
 
-      modules-left = [ "hyprland/workspaces" ];
-      modules-center = [ "hyprland/window" ];
-      modules-right = [ "battery" "clock" ];
+        modules-left = [ "hyprland/workspaces" ];
+        modules-center = [ "hyprland/window" ];
+        modules-right = [ "battery" "clock" ];
 
-      battery = {
-        format = "{icon}  {capacity}%";
-        format-icons = ["" "" "" "" "" ];
-      };
+        battery = {
+          format = "{icon}  {capacity}%";
+          format-icons = ["" "" "" "" "" ];
+        };
 
-      clock = {
-        format = "⏰ {:%a %d, %b %H:%M}";
+        clock = {
+          format = "⏰ {:%a %d, %b %H:%M}";
+        };
       };
     };
   };

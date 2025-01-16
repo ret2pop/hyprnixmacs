@@ -1,6 +1,11 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [];
+  imports = [
+    ./xserver.nix
+    ./ssh.nix
+    ./pipewire.nix
+    ./tor.nix
+  ];
 
   documentation = {
     enable = lib.mkDefault config.monorepo.profiles.documentation.enable;
@@ -197,10 +202,6 @@
     usbguard.enable = false;
     dbus.apparmor = "enabled";
 
-    tor = import ./tor.nix;
-    xserver = import ./xserver.nix;
-    pipewire = import ./pipewire.nix;
-    openssh = import ./ssh.nix;
     kanata.enable = true;
 
     # Misc.
@@ -228,7 +229,7 @@
     hostPlatform = lib.mkDefault "x86_64-linux";
     config = {
       allowUnfree = true;
-      cudaSupport = lib.mkDefault false;
+      cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
     };
   };
 
@@ -273,9 +274,11 @@
   };
 
   environment.systemPackages = with pkgs; [
-    tree
     restic
     sbctl
+    git
+    vim
+    curl
   ];
   
   users.users = {

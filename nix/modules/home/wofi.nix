@@ -1,23 +1,24 @@
 { lib, config, ... }:
 {
-  enable = lib.mkDefault config.monorepo.profiles.home.enable;
-  settings = {
-    location = "bottom-right";
-    allow_markup = true;
-    show = "drun";
-    width = 750;
-    height = 400;
-    always_parse_args = true;
-    show_all = false;
-    term = "kitty";
-    hide_scroll = true;
-    print_command = true;
-    insensitive = true;
-    prompt = "Run what, Commander?";
-    columns = 2;
-  };
+  programs.wofi = {
+    enable = true; 
+    settings = {
+      location = "bottom-right";
+      allow_markup = true;
+      show = "drun";
+      width = 750;
+      height = 400;
+      always_parse_args = true;
+      show_all = false;
+      term = "kitty";
+      hide_scroll = true;
+      print_command = true;
+      insensitive = true;
+      prompt = "Run what, Commander?";
+      columns = 2;
+    };
 
-  style = ''
+    style = ''
       @define-color	rosewater  #f5e0dc;
       @define-color	rosewater-rgb  rgb(245, 224, 220);
       @define-color	flamingo  #f2cdcd;
@@ -183,4 +184,5 @@
         background-color: @lavender!important;
       }
     '';
+  };
 }

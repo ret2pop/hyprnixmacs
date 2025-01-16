@@ -1,6 +1,5 @@
 { lib, config, pkgs, ... }:
 {
-  sops = import ./sops.nix;
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''
     if [ ! -d "/home/${config.monorepo.vars.userName}/email/ret2pop/" ]; then
@@ -14,7 +13,6 @@
     fi
     touch /home/${config.monorepo.vars.userName}/org/agenda.org
     touch /home/${config.monorepo.vars.userName}/org/notes.org
-    touch /home/${config.monorepo.vars.userName}/.monorepo
     '';
 
     enableNixpkgsReleaseCheck = false;
@@ -33,13 +31,16 @@
       graphviz jq
 
       # Apps
-      octaveFull vesktop grim swww
+      octaveFull vesktop grim swww vim 
 
       # Sound/media
-      pavucontrol alsa-utils imagemagick ffmpeg vim
+      pavucontrol alsa-utils imagemagick ffmpeg helvum
 
       # Net
       curl rsync git
+
+      # Tor
+      torsocks tor-browser
 
       # fonts
       noto-fonts
@@ -58,23 +59,10 @@
       acpilight
       pfetch
       libnotify
-      
-      # Shell script
-      (writeShellScriptBin "post-install" ''
-cd $HOME
-ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the post-install..." || nmtui
-sudo chown -R "$(whoami)":users ./monorepo
-
-sudo nixos-rebuild switch --flake ./monorepo/nix#continuity
-echo "Post install done! Now install your ssh and gpg keys. Log in again."
-sleep 3
-exit
-'')
     ];
   };
 
   services = {
-    mako = import ./mako.nix;
     gpg-agent = {
       pinentryPackage = pkgs.pinentry-emacs;
       enable = true;
@@ -83,27 +71,9 @@ exit
       allow-loopback-pinentry
     '';
     };
-    gammastep = import ./gammastep.nix;
-    mpd = import ./mpd.nix;
   };
 
-  programs = {
-    mpv = import ./mpv.nix;
-    yt-dlp = import ./yt-dlp.nix;
-    wofi = import ./wofi.nix;
-    kitty = import ./kitty.nix;
-    firefox = import ./firefox.nix;
-    waybar = import ./waybar.nix;
-    zsh = import ./zsh.nix;
-    emacs = import ./emacs.nix;
-    mbsync = import ./mbsync.nix;
-    msmtp = import ./msmtp.nix;
-    bash.enable = true;
-    git = import ./git.nix;
-    home-manager.enable = lib.mkDefault config.monorepo.profiles.home.enable;
-  };
-
-  wayland.windowManager.hyprland = import ./hyprland.nix;
+  programs.bash.enable = true;
 
   gtk = {
     enable = true;
@@ -111,17 +81,6 @@ exit
     iconTheme = null;
   };
 
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-gtk
-      fcitx5-chinese-addons
-      fcitx5-configtool
-      fcitx5-mozc
-      fcitx5-rime
-    ];
-  };
-
   fonts.fontconfig.enable = true;
-  nixpkgs.config.cudaSupport = false;
+  nixpkgs.config.cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
 }

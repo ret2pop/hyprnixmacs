@@ -1,26 +1,28 @@
-{ config, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 {
-  enable = lib.mkDefault config.monorepo.profiles.home.hyprland.enable;
-  displayManager = {
-    startx.enable = true;
-  };
-
-  windowManager = {
-    i3 = {
-      enable = true;
-      package = pkgs.i3-gaps;
+  services.xserver = {
+    enable = lib.mkDefault true;
+    displayManager = {
+      startx.enable = true;
     };
-  };
 
-  desktopManager = {
-    runXdgAutostartIfNone = true;
-  };
+    windowManager = {
+      i3 = {
+        enable = true;
+        package = pkgs.i3-gaps;
+      };
+    };
 
-  xkb = {
-    layout = "us";
-    variant = "";
-    options = "caps:escape";
-  };
+    desktopManager = {
+      runXdgAutostartIfNone = true;
+    };
 
-  videoDrivers = config.monorepo.profiles.vars.videoDrivers;
+    xkb = {
+      layout = "us";
+      variant = "";
+      options = "caps:escape";
+    };
+
+    videoDrivers = [];
+  };
 }
