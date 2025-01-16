@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, sounds, ... }:
 {
   services.mako = {
     enable = true;
@@ -9,7 +9,7 @@
     font = "Fira Code 10";
     defaultTimeout = 3000;
     extraConfig = ''
-on-notify=exec mpv /home/${config.monorepo.vars.userName}/sounds/notification.wav --no-config --no-video
+on-notify=exec mpv ${sounds}/polite.ogg --no-config --no-video
 '';
   };
 }

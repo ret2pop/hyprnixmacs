@@ -25,6 +25,7 @@
     sops-nix.url = "github:Mic92/sops-nix";
     scripts.url = "github:ret2pop/scripts";
     wallpapers.url = "github:ret2pop/wallpapers";
+    sounds.url = "github:ret2pop/sounds";
   };
 
   outputs = { nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, ... }@attrs: {

@@ -307,6 +307,7 @@
         "nur": "nur",
         "scripts": "scripts",
         "sops-nix": "sops-nix",
+        "sounds": "sounds",
         "wallpapers": "wallpapers"
       }
     },
@@ -365,6 +366,21 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "sounds": {
+      "locked": {
+        "lastModified": 1737024247,
+        "narHash": "sha256-OTtqUYIe713ti4vaa8hS1Z0UvD/X4J9XkLzKgl2+RBE=",
+        "owner": "ret2pop",
+        "repo": "sounds",
+        "rev": "9714690a6d216f9c55bfe56969d6e7d98768559f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ret2pop",
+        "repo": "sounds",
         "type": "github"
       }
     },
