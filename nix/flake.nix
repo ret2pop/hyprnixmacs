@@ -54,6 +54,7 @@
           { nixpkgs.overlays = [ nur.overlays.default ]; }
           { home-manager.extraSpecialArgs = attrs; }
 
+          ./modules/sda-simple.nix
           ./systems/continuity/default.nix
         ];
       };
