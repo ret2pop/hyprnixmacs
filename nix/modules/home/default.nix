@@ -34,6 +34,7 @@
       lang-openscad.enable = lib.mkEnableOption "Enables openscad language support";
       lang-js.enable = lib.mkEnableOption "Enables javascript language support";
       lang-nix.enable = lib.mkEnableOption "Enables nix language support";
+      lang-coq.enable = lib.mkEnableOption "Enables coq language support";
 
       crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
       art.enable = lib.mkEnableOption "Enables various art programs";
@@ -123,6 +124,10 @@
                       bash-language-server
                     ]) else [])
                     ++
+                    (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
+                      coq
+                    ]) else [])
+                    ++
                     (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
                       nil
                       nixd
@@ -161,6 +166,7 @@
       lang-openscad.enable = lib.mkDefault true;
       lang-js.enable = lib.mkDefault true;
       lang-nix.enable = lib.mkDefault true;
+      lang-coq.enable = lib.mkDefault true;
 
       crypto.enable = lib.mkDefault true;
       art.enable = lib.mkDefault true;
