@@ -203,6 +203,11 @@
             globalprivacycontrol.enabled = true;
             history.custom = true;
             userContext.ui.enabled = true;
+            trackingprotection = {
+              enabled = true;
+              pbmode.enabled = true;
+              socialtracking.enabled = true;
+            };
           };
 
           full-screen-api = {

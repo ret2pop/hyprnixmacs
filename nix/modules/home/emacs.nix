@@ -41,6 +41,7 @@
         epkgs.irony-eldoc
         epkgs.ivy
         epkgs.ivy-pass
+        epkgs.kiwix
         epkgs.latex-preview-pane
         epkgs.lsp-ivy
         epkgs.lsp-mode

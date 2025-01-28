@@ -21,6 +21,8 @@
     stateVersion = "24.11";
 
     packages = with pkgs; [
+      # wikipedia
+      kiwix kiwix-tools
       # passwords
       age sops
 

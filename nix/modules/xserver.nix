@@ -7,6 +7,7 @@
     };
 
     windowManager = {
+      # Backup in case wayland isn't sufficient
       i3 = {
 	enable = true;
 	package = pkgs.i3-gaps;
