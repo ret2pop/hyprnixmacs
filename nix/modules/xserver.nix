@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 {
   services.xserver = {
     enable = lib.mkDefault true;
@@ -8,8 +8,8 @@
 
     windowManager = {
       i3 = {
-        enable = true;
-        package = pkgs.i3-gaps;
+	enable = true;
+	package = pkgs.i3-gaps;
       };
     };
 
@@ -23,6 +23,6 @@
       options = "caps:escape";
     };
 
-    videoDrivers = [];
+    videoDrivers = (if config.monorepo.profiles.cuda.enable then [ "nvidia" ] else []);
   };
 }

@@ -29,44 +29,53 @@
   outputs = { nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, ... }@attrs: {
     nixosConfigurations = {
       installer = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          (
-            { pkgs, modulesPath, ... }:
-            {
-              imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
-            }
-          )
-          ./systems/installer/default.nix
-        ];
+	system = "x86_64-linux";
+	modules = [
+	  (
+	    { pkgs, modulesPath, ... }:
+	    {
+	      imports = [ (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix") ];
+	    }
+	  )
+	  ./systems/installer/default.nix
+	];
       };
 
       continuity = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = attrs;
-        modules = [
-          lanzaboote.nixosModules.lanzaboote
-          disko.nixosModules.disko
-          home-manager.nixosModules.home-manager
-          sops-nix.nixosModules.sops
-          { nixpkgs.overlays = [ nur.overlays.default ]; }
-          { home-manager.extraSpecialArgs = attrs; }
+	system = "x86_64-linux";
+	specialArgs = attrs;
+	modules = [
+	  lanzaboote.nixosModules.lanzaboote
+	  disko.nixosModules.disko
+	  home-manager.nixosModules.home-manager
+	  sops-nix.nixosModules.sops
+	  { nixpkgs.overlays = [ nur.overlays.default ]; }
+	  { home-manager.extraSpecialArgs = attrs; }
 
-          ./modules/sda-simple.nix
-          ./systems/continuity/default.nix
-        ];
-      };
-
-      spontaneity = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = attrs;
-        modules = [];
+	  ./modules/sda-simple.nix
+	  ./systems/continuity/default.nix
+	];
       };
 
       affinity = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = attrs;
-        modules = [];
+	system = "x86_64-linux";
+	specialArgs = attrs;
+	modules = [
+	  lanzaboote.nixosModules.lanzaboote
+	  disko.nixosModules.disko
+	  home-manager.nixosModules.home-manager
+	  sops-nix.nixosModules.sops
+	  { nixpkgs.overlays = [ nur.overlays.default ]; }
+	  { home-manager.extraSpecialArgs = attrs; }
+	  ./modules/nvme-simple.nix
+	  ./systems/affinity/default.nix
+	];
+      };
+
+      spontaneity = nixpkgs.lib.nixosSystem {
+	system = "x86_64-linux";
+	specialArgs = attrs;
+	modules = [];
       };
     };
   };

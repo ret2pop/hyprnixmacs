@@ -6,6 +6,14 @@
     ./pipewire.nix
     ./tor.nix
     ./kubo.nix
+    ./nvidia.nix
+    ./cuda.nix
+    ./nginx.nix
+    ./git-daemon.nix
+    ./postfix.nix
+    ./dovecot.nix
+    ./ollama.nix
+    ./i2pd.nix
   ];
 
   documentation = {
@@ -17,9 +25,9 @@
   environment = {
     etc = {
       securetty.text = ''
-          # /etc/securetty: list of terminals on which root is allowed to login.
-          # See securetty(5) and login(1).
-          '';
+	  # /etc/securetty: list of terminals on which root is allowed to login.
+	  # See securetty(5) and login(1).
+	  '';
     };
   };
 
@@ -30,9 +38,9 @@
       "restricthome"."/home/*".Z.mode = "~0700";
 
       "restrictetcnixos"."/etc/nixos/*".Z = {
-        mode = "0000";
-        user = "root";
-        group = "root";
+	mode = "0000";
+	user = "root";
+	group = "root";
       };
     };
   };
@@ -43,15 +51,15 @@
 
     initrd = {
       availableKernelModules = [
-        "xhci_pci"
-        "ahci"
-        "usb_storage"
-        "sd_mod"
-        "nvme"
-        "sd_mod"
-        "ehci_pci"
-        "rtsx_pci_sdmmc"
-        "usbhid"
+	"xhci_pci"
+	"ahci"
+	"usb_storage"
+	"sd_mod"
+	"nvme"
+	"sd_mod"
+	"ehci_pci"
+	"rtsx_pci_sdmmc"
+	"usbhid"
       ];
 
       kernelModules = [ ];
@@ -66,7 +74,7 @@
       systemd-boot.enable = lib.mkForce (! config.monorepo.profiles.secureBoot.enable);
       efi.canTouchEfiVariables = true;
     };
-    
+
     kernelModules = [
       "snd-seq"
       "snd-rawmidi"
@@ -209,9 +217,9 @@
     udev = {
       extraRules = '''';
       packages = with pkgs; [ 
-        platformio-core
-        platformio-core.udev
-        openocd
+	platformio-core
+	platformio-core.udev
+	openocd
       ];
     };
 
@@ -281,12 +289,17 @@
     vim
     curl
   ];
-  
+
   users.users = {
     root.openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINSshvS1N/42pH9Unp3Zj4gjqs9BXoin99oaFWYHXZDJ preston@preston-arch"
     ];
 
+    git = {
+      isSystemUser = true;
+      home = "/srv/git";
+      shell = "${pkgs.git}/bin/git-shell";
+    };
     "${config.monorepo.vars.userName}" = {
       initialPassword = "${config.monorepo.vars.userName}";
       isNormalUser = true;

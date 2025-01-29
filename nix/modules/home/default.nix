@@ -39,117 +39,134 @@
       crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
       art.enable = lib.mkEnableOption "Enables various art programs";
       music.enable = lib.mkEnableOption "Enables mpd";
+      workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
 
       hyprland = {
-        enable = lib.mkEnableOption "Enables hyprland";
-        monitors = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          default = [
-            "HDMI-A-1"
-            "eDP-1"
-            "DP-2"
-            "DP-3"
-            "LVDS-1"
-          ];
-          example = [];
-          description = "Hyprland monitors";
-        };
+	      enable = lib.mkEnableOption "Enables hyprland";
+	      monitors = lib.mkOption {
+		      type = lib.types.listOf lib.types.str;
+		      default = [
+			"HDMI-A-1"
+			"eDP-1"
+			"DP-2"
+			"DP-3"
+			"LVDS-1"
+		      ];
+		      example = [];
+		      description = "Hyprland monitors";
+	      };
       };
       email = {
-        email = lib.mkOption {
-          type = lib.types.str;
-          default = "ret2pop@gmail.com";
-          example = "john@example.com";
-          description = "Email address and imaps/smtps account";
-        };
-        imapsServer = lib.mkOption {
-          type = lib.types.str;
-          default = "imap.gmail.com";
-          example = "imap.example.com";
-          description = "imaps server address";
-        };
-        smtpsServer = lib.mkOption {
-          type = lib.types.str;
-          default = "smtp.gmail.com";
-          example = "smtp.example.com";
-          description = "smtp server address";
-        };
-        enable = lib.mkEnableOption "Enables email";
+	      email = lib.mkOption {
+		      type = lib.types.str;
+		      default = "ret2pop@gmail.com";
+		      example = "john@example.com";
+		      description = "Email address and imaps/smtps account";
+	      };
+	      imapsServer = lib.mkOption {
+		      type = lib.types.str;
+		      default = "imap.gmail.com";
+		      example = "imap.example.com";
+		      description = "imaps server address";
+	      };
+	      smtpsServer = lib.mkOption {
+		      type = lib.types.str;
+		      default = "smtp.gmail.com";
+		      example = "smtp.example.com";
+		      description = "smtp server address";
+	      };
+	      enable = lib.mkEnableOption "Enables email";
       };
     };
   };
 
   config = {
     home.packages = (if config.monorepo.profiles.email.enable then [ pkgs.mu ] else [])
-                    ++
-                    (if config.monorepo.profiles.lang-c.enable then (with pkgs; [
-                      autobuild
-                      clang
-                      gdb
-                      gnumake
-                      bear
-                      clang-tools
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-js.enable then (with pkgs; [
-                      nodejs
-                      bun
-                      yarn
-                      typescript
-                      vscode-langservers-extracted
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-rust.enable then (with pkgs; [
-                      cargo
-                      rust-analyzer
-                      rustfmt
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
-                      poetry
-                      python3
-                      python312Packages.jedi
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-sol.enable then (with pkgs; [
-                      solc
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-openscad.enable then (with pkgs; [
-                      openscad
-                      openscad-lsp
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-sh.enable then (with pkgs; [
-                      bash-language-server
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
-                      coq
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
-                      nil
-                      nixd
-                      nixfmt-rfc-style
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.crypto.enable then (with pkgs; [
-                      bitcoin
-                      electrum
-                      monero-cli
-                      monero-gui
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.art.enable then (with pkgs; [
-                      inkscape
-                      krita
-                    ]) else [])
-                    ++
-                    (if config.monorepo.profiles.music.enable then (with pkgs; [
-                      mpc-cli
-                      sox
-                    ]) else []);
+					    ++
+					    (if config.monorepo.profiles.lang-c.enable then (with pkgs; [
+					      autobuild
+					      clang
+					      gdb
+					      gnumake
+					      bear
+					      clang-tools
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-js.enable then (with pkgs; [
+					      nodejs
+					      bun
+					      yarn
+					      typescript
+					      vscode-langservers-extracted
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-rust.enable then (with pkgs; [
+					      cargo
+					      rust-analyzer
+					      rustfmt
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
+					      poetry
+					      python3
+					      python312Packages.jedi
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-sol.enable then (with pkgs; [
+					      solc
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-openscad.enable then (with pkgs; [
+					      openscad
+					      openscad-lsp
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-sh.enable then (with pkgs; [
+					      bash-language-server
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
+					      coq
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
+					      nil
+					      nixd
+					      nixfmt-rfc-style
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.crypto.enable then (with pkgs; [
+					      bitcoin
+					      electrum
+					      monero-cli
+					      monero-gui
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.art.enable then (with pkgs; [
+					      inkscape
+					      krita
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.music.enable then (with pkgs; [
+					      mpc-cli
+					      sox
+					    ]) else [])
+					    ++
+					    (if config.monorepo.profiles.workstation.enable then (with pkgs; [
+		      alsa-utils
+		      alsa-scarlett-gui
+				  ardour
+				  audacity
+					blender
+		      fluidsynth
+		      qjackctl
+		      qsynth
+		      qpwgraph
+		      imagemagick
+		      inkscape
+		      kdenlive
+		      kicad
+					    ]) else []);
 
     monorepo.profiles = {
       enable = lib.mkDefault true;
@@ -170,6 +187,7 @@
 
       crypto.enable = lib.mkDefault true;
       art.enable = lib.mkDefault true;
+      workstation.enable = lib.mkDefault true;
     };
   };
 }
