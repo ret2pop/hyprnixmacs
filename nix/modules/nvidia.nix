@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 {
   hardware = {
-    opengl.extraPackages = with pkgs; [
+    graphics.extraPackages = with pkgs; [
       vaapiVdpau
       libvdpau-va-gl
       nvidia-vaapi-driver

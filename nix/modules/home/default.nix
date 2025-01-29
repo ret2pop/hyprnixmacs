@@ -40,6 +40,7 @@
       art.enable = lib.mkEnableOption "Enables various art programs";
       music.enable = lib.mkEnableOption "Enables mpd";
       workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
+      cuda.enable = lib.mkEnableOption "Enables CUDA user package builds";
 
       hyprland = {
 	      enable = lib.mkEnableOption "Enables hyprland";
