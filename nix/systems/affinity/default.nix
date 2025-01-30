@@ -5,8 +5,8 @@
   ];
   config.monorepo = {
     profiles = {
-      server.enable = true;
-      cuda.enable = true;
+	server.enable = true;
+	cuda.enable = true;
     };
     vars.hostName = "affinity";
   };

@@ -8,36 +8,36 @@
 
   options = {
     monorepo = {
-      profiles = {
-	      cuda.enable = lib.mkEnableOption "Enables CUDA support";
-	      documentation.enable = lib.mkEnableOption "Enables documentation on system.";
-	      secureBoot.enable = lib.mkEnableOption "Enables secure boot. See sbctl.";
-	      pipewire.enable = lib.mkEnableOption "Enables pipewire low latency audio setup";
-	      tor.enable = lib.mkEnableOption "Enables tor along with torsocks";
-	      home.enable = lib.mkEnableOption "Enables home user";
-	      server.enable = lib.mkEnableOption "Enables server services";
-      };
+	profiles = {
+		cuda.enable = lib.mkEnableOption "Enables CUDA support";
+		documentation.enable = lib.mkEnableOption "Enables documentation on system.";
+		secureBoot.enable = lib.mkEnableOption "Enables secure boot. See sbctl.";
+		pipewire.enable = lib.mkEnableOption "Enables pipewire low latency audio setup";
+		tor.enable = lib.mkEnableOption "Enables tor along with torsocks";
+		home.enable = lib.mkEnableOption "Enables home user";
+		server.enable = lib.mkEnableOption "Enables server services";
+	};
     };
   };
 
   config = {
     home-manager.users."${config.monorepo.vars.userName}" = {
-      programs.home-manager.enable = config.monorepo.profiles.home.enable;
+	programs.home-manager.enable = config.monorepo.profiles.home.enable;
     };
 
     environment.systemPackages = lib.mkIf config.monorepo.profiles.documentation.enable (with pkgs; [
-      linux-manual
-      man-pages
-      man-pages-posix
+	linux-manual
+	man-pages
+	man-pages-posix
     ]);
 
     monorepo = {
-      profiles = {
-	      documentation.enable = lib.mkDefault true;
-	      pipewire.enable = lib.mkDefault true;
-	      tor.enable = lib.mkDefault true;
-	      home.enable = lib.mkDefault true;
-      };
+	profiles = {
+		documentation.enable = lib.mkDefault true;
+		pipewire.enable = lib.mkDefault true;
+		tor.enable = lib.mkDefault true;
+		home.enable = lib.mkDefault true;
+	};
     };
   };
 }

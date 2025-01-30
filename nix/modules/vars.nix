@@ -50,6 +50,7 @@
         "eDP-1"
         "DP-2"
         "DP-3"
+        "DP-4"
         "LVDS-1"
       ];
       example = [];
