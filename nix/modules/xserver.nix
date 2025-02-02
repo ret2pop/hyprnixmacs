@@ -7,18 +7,10 @@
     };
 
     windowManager = {
-<<<<<<< Updated upstream
-      # Backup in case wayland isn't sufficient
-      i3 = {
-	enable = true;
-	package = pkgs.i3-gaps;
-      };
-=======
 	i3 = {
 	  enable = true;
 	  package = pkgs.i3-gaps;
 	};
->>>>>>> Stashed changes
     };
 
     desktopManager = {

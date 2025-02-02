@@ -27,7 +27,7 @@
       rb = "sudo nixos-rebuild switch --flake .#continuity";
       nfu = "cd ~/monorepo/nix && git add . && git commit -m \"new flake lock\" &&  nix flake update";
       usite
-      = "cd ~/monorepo/publish-org-roam-ui && bash local.sh && rm -rf ~/website_html/graph_view; cp -r ~/monorepo/publish-org-roam-ui/out ~/website_html/graph_view && rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${config.monorepo.vars.remoteHost}:/usr/share/nginx/ret2pop/";
+      = "cd ~/src/publish-org-roam-ui && bash local.sh && rm -rf ~/website_html/graph_view; cp -r ~/src/publish-org-roam-ui/out ~/website_html/graph_view && rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${config.monorepo.vars.remoteHost}:/usr/share/nginx/ret2pop/";
       sai = "eval \"$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519 && ssh-add -l";
       i3 = "exec ${pkgs.i3-gaps}/bin/i3";
     };
