@@ -181,7 +181,7 @@
 	# wifi.macAddress = "";
     };
     firewall = {
-	allowedTCPPorts = [ ];
+	allowedTCPPorts = [ 11434 ];
 	allowedUDPPorts = [ ];
     };
   };

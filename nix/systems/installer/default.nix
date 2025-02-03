@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 let
   commits = import ./commits.nix;
 in
@@ -9,15 +9,28 @@ in
       enable = true;
     };
     firewall = {
-      allowedTCPPorts = [ ];
+      allowedTCPPorts = [ 22 ];
       allowedUDPPorts = [ ];
     };
     wireless.enable = false;
+  };
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+    settings = {
+      PasswordAuthentication = true;
+      AllowUsers = null;
+      UseDns = true;
+      PermitRootLogin = lib.mkForce "prohibit-password";
+    };
   };
 
   users.extraUsers.root.password = "nixos";
   users.extraUsers.nixos.password = "nixos";
   users.users = {
+    root.openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+    ];
     nixos = {
       packages = with pkgs; [
         git
@@ -35,7 +48,7 @@ fi
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
 cd
 if [ ! -d "$HOME/monorepo/" ]; then
-  git clone --recurse-submodules https://git.nullring.xyz/monorepo.git
+  git clone https://git.nullring.xyz/monorepo.git
   cd monorepo
   git checkout "${commits.monorepoCommitHash}"
 fi
