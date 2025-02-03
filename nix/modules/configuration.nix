@@ -181,7 +181,7 @@
 	# wifi.macAddress = "";
     };
     firewall = {
-	allowedTCPPorts = [ 11434 ];
+	allowedTCPPorts = [ 22 11434 ];
 	allowedUDPPorts = [ ];
     };
   };
@@ -292,7 +292,7 @@
 
   users.users = {
     root.openssh.authorizedKeys.keys = [
-	"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINSshvS1N/42pH9Unp3Zj4gjqs9BXoin99oaFWYHXZDJ preston@preston-arch"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
     ];
 
     git = {

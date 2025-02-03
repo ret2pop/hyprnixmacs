@@ -75,7 +75,16 @@
 	    spontaneity = nixpkgs.lib.nixosSystem {
 	      system = "x86_64-linux";
 	      specialArgs = attrs;
-	      modules = [];
+	      modules = [
+	        lanzaboote.nixosModules.lanzaboote
+	        disko.nixosModules.disko
+	        home-manager.nixosModules.home-manager
+	        sops-nix.nixosModules.sops
+	        { nixpkgs.overlays = [ nur.overlays.default ]; }
+	        { home-manager.extraSpecialArgs = attrs; }
+          ./modules/vda-simple.nix
+          ./systems/spontaneity/default.nix
+        ];
 	    };
     };
   };

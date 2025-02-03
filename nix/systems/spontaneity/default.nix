@@ -1,10 +1,13 @@
-{ ... }:
+{ config, lib, ... }:
 {
   imports = [
     ../../modules/default.nix
   ];
-  monorepo = {
-    pipewire.enable = false;
-    home.enable = false;
+  config.monorepo = {
+    profiles = {
+      home.enable = false;
+      server.enable = true;
+    };
+    vars.hostName = "spontaneity";
   };
 }
