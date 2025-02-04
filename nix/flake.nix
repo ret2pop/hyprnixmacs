@@ -51,7 +51,6 @@
 	        sops-nix.nixosModules.sops
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
-
 	        ./systems/continuity/default.nix
 	      ];
 	    };
@@ -66,7 +65,6 @@
 	        sops-nix.nixosModules.sops
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
-
 	        ./systems/affinity/default.nix
 	      ];
 	    };

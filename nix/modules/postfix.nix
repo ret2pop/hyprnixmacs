@@ -1,7 +1,7 @@
 { config, lib, ... }:
 {
   services.postfix = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.server.enable;
     config = {
     };
   };

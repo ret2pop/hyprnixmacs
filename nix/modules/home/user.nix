@@ -26,6 +26,7 @@
     packages = with pkgs; [
       # wikipedia
       kiwix kiwix-tools
+
       # passwords
       age sops
 
@@ -64,6 +65,7 @@
       acpilight
       pfetch
       libnotify
+      htop
     ];
   };
 

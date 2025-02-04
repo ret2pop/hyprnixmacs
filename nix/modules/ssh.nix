@@ -5,7 +5,7 @@
     settings = {
       PasswordAuthentication = true;
       AllowUsers = [ config.monorepo.vars.userName ];
-      PermitRootLogin = "no";
+      PermitRootLogin = "prohibit-password";
       KbdInteractiveAuthentication = false;
     };
   };
