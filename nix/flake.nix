@@ -52,7 +52,6 @@
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
 
-	        ./modules/sda-simple.nix
 	        ./systems/continuity/default.nix
 	      ];
 	    };
@@ -67,7 +66,7 @@
 	        sops-nix.nixosModules.sops
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
-	        ./modules/nvme-simple.nix
+
 	        ./systems/affinity/default.nix
 	      ];
 	    };
@@ -82,7 +81,6 @@
 	        sops-nix.nixosModules.sops
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
-          ./modules/vda-simple.nix
           ./systems/spontaneity/default.nix
         ];
 	    };

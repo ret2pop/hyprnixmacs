@@ -2,6 +2,8 @@
 {
   imports = [
     ../../modules/default.nix
+    ../../modules/home/home.nix
+    ../../modules/nvme-simple.nix
   ];
   config.monorepo = {
     profiles = {

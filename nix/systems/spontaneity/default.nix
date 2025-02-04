@@ -2,11 +2,12 @@
 {
   imports = [
     ../../modules/default.nix
+    ../../modules/vda-simple.nix
   ];
   config.monorepo = {
     profiles = {
-      home.enable = false;
       server.enable = true;
+      home.enable = false;
     };
     vars.hostName = "spontaneity";
   };
