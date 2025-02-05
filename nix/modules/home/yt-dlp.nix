@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   programs.yt-dlp = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     settings = {
       embed-thumbnail = true;
       embed-subs = true;

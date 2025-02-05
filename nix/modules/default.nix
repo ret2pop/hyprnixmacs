@@ -16,6 +16,7 @@
 		    home.enable = lib.mkEnableOption "Enables home user";
 		    server.enable = lib.mkEnableOption "Enables server services";
         ttyonly.enable = lib.mkEnableOption "TTY only, no xserver";
+        grub.enable = lib.mkEnableOption "Enables grub instead of systemd-boot";
 	    };
     };
   };
@@ -26,6 +27,9 @@
 	    man-pages
 	    man-pages-posix
     ]);
+    boot.loader.grub = lib.mkIf config.monorepo.profiles.grub.enable {
+      enable = true;
+    };
 
     monorepo = {
 	    profiles = {

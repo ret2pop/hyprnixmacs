@@ -2,7 +2,7 @@
 {
   programs.emacs = 
     {
-      enable = true;
+      enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
       package = pkgs.emacs29-pgtk;
       extraConfig = ''
       (setq debug-on-error t)

@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   programs.kitty = {
-    enable = lib.mkDefault config.monorepo.profiles.hyprland.enable;
+    enable = lib.mkDefault (config.monorepo.profiles.hyprland.enable && config.monorepo.profiles.graphics.enable);
     settings = {
       enable_audio_bell = false;
       font_family = "Iosevka Nerd Font";

@@ -10,6 +10,7 @@
     profiles = {
       server.enable = true;
       ttyonly.enable = true;
+      grub.enable = true;
     };
     vars.hostName = "spontaneity";
   };

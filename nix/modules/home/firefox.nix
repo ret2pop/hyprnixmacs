@@ -1,7 +1,7 @@
 { lib, config, pkgs, ... }:
 {
   programs.firefox = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     policies = {
       EnableTrackingProtection = true;
       OfferToSaveLogins = false;

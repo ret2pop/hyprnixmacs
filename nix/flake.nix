@@ -79,6 +79,7 @@
 	        sops-nix.nixosModules.sops
 	        { nixpkgs.overlays = [ nur.overlays.default ]; }
 	        { home-manager.extraSpecialArgs = attrs; }
+          ./systems/spontaneity/hardware-configuration.nix
           ./systems/spontaneity/default.nix
         ];
 	    };

@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   services.gammastep = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     provider = "manual";
     latitude = 49.282730;
     longitude = -123.120735;

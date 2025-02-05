@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   programs.mpv = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     config = {
       profile = "gpu-hq";
       force-window = true;

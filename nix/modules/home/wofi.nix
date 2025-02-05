@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   programs.wofi = {
-    enable = true; 
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     settings = {
       location = "bottom-right";
       allow_markup = true;

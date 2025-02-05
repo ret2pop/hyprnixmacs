@@ -71,8 +71,8 @@
     };
 
     loader = {
-	    systemd-boot.enable = lib.mkForce (! config.monorepo.profiles.secureBoot.enable);
-	    efi.canTouchEfiVariables = true;
+	    systemd-boot.enable = lib.mkForce (! config.monorepo.profiles.grub.enable);
+	    efi.canTouchEfiVariables = lib.mkDefault (! config.monorepo.profiles.grub.enable);
     };
 
     kernelModules = [

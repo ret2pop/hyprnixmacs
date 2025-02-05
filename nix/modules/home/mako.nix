@@ -1,7 +1,7 @@
 { lib, config, sounds, ... }:
 {
   services.mako = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     backgroundColor = "#11111bf8";
     textColor = "#cdd6f4";
     borderColor = "#89b4faff";

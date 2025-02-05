@@ -23,7 +23,7 @@
     homeDirectory = "/home/${config.monorepo.vars.userName}";
     stateVersion = "24.11";
 
-    packages = with pkgs; [
+    packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
       # wikipedia
       kiwix kiwix-tools
 
@@ -49,11 +49,7 @@
       torsocks tor-browser
 
       # fonts
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-emoji
-      fira-code
-      font-awesome_6
+      noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6
       (aspellWithDicts
         (dicts: with dicts; [ en en-computers en-science ]))
       (nerdfonts.override { fonts = [ "Iosevka" ]; })
@@ -66,7 +62,20 @@
       pfetch
       libnotify
       htop
-    ];
+      (writeShellScriptBin "install_vps"
+        ''
+#!/bin/bash
+nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-config ./systems/spontaneity/hardware-configuration.nix --flake .#spontaneity --target-host "$1"
+        ''
+      )
+    ] else [
+      pfetch
+
+      # net
+      curl
+      torsocks
+      rsync
+    ]);
   };
 
   services = {
@@ -83,7 +92,7 @@
   programs.bash.enable = true;
 
   gtk = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     theme = null;
     iconTheme = null;
   };

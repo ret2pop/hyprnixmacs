@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   programs.git = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     userName = config.monorepo.vars.fullName;
     userEmail = config.monorepo.profiles.email.email;
     signing = {
