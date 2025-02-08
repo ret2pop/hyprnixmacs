@@ -4,16 +4,13 @@ let
     (config.lib.topology);
 in
 {
-  # Connect node1.lan -> node2.wan
   nodes = {
     spontaneity = {
       interfaces.wan.network = "remote";
     };
-
     installer = {
       interfaces.lan.network = "home";
     };
-
     affinity = {
       interfaces.lan = {
         network = "home";
@@ -45,7 +42,6 @@ in
       };
     };
   };
-
   networks = {
     home = {
       name = "Home Network";
