@@ -1,8 +1,12 @@
 { config, lib, ... }:
 {
   imports = [
+    # nixos-anywhere generates this file
+    ./hardware-configuration.nix
+
+    ../../disko/vda-simple.nix
+
     ../../modules/default.nix
-    ../../modules/vda-simple.nix
     ../home.nix
   ];
 
@@ -12,6 +16,5 @@
       ttyonly.enable = true;
       grub.enable = true;
     };
-    vars.hostName = "spontaneity";
   };
 }

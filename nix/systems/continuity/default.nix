@@ -2,7 +2,7 @@
 {
   imports = [
     ../../modules/default.nix
-    ../../modules/sda-simple.nix
+    ../../disko/sda-simple.nix
     ../home.nix
   ];
 }

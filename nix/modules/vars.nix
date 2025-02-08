@@ -1,13 +1,6 @@
 { lib, ... }:
 {
   options.monorepo.vars = {
-    hostName = lib.mkOption {
-      type = lib.types.str;
-      default = "continuity";
-      example = "hostname";
-      description = "system hostname";
-    };
-
     userName = lib.mkOption {
       type = lib.types.str;
       default = "preston";

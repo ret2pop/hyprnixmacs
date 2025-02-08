@@ -17,6 +17,7 @@
 		    server.enable = lib.mkEnableOption "Enables server services";
         ttyonly.enable = lib.mkEnableOption "TTY only, no xserver";
         grub.enable = lib.mkEnableOption "Enables grub instead of systemd-boot";
+        workstation.enable = lib.mkEnableOption "Enables workstation services";
 	    };
     };
   };

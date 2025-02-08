@@ -1,10 +1,13 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, modulesPath, ... }:
 let
   commits = import ./commits.nix;
 in
 {
+  imports = [
+    (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
+  ];
+
   networking = {
-    hostName = "nixos";
     networkmanager = {
       enable = true;
     };
@@ -40,6 +43,9 @@ in
           ''
 #!/usr/bin/env bash
 
+SYSTEM=continuity
+DRIVE=sda
+
 set -euo pipefail
 if [ "$(id -u)" -eq 0 ]; then
   echo "ERROR! $(basename "$0") should be run as a regular user"
@@ -52,10 +58,10 @@ if [ ! -d "$HOME/monorepo/" ]; then
   cd monorepo
   git checkout "${commits.monorepoCommitHash}"
 fi
-vim "$HOME/monorepo/nix/systems/continuity/default.nix"
-sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/modules/sda-simple.nix"
+vim "$HOME/monorepo/nix/systems/$SYSTEM/default.nix"
+sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/disko/$DRIVE-simple.nix"
 cd /mnt
-sudo nixos-install --flake $HOME/monorepo/nix#continuity
+sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
 sudo cp -r $HOME/monorepo "/mnt/home/$(ls /mnt/home/)/"
 echo "rebooting..."; sleep 3; reboot
 '')

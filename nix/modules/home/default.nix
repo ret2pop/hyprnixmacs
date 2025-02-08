@@ -42,23 +42,8 @@
 	    music.enable = lib.mkEnableOption "Enables mpd";
 	    workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
 	    cuda.enable = lib.mkEnableOption "Enables CUDA user package builds";
+	    hyprland.enable = lib.mkEnableOption "Enables hyprland";
 
-	    hyprland = {
-		    enable = lib.mkEnableOption "Enables hyprland";
-		    monitors = lib.mkOption {
-			    type = lib.types.listOf lib.types.str;
-			    default = [
-			      "HDMI-A-1"
-			      "eDP-1"
-			      "DP-2"
-			      "DP-3"
-			      "LVDS-1"
-            "DP-4"
-			    ];
-			    example = [];
-			    description = "Hyprland monitors";
-		    };
-	    };
 	    email = {
 		    email = lib.mkOption {
 			    type = lib.types.str;

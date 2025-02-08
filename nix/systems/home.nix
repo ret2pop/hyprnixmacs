@@ -6,6 +6,6 @@
     ];
     useGlobalPkgs = true;
     useUserPackages = true;
-    users."${config.monorepo.vars.userName}" = import (./. + "/${config.monorepo.vars.hostName}/home.nix");
+    users."${config.monorepo.vars.userName}" = import (./. + "/${config.networking.hostName}/home.nix");
   };
 }

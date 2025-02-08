@@ -1,7 +1,7 @@
-{ config, services, ... }:
+{ config, lib, services, ... }:
 {
   services.nginx = {
-    enable = true;
+    enable = lib.mkDefault config.monorepo.profiles.server.enable;
 
     # Use recommended settings
     recommendedGzipSettings = true;

@@ -62,12 +62,17 @@
       pfetch
       libnotify
       htop
-      (writeShellScriptBin "install_vps"
+      (writeShellScriptBin "remote-build"
+        ''
+#!/bin/bash
+nixos-rebuild --target-host "$1" switch --flake .#spontaneity
+''
+      )
+      (writeShellScriptBin "install-vps"
         ''
 #!/bin/bash
 nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-config ./systems/spontaneity/hardware-configuration.nix --flake .#spontaneity --target-host "$1"
-        ''
-      )
+        '')
     ] else [
       pfetch
 

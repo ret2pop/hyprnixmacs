@@ -7,6 +7,12 @@
     systemd.enable = true;
     settings = {
       "$mod" = "SUPER";
+      bezier = [
+        "overshot,0,1,0,0.95"
+      ];
+      animation = [
+        "workspaces, 1, 10, overshot"
+      ];
       exec-once = [
         "waybar"
         "swww-daemon --format xrgb"
