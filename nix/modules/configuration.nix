@@ -310,6 +310,10 @@
     };
   };
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "olm-3.2.16"
+  ];
+
   nix.settings.experimental-features = "nix-command flakes";
   time.timeZone = config.monorepo.vars.timeZone;
   i18n.defaultLocale = "en_CA.UTF-8";

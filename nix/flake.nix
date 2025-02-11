@@ -53,11 +53,6 @@
           ];
         };
       });
-
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ nix-topology.overlays.default ];
-      };
     in {
       nixosConfigurations = builtins.listToAttrs (mkConfigs [
         "affinity"
@@ -67,7 +62,10 @@
       ]);
 
       topology."${system}" = import nix-topology {
-        inherit pkgs;
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ nix-topology.overlays.default ];
+        };
         modules = [
           ./topology/default.nix
           { nixosConfigurations = self.nixosConfigurations; }

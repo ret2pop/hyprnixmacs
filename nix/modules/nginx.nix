@@ -37,11 +37,11 @@
 '';
 
     virtualHosts = {
-	"ret2pop.net" = {
-	  # addSSL = true;
-	  # enableACME = true;
-	  root = "/home/preston/ret2pop-website/";
-	};
+	    "ret2pop.nullring.xyz" = {
+	      # addSSL = true;
+	      # enableACME = true;
+	      root = "/home/preston/ret2pop-website/";
+	    };
     };
   };
 }

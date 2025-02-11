@@ -20,6 +20,7 @@
     ./mpd.nix
     ./mako.nix
     ./user.nix
+    ./pantalaimon.nix
   ];
 
   options = {
