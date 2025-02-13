@@ -17,4 +17,8 @@
       grub.enable = true;
     };
   };
+  config.networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
 }

@@ -2,7 +2,7 @@
 {
   services.nginx = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
-
+    user = "nginx";
     # Use recommended settings
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
@@ -10,37 +10,58 @@
     recommendedTlsSettings = true;
 
     # Only allow PFS-enabled ciphers with AES256
-    sslCiphers = "AES256+EECDH:AES256+EDH:!aNULL";
+    # sslCiphers = "AES256+EECDH:AES256+EDH:!aNULL";
 
-    appendHttpConfig = ''
-  # Add HSTS header with preloading to HTTPS requests.
-  # Adding this header to HTTP requests is discouraged
-  map $scheme $hsts_header {
-	https   "max-age=31536000; includeSubdomains; preload";
-  }
-  add_header Strict-Transport-Security $hsts_header;
+    appendHttpConfig = '''';
 
-  # Enable CSP for your services.
-  #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
-
-  # Minimize information leaked to other domains
-  add_header 'Referrer-Policy' 'origin-when-cross-origin';
-
-  # Disable embedding as a frame
-  add_header X-Frame-Options DENY;
-
-  # Prevent injection of code in other mime types (XSS Attacks)
-  add_header X-Content-Type-Options nosniff;
-
-  # This might create errors
-  proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
-'';
+    gitweb = {
+      enable = true;
+      virtualHost = "ret2pop.net";
+    };
 
     virtualHosts = {
-	    "ret2pop.nullring.xyz" = {
-	      # addSSL = true;
-	      # enableACME = true;
-	      root = "/home/preston/ret2pop-website/";
+      "matrix.ret2pop.net" = {
+        enableACME = true;
+        forceSSL = true;
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = 443;
+            ssl = true;
+          }
+          {
+            addr = "[::]";
+            port = 443;
+            ssl = true;
+          }          {
+            addr = "0.0.0.0";
+            port = 8448;
+            ssl = true;
+          }
+          {
+            addr = "[::]";
+            port = 8448;
+            ssl = true;
+          }
+        ];
+        locations."/_matrix/" = {
+          proxyPass = "http://127.0.0.1:6167";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_buffers 32 16k;
+            proxy_read_timeout 5m;
+          '';
+        };
+
+        extraConfig = ''
+          merge_slashes off;
+        '';
+      };
+	    "ret2pop.net" = {
+        serverName = "ret2pop.net";
+	      root = "/var/www/ret2pop-website/";
+	      addSSL = true;
+	      enableACME = true;
 	    };
     };
   };

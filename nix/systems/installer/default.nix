@@ -21,7 +21,7 @@ in
     enable = true;
     ports = [ 22 ];
     settings = {
-      PasswordAuthentication = true;
+      PasswordAuthentication = false;
       AllowUsers = null;
       UseDns = true;
       PermitRootLogin = lib.mkForce "prohibit-password";

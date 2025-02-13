@@ -65,7 +65,8 @@
       (writeShellScriptBin "remote-build"
         ''
 #!/bin/bash
-nixos-rebuild --target-host "$1" switch --flake .#spontaneity
+cd ~/monorepo/nix
+nixos-rebuild --use-remote-sudo --target-host "$1" switch --flake .#spontaneity
 ''
       )
       (writeShellScriptBin "install-vps"

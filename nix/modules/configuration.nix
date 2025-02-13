@@ -14,6 +14,8 @@
     ./dovecot.nix
     ./ollama.nix
     ./i2pd.nix
+    ./gitweb.nix
+    ./conduit.nix
   ];
 
   documentation = {
@@ -241,6 +243,10 @@
   };
 
   security = {
+    acme = {
+      acceptTerms = true;
+      defaults.email = "ret2pop@gmail.com";
+    };
     apparmor = {
   	  enable = true;
   	  killUnconfinedConfinables = true;
@@ -280,16 +286,39 @@
     config.common.default = "*";
   };
 
+  environment.etc."gitconfig".text = ''
+  [init]
+  defaultBranch = main
+  '';
+  environment.extraInit = ''
+  umask 0022
+  '';
   environment.systemPackages = with pkgs; [
     restic
     sbctl
     git
     vim
     curl
+    nmap
+    (writeShellScriptBin "new-repo"
+      ''
+  #!/bin/bash
+  cd /srv/git
+  git init --bare "$1"
+  vim "$1/description"
+  chown -R git:git "$1"
+  ''
+    )
   ];
 
-  users.groups.git = {};
+  users.groups.nginx = lib.mkDefault {};
+  users.groups.git = lib.mkDefault {};
   users.users = {
+    nginx.group = "nginx";
+    nginx.isSystemUser = lib.mkDefault true;
+    nginx.extraGroups = [
+      "acme"
+    ];
     root.openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
     ];
@@ -299,8 +328,14 @@
   	  home = "/srv/git";
   	  shell = "${pkgs.git}/bin/git-shell";
       group = "git";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+      ];
     };
     "${config.monorepo.vars.userName}" = {
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+      ];
   	  initialPassword = "${config.monorepo.vars.userName}";
   	  isNormalUser = true;
   	  description = config.monorepo.vars.fullName;
@@ -314,7 +349,12 @@
     "olm-3.2.16"
   ];
 
-  nix.settings.experimental-features = "nix-command flakes";
+  nix = {
+    settings = {
+      experimental-features = "nix-command flakes";
+      trusted-users = [ "@wheel" ];
+    };
+  };
   time.timeZone = config.monorepo.vars.timeZone;
   i18n.defaultLocale = "en_CA.UTF-8";
   system.stateVersion = "24.11";

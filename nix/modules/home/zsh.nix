@@ -3,7 +3,7 @@
   programs.zsh = {
     enable = true;
     initExtra = ''
-    umask 0077
+    umask 0022
     export EXTRA_CCFLAGS="-I/usr/include"
     source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
     export QT_QPA_PLATFORM="wayland"
