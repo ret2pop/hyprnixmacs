@@ -24,7 +24,7 @@
 
     remoteHost = lib.mkOption {
       type = lib.types.str;
-      default = "nullring.xyz";
+      default = "ret2pop.net";
       example = "example.com";
       description = "Address to push to and pull from for website and git repos";
     };

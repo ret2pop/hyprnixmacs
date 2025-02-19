@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "monorepo"
+version = "0.1.0"
+description = "My Monorepo"
+authors = ["Preston Pan <ret2pop@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+octodns-cloudflare = "^0.0.9"
+octodns-bind = "^0.0.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

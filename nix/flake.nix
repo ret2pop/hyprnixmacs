@@ -24,15 +24,25 @@
 	    url = "github:nix-community/lanzaboote/v0.4.1";
 	    inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-dns = {
+      url = "github:Janik-Haag/nixos-dns";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, nix-topology, ... }@attrs:
+  outputs = { self, nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, nix-topology, nixos-dns, ... }@attrs:
     let
       system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
+      generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
+      dnsConfig = {
+        inherit (self) nixosConfigurations;
+        extraConfig = import ./dns/default.nix;
+      };
       mkConfigs = map (hostname: {
         name = "${hostname}";
         value = nixpkgs.lib.nixosSystem {
-          system = system;
+          inherit system;
           specialArgs = attrs;
           modules = if (hostname == "installer") then [
             (./. + "/systems/${hostname}/default.nix")
@@ -44,6 +54,7 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+            nixos-dns.nixosModules.dns
             {
               nixpkgs.overlays = [ nur.overlays.default ];
               home-manager.extraSpecialArgs = attrs;
@@ -70,6 +81,39 @@
           ./topology/default.nix
           { nixosConfigurations = self.nixosConfigurations; }
         ];
+      };
+
+      devShell."${system}" = with pkgs; mkShell {
+        buildInputs = [
+          fira-code
+          python3
+          poetry
+        ];
+        shellHook = ''
+poetry shell
+        '';
+      };
+
+      packages."${system}" = {
+        zoneFiles = generate.zoneFiles dnsConfig;
+        octodns = generate.octodnsConfig {
+          inherit dnsConfig;
+          
+          config = {
+            providers = {
+              cloudflare = {
+                class = "octodns_cloudflare.CloudflareProvider";
+                token = "env/CLOUDFLARE_TOKEN";
+              };
+              config = {
+                check_origin = false;
+              };
+            };
+          };
+          zones = {
+            "ret2pop.net." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
+          };
+        };
       };
     };
 }

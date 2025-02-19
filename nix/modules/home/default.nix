@@ -96,7 +96,7 @@
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
-						          poetry
+                      poetry
 						          python3
 						          python312Packages.jedi
 					          ]) else [])
@@ -122,6 +122,7 @@
 						          nil
 						          nixd
 						          nixfmt-rfc-style
+                      nix-prefetch-scripts
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.crypto.enable then (with pkgs; [

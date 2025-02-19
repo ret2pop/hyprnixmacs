@@ -16,11 +16,11 @@
 
     gitweb = {
       enable = true;
-      virtualHost = "ret2pop.net";
+      virtualHost = "${config.monorepo.vars.remoteHost}";
     };
 
     virtualHosts = {
-      "matrix.ret2pop.net" = {
+      "matrix.${config.monorepo.vars.remoteHost}" = {
         enableACME = true;
         forceSSL = true;
         listen = [
@@ -57,8 +57,8 @@
           merge_slashes off;
         '';
       };
-	    "ret2pop.net" = {
-        serverName = "ret2pop.net";
+	    "${config.monorepo.vars.remoteHost}" = {
+        serverName = "${config.monorepo.vars.remoteHost}";
 	      root = "/var/www/ret2pop-website/";
 	      addSSL = true;
 	      enableACME = true;

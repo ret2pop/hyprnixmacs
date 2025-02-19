@@ -9,6 +9,10 @@
       format = "yaml";
       path = "${config.sops.defaultSymlinkPath}/mail";
     };
+    secrets.cloudflare-dns = {
+      format = "yaml";
+      path = "${config.sops.defaultSymlinkPath}/cloudflare-dns";
+    };
     secrets.digikey = {
       format = "yaml";
       path = "${config.sops.defaultSymlinkPath}/digikey";
