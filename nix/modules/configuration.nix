@@ -16,6 +16,7 @@
     ./i2pd.nix
     ./gitweb.nix
     ./conduit.nix
+    ./bitcoin.nix
   ];
 
   documentation = {

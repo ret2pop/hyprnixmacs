@@ -37,6 +37,7 @@
 	    lang-js.enable = lib.mkEnableOption "Enables javascript language support";
 	    lang-nix.enable = lib.mkEnableOption "Enables nix language support";
 	    lang-coq.enable = lib.mkEnableOption "Enables coq language support";
+	    lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
 
 	    crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
 	    art.enable = lib.mkEnableOption "Enables various art programs";
@@ -86,6 +87,7 @@
 						          bun
 						          yarn
 						          typescript
+                      typescript-language-server
 						          vscode-langservers-extracted
 					          ]) else [])
 					          ++
@@ -112,6 +114,12 @@
 					          ++
 					          (if config.monorepo.profiles.lang-sh.enable then (with pkgs; [
 						          bash-language-server
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-haskell.enable then (with pkgs; [
+                      haskell-language-server
+                      haskellPackages.hlint
+                      ghc
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
@@ -156,6 +164,7 @@
 			                inkscape
 			                kdenlive
 			                kicad
+                      reaper
 					          ]) else []);
 
     monorepo.profiles = {
@@ -175,6 +184,7 @@
 	    lang-js.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
 	    lang-nix.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
 	    lang-coq.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
+	    lang-haskell.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
 
 	    crypto.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
 	    art.enable = lib.mkDefault (true && config.monorepo.profiles.enable);

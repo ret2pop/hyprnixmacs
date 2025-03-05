@@ -37,6 +37,7 @@
         epkgs.general
         epkgs.gptel
         epkgs.gruvbox-theme
+        epkgs.haskell-mode
         epkgs.htmlize
         epkgs.irony-eldoc
         epkgs.ivy
@@ -45,6 +46,7 @@
         epkgs.latex-preview-pane
         epkgs.lsp-ivy
         epkgs.lsp-mode
+        epkgs.lsp-haskell
         epkgs.lyrics-fetcher
         epkgs.magit
         epkgs.magit-delta

@@ -19,6 +19,7 @@
       firewall.allowedTCPPorts = [
         80
         443
+        8448
       ];
       domains = {
         enable = true;

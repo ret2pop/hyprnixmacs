@@ -43,7 +43,7 @@
       pavucontrol alsa-utils imagemagick ffmpeg helvum
 
       # Net
-      curl rsync git
+      curl rsync git iamb
 
       # Tor
       torsocks tor-browser
