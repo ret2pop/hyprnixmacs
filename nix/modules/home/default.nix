@@ -81,7 +81,11 @@
 						          bear
 						          clang-tools
 					          ]) else [])
-					          ++
+                    ++
+                    (if config.monorepo.profiles.workstation.enable then (with pkgs; [
+                      open-webui
+                    ]) else [])
+                    ++
 					          (if config.monorepo.profiles.lang-js.enable then (with pkgs; [
 						          nodejs
 						          bun
@@ -165,6 +169,7 @@
 			                kdenlive
 			                kicad
                       reaper
+                      murmur
 					          ]) else []);
 
     monorepo.profiles = {

@@ -59,6 +59,7 @@
       };
 	    "${config.monorepo.vars.remoteHost}" = {
         serverName = "${config.monorepo.vars.remoteHost}";
+        serverAliases = [ "ret2pop.nullring.xyz" ];
 	      root = "/var/www/ret2pop-website/";
 	      addSSL = true;
 	      enableACME = true;

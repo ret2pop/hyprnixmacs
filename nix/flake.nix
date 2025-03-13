@@ -112,6 +112,7 @@ poetry shell
           };
           zones = {
             "ret2pop.net." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
+            "nullring.xyz." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
           };
         };
       };

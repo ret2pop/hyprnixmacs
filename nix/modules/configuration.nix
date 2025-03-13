@@ -17,6 +17,7 @@
     ./gitweb.nix
     ./conduit.nix
     ./bitcoin.nix
+    ./murmur.nix
   ];
 
   documentation = {
