@@ -24,6 +24,20 @@
         always_on       "yes" # prevent MPD from disconnecting all listeners when playback is stopped.
         tags            "yes" # httpd supports sending tags to listening streams.
       }
+audio_output {
+    type        "shout"
+    encoding    "ogg"
+    name        "my cool stream"
+    host        "localhost"
+    port        "8000"
+    mount       "/example.ogg"
+    user        "source"
+    password    "<source-password>"
+
+    bitrate     "64"
+    format      "44100:16:1"
+    description "Nullring public radio"
+}
     '';
   };
 }

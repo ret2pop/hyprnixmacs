@@ -19,7 +19,11 @@
       firewall.allowedTCPPorts = [
         80
         443
+        465
+        993
         8448
+        6697
+        6667
       ];
       domains = {
         enable = true;
@@ -29,26 +33,19 @@
             aaaa.data = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
           };
           "nullring.xyz" = {
-            a.data = "144.202.92.209";
-            aaaa.data = "2001:19f0:8000:1c38:5400:04ff:fecf:58cd";
+            a.data = "66.42.84.130";
+            aaaa.data = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
           };
         };
         subDomains = {
           "${config.monorepo.vars.remoteHost}" = {};
           "matrix.${config.monorepo.vars.remoteHost}" = {};
           "www.${config.monorepo.vars.remoteHost}" = {};
+          "mail.${config.monorepo.vars.remoteHost}" = {};
 
           "nullring.xyz" = {};
-          "git.nullring.xyz" = {};
-          "social.nullring.xyz" = {};
-          "talk.nullring.xyz" = {
-            a.data = "66.42.84.130";
-            aaaa.data = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
-          };
-          "ret2pop.nullring.xyz" = {
-            a.data = "66.42.84.130";
-            aaaa.data = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
-          };
+          "talk.nullring.xyz" = {};
+          "ret2pop.nullring.xyz" = {};
         };
       };
     };

@@ -27,6 +27,7 @@
 	    linux-manual
 	    man-pages
 	    man-pages-posix
+      iproute2
     ]);
     boot.loader.grub = lib.mkIf config.monorepo.profiles.grub.enable {
       enable = true;

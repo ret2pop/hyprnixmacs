@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 {
   imports = [
+    ./matterbridge.nix
     ./xserver.nix
     ./ssh.nix
     ./pipewire.nix
@@ -10,14 +11,14 @@
     ./cuda.nix
     ./nginx.nix
     ./git-daemon.nix
-    ./postfix.nix
-    ./dovecot.nix
     ./ollama.nix
     ./i2pd.nix
     ./gitweb.nix
     ./conduit.nix
     ./bitcoin.nix
     ./murmur.nix
+    ./ngircd.nix
+    ./znc.nix
   ];
 
   documentation = {
@@ -315,12 +316,28 @@
 
   users.groups.nginx = lib.mkDefault {};
   users.groups.git = lib.mkDefault {};
+  users.groups.ircd = lib.mkDefault {};
+
   users.users = {
-    nginx.group = "nginx";
-    nginx.isSystemUser = lib.mkDefault true;
-    nginx.extraGroups = [
-      "acme"
-    ];
+    ngircd = {
+      isSystemUser = lib.mkDefault true;
+      extraGroups = [ "acme" "nginx" ];
+    };
+
+    ircd = {
+      isSystemUser = lib.mkDefault true;
+      group = "ircd";
+      home = "/home/ircd";
+    };
+    
+    nginx = {
+      group = "nginx";
+      isSystemUser = lib.mkDefault true;
+      extraGroups = [
+        "acme"
+      ];
+    };
+
     root.openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
     ];

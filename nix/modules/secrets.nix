@@ -5,7 +5,6 @@
     age = {
       keyFile = "/home/${config.monorepo.vars.userName}/.ssh/keys.txt";
     };
-
     secrets = {
       mail = {
         format = "yaml";

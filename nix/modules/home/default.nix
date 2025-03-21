@@ -84,6 +84,7 @@
                     ++
                     (if config.monorepo.profiles.workstation.enable then (with pkgs; [
                       open-webui
+                      mumble
                     ]) else [])
                     ++
 					          (if config.monorepo.profiles.lang-js.enable then (with pkgs; [

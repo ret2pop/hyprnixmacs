@@ -8,10 +8,6 @@
     recommendedOptimisation = true;
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
-
-    # Only allow PFS-enabled ciphers with AES256
-    # sslCiphers = "AES256+EECDH:AES256+EDH:!aNULL";
-
     appendHttpConfig = '''';
 
     gitweb = {
@@ -64,6 +60,20 @@
 	      addSSL = true;
 	      enableACME = true;
 	    };
+
+      "nullring.xyz" = {
+        serverName = "nullring.xyz";
+        root = "/var/www/nullring/";
+        addSSL = true;
+        enableACME = true;
+      };
+
+      "mail.${config.monorepo.vars.remoteHost}" = {
+        serverName = "mail.${config.monorepo.vars.remoteHost}";
+        root = "/var/www/dummy";
+        addSSL = true;
+        enableACME = true;
+      };
     };
   };
 }

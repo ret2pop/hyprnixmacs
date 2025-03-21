@@ -1,0 +1,25 @@
+[matrix.mymatrix]
+Server="https://matrix.ret2pop.net"
+Login="bridge"
+Password="${MATTERBRIDGE_MATRIX_PASS}"
+RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+NoHomeServerSuffix=true
+
+[irc.myirc]
+Server="nullring.xyz:6697"
+Nick="bridge"
+RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+UseTLS=true
+SkipTLSVerify=true
+
+[[gateway]]
+name="gateway1"
+enable=true
+
+[[gateway.inout]]
+account="matrix.mymatrix"
+channel="!BQZli4UPBNC5w6ntXu:matrix.ret2pop.net"
+
+[[gateway.inout]]
+account="irc.myirc"
+channel="#nullring"
