@@ -22,8 +22,15 @@
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/dn42";
       };
+      znc = {
+        format = "yaml";
+        path = "${config.sops.defaultSymlinkPath}/znc";
+      };
+      matrix_bridge = {
+        format = "yaml";
+        path = "${config.sops.defaultSymlinkPath}/matrix_bridge";
+      };
     };
-
     defaultSymlinkPath = "/run/user/1000/secrets";
     defaultSecretsMountPoint = "/run/user/1000/secrets.d";
   };

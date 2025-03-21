@@ -317,10 +317,12 @@
   users.groups.nginx = lib.mkDefault {};
   users.groups.git = lib.mkDefault {};
   users.groups.ircd = lib.mkDefault {};
+  users.groups.ngircd = lib.mkDefault {};
 
   users.users = {
     ngircd = {
       isSystemUser = lib.mkDefault true;
+      group = "ngircd";
       extraGroups = [ "acme" "nginx" ];
     };
 

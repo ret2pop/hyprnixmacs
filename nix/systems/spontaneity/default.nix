@@ -44,7 +44,9 @@
           "mail.${config.monorepo.vars.remoteHost}" = {};
 
           "nullring.xyz" = {};
+          "matrix.nullring.xyz" = {};
           "talk.nullring.xyz" = {};
+          "mail.nullring.xyz" = {};
           "ret2pop.nullring.xyz" = {};
         };
       };
