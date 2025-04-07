@@ -2,7 +2,7 @@
   description = "Emacs centric configurations for a complete networked system";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nur.url = "github:nix-community/NUR";
     sops-nix.url = "github:Mic92/sops-nix";
     scripts.url = "github:ret2pop/scripts";
