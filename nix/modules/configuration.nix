@@ -193,7 +193,6 @@
     enableAllFirmware = true;
     cpu.intel.updateMicrocode = true;
     graphics.enable = ! config.monorepo.profiles.ttyonly.enable;
-    pulseaudio.enable = ! config.monorepo.profiles.pipewire.enable;
 
     bluetooth = {
   	  enable = true;
@@ -202,6 +201,7 @@
   };
 
   services = {
+    pulseaudio.enable = ! config.monorepo.profiles.pipewire.enable;
     chrony = {
   	  enable = true;
   	  enableNTS = true;

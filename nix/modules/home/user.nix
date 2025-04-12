@@ -49,10 +49,9 @@
       torsocks tor-browser
 
       # fonts
-      noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6
+      nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6
       (aspellWithDicts
         (dicts: with dicts; [ en en-computers en-science ]))
-      (nerdfonts.override { fonts = [ "Iosevka" ]; })
 
       # Misc.
       pinentry

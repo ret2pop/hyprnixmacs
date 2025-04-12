@@ -20,7 +20,6 @@
     ./mpd.nix
     ./mako.nix
     ./user.nix
-    ./pantalaimon.nix
   ];
 
   options = {
@@ -83,7 +82,6 @@
 					          ]) else [])
                     ++
                     (if config.monorepo.profiles.workstation.enable then (with pkgs; [
-                      open-webui
                       mumble
                     ]) else [])
                     ++
@@ -167,7 +165,7 @@
 			                qpwgraph
 			                imagemagick
 			                inkscape
-			                kdenlive
+			                kdePackages.kdenlive
 			                kicad
                       reaper
                       murmur

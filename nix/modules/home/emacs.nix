@@ -3,7 +3,7 @@
   programs.emacs = 
     {
       enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
-      package = pkgs.emacs30-pgtk;
+      package = pkgs.emacs-pgtk;
       extraConfig = ''
       (setq debug-on-error t)
       (org-babel-load-file
