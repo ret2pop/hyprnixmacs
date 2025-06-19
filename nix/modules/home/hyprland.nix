@@ -117,6 +117,10 @@
         };
         rounding = 5;
       };
+      device = {
+        name = "beken-usb-gaming-mouse-1";
+        sensitivity = -0.5;
+      };
       input = {
         kb_options = "caps:swapescape";
         repeat_delay = 300;
