@@ -2,7 +2,7 @@
 {
   programs.zsh = {
     enable = true;
-    initExtra = ''
+    initContent = ''
     umask 0022
     export EXTRA_CCFLAGS="-I/usr/include"
     source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh

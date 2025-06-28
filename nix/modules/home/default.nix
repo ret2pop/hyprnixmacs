@@ -159,15 +159,16 @@
 				              ardour
 				              audacity
 					            blender
+                      foxdot
 			                fluidsynth
 			                qjackctl
 			                qsynth
 			                qpwgraph
 			                imagemagick
+                      supercollider
 			                inkscape
 			                kdePackages.kdenlive
 			                kicad
-                      reaper
                       murmur
 					          ]) else []);
 

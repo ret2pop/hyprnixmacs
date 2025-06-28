@@ -156,6 +156,7 @@
   	  "kernel.kptr_restrict" = 2;
 
   	  # madaidan
+            "kernel.smtcontrol" = "on";
   	  "vm.swappiness" = 1;
   	  "vm.unprivileged_userfaultfd" = 0;
   	  "dev.tty.ldisc_autoload" = 0;
@@ -260,7 +261,7 @@
 
     lockKernelModules = true;
     protectKernelImage = true;
-    allowSimultaneousMultithreading = false;
+    allowSimultaneousMultithreading = true;
     forcePageTableIsolation = true;
 
     tpm2 = {

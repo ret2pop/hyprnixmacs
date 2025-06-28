@@ -37,7 +37,8 @@
       graphviz jq
 
       # Apps
-      octaveFull vesktop grim swww vim 
+      octaveFull
+      vesktop grim swww vim 
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
@@ -85,7 +86,7 @@ nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-
 
   services = {
     gpg-agent = {
-      pinentryPackage = pkgs.pinentry-emacs;
+      pinentry.package = pkgs.pinentry-emacs;
       enable = true;
       extraConfig = ''
       allow-emacs-pinentry
