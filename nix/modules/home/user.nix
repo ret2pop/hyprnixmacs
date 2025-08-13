@@ -38,7 +38,7 @@
 
       # Apps
       octaveFull
-      vesktop grim swww vim 
+      vesktop grim swww vim telegram-desktop
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
