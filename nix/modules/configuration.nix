@@ -19,6 +19,7 @@
     ./murmur.nix
     ./ngircd.nix
     ./znc.nix
+    ./docker.nix
   ];
 
   documentation = {
@@ -318,6 +319,7 @@
   users.groups.ngircd = lib.mkDefault {};
 
   users.users = {
+
     ngircd = {
       isSystemUser = lib.mkDefault true;
       group = "ngircd";
@@ -355,10 +357,11 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
       ];
+
   	  initialPassword = "${config.monorepo.vars.userName}";
   	  isNormalUser = true;
   	  description = config.monorepo.vars.fullName;
-  	  extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" ];
+  	  extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" "docker" ];
   	  shell = pkgs.zsh;
   	  packages = [];
     };
