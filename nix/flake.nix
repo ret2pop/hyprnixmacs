@@ -12,6 +12,9 @@
       url = "github:oddlama/nix-topology";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    deep-research = {
+      url = "github:ret2pop/ollama-deep-researcher";
+    };
     home-manager = {
 	    url = "github:nix-community/home-manager/release-25.05";
 	    inputs.nixpkgs.follows = "nixpkgs";
@@ -30,7 +33,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, nix-topology, nixos-dns, ... }@attrs:
+  outputs = { self, nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, nix-topology, nixos-dns, deep-research, ... }@attrs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
@@ -49,6 +52,11 @@
             { networking.hostName = "${hostname}"; }
             nix-topology.nixosModules.default
           ] else [
+            {
+              environment.systemPackages = with nixpkgs.lib; [
+                deep-research.packages.${system}.deep-research
+              ];
+            }
             nix-topology.nixosModules.default
             lanzaboote.nixosModules.lanzaboote
             disko.nixosModules.disko

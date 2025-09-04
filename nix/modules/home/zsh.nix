@@ -7,6 +7,7 @@
     export EXTRA_CCFLAGS="-I/usr/include"
     source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
     export QT_QPA_PLATFORM="wayland"
+    export OLLAMA_MODEL="qwen3:14b"
     '';
 
     localVariables = {
