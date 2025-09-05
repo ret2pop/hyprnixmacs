@@ -43,26 +43,81 @@ in
           ''
 #!/usr/bin/env bash
 
-SYSTEM=continuity
-DRIVE=sda
-
 set -euo pipefail
+
 if [ "$(id -u)" -eq 0 ]; then
   echo "ERROR! $(basename "$0") should be run as a regular user"
   exit 1
 fi
+
+if [ -z "$SYSTEM" ]; then
+    SYSTEM=continuity
+fi
+
+if [ -z "$DRIVE" ]; then
+    DRIVE=sda-simple
+fi
+
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
-cd
+
+cd "$HOME"
+
 if [ ! -d "$HOME/monorepo/" ]; then
   git clone https://git.nullring.xyz/monorepo.git
   cd monorepo
   git checkout "${commits.monorepoCommitHash}"
 fi
-vim "$HOME/monorepo/nix/systems/$SYSTEM/default.nix"
-sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/disko/$DRIVE-simple.nix"
+
+
+if [ ! -d "$HOME/monorepo/nix/systems/$SYSTEM" ]; then
+  mkdir -p "$HOME/monorepo/nix/systems/$SYSTEM"
+  cp "$HOME/monorepo/nix/systems/continuity/home.nix" "$HOME/monorepo/nix/systems/$SYSTEM/home.nix"
+  cat > "$HOME/monorepo/nix/systems/$SYSTEM/default.nix" <<EOF
+{ ... }:
+{
+  imports = [
+    ../../modules/default.nix
+    ../../disko/$DRIVE.nix
+    ../home.nix
+  ];
+}
+EOF
+
+  gum style --border normal --margin "1" --padding "1 2" "Edit the system default.nix with options."
+  gum input --placeholder "Press Enter to continue" >/dev/null
+  vim "$HOME/monorepo/nix/systems/$SYSTEM/default.nix"
+
+  sed -i "/mkConfigs \[/,/\]/ s/^\(\s*\)\]/\1  \"$SYSTEM\"\n\1]/" "$HOME/monorepo/nix/flake.nix"
+fi
+
+if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE.nix" ]; then
+  cp "$HOME/monorepo/nix/disko/sda-simple.nix" "$HOME/monorepo/nix/disko/$DRIVE.nix"
+  gum style --border normal --margin "1" --padding "1 2" "Edit the drive file with your preferred partitioning scheme."
+  gum input --placeholder "Press Enter to continue" >/dev/null
+  vim "$HOME/monorepo/nix/disko/$DRIVE.nix"
+fi
+
+cd "$HOME/monorepo" && git add . && cd "$HOME"
+
+gum style --border normal --margin "1" --padding "1 2" "Formatting the drive is destructive!"
+if gum confirm "Are you sure you want to continue?"; then
+    echo "Proceeding..."
+else
+    echo "Aborting."
+    exit 1
+fi
+
+sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/disko/$DRIVE.nix"
 cd /mnt
 sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
-sudo cp -r $HOME/monorepo "/mnt/home/$(ls /mnt/home/)/"
+
+target_user="$(ls /mnt/home | head -n1)"
+if [ -z "$target_user" ]; then
+    echo "No user directories found in /mnt/home"
+    exit 1
+fi
+sudo cp -r "$HOME/monorepo" "/mnt/home/$target_user/"
+
 echo "rebooting..."; sleep 3; reboot
 '')
       ];

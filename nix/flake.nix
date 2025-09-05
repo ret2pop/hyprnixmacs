@@ -73,6 +73,7 @@
         };
       });
     in {
+      # add new systems here
       nixosConfigurations = builtins.listToAttrs (mkConfigs [
         "affinity"
         "continuity"
