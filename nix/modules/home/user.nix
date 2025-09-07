@@ -104,5 +104,4 @@ nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-
   };
 
   fonts.fontconfig.enable = true;
-  nixpkgs.config.cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
 }

@@ -12,6 +12,7 @@
               type = "EF02";
             };
             root = {
+              label = "disk-main-root"; 
               size = "100%";
               content = {
                 type = "filesystem";

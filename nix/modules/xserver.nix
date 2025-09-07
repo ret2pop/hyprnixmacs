@@ -1,9 +1,9 @@
 { lib, config, pkgs, ... }:
 {
   services.xserver = {
-    enable = lib.mkDefault true;
+    enable = (! config.monorepo.profiles.ttyonly.enable);
     displayManager = {
-      startx.enable = true;
+      startx.enable = (! config.monorepo.profiles.ttyonly.enable);
     };
 
     windowManager = {

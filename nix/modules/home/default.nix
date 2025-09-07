@@ -175,26 +175,26 @@
 
     monorepo.profiles = {
 	    enable = lib.mkDefault true;
-	    music.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    hyprland.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    email.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
+	    music.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    hyprland.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    email.enable = lib.mkDefault config.monorepo.profiles.enable;
 
 	    # Programming
-      graphics.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-c.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-rust.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-python.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-sol.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-sh.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-openscad.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-js.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-nix.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-coq.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    lang-haskell.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
+      graphics.enable = lib.mkDefault  config.monorepo.profiles.enable;
+	    lang-c.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-rust.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-python.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-sol.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-sh.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-openscad.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-js.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-nix.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-coq.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
 
-	    crypto.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    art.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
-	    workstation.enable = lib.mkDefault (true && config.monorepo.profiles.enable);
+	    crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    art.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    workstation.enable = lib.mkDefault config.monorepo.profiles.enable;
     };
   };
 }

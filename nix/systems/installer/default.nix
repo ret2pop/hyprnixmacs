@@ -50,12 +50,21 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-if [ -z "$SYSTEM" ]; then
-    SYSTEM=continuity
+gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select `new` in order to create a new system."
+
+SYSTEM="$(gum choose "$(find "$HOME/monorepo/nix/systems" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep -v -E 'installer'; printf "New")")"
+
+if [[ "$SYSTEM" == "New" ]]; then
+  gum style --border normal --margin "1" --padding "1 2" "Choose a system name"
+  SYSTEM="$(gum input --placeholder "system name")"
 fi
 
-if [ -z "$DRIVE" ]; then
-    DRIVE=sda-simple
+gum style --border normal --margin "1" --padding "1 2" "Select a drive file or create a new drive file."
+DRIVE="$(gum choose "$(find "$HOME/monorepo/nix/disko" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | printf "New")")"
+
+if [[ "$DRIVE" == "New" ]]; then
+  gum style --border normal --margin "1" --padding "1 2" "Choose a name to call your drive file."
+  SYSTEM="$(gum input --placeholder "drive file name (ex: my_sda.nix)")"
 fi
 
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
@@ -63,9 +72,10 @@ ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installa
 cd "$HOME"
 
 if [ ! -d "$HOME/monorepo/" ]; then
-  git clone https://git.nullring.xyz/monorepo.git
-  cd monorepo
+  git clone ${commits.monorepoUrl}
+  cd "$HOME/monorepo"
   git checkout "${commits.monorepoCommitHash}"
+  cd "$HOME"
 fi
 
 
@@ -77,7 +87,7 @@ if [ ! -d "$HOME/monorepo/nix/systems/$SYSTEM" ]; then
 {
   imports = [
     ../../modules/default.nix
-    ../../disko/$DRIVE.nix
+    ../../disko/$DRIVE
     ../home.nix
   ];
 }
@@ -87,17 +97,21 @@ EOF
   gum input --placeholder "Press Enter to continue" >/dev/null
   vim "$HOME/monorepo/nix/systems/$SYSTEM/default.nix"
 
-  sed -i "/mkConfigs \[/,/\]/ s/^\(\s*\)\]/\1  \"$SYSTEM\"\n\1]/" "$HOME/monorepo/nix/flake.nix"
+  sed -i "/hostnames = \[/,/];/ { /];/i \        \"your-hostname-$SYSTEM\" }" "$HOME/monorepo/nix/flake.nix"
+
+  if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE" ]; then
+    cp "$HOME/monorepo/nix/disko/sda-simple.nix" "$HOME/monorepo/nix/disko/$DRIVE"
+    gum style --border normal --margin "1" --padding "1 2" "Edit the drive file with your preferred partitioning scheme."
+    gum input --placeholder "Press Enter to continue" >/dev/null
+    vim "$HOME/monorepo/nix/disko/$DRIVE"
+  fi
+  cd "$HOME/monorepo" && git add . && cd "$HOME"
 fi
 
-if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE.nix" ]; then
-  cp "$HOME/monorepo/nix/disko/sda-simple.nix" "$HOME/monorepo/nix/disko/$DRIVE.nix"
-  gum style --border normal --margin "1" --padding "1 2" "Edit the drive file with your preferred partitioning scheme."
-  gum input --placeholder "Press Enter to continue" >/dev/null
-  vim "$HOME/monorepo/nix/disko/$DRIVE.nix"
+if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE" ]; then
+  echo "error: you should create a new system if you use a drive file that is not in the repo."
+  exit 1
 fi
-
-cd "$HOME/monorepo" && git add . && cd "$HOME"
 
 gum style --border normal --margin "1" --padding "1 2" "Formatting the drive is destructive!"
 if gum confirm "Are you sure you want to continue?"; then
@@ -107,7 +121,7 @@ else
     exit 1
 fi
 
-sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/disko/$DRIVE.nix"
+sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/monorepo/nix/disko/$DRIVE"
 cd /mnt
 sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
 

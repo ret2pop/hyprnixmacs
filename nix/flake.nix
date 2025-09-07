@@ -35,6 +35,13 @@
 
   outputs = { self, nixpkgs, home-manager, nur, disko, lanzaboote, sops-nix, nix-topology, nixos-dns, deep-research, ... }@attrs:
     let
+      hostnames = [
+        "affinity"
+        "continuity"
+        "installer"
+        "spontaneity"
+        # add hostnames here
+      ];
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
@@ -42,8 +49,7 @@
         inherit (self) nixosConfigurations;
         extraConfig = import ./dns/default.nix;
       };
-      mkConfigs = map (hostname: {
-        name = "${hostname}";
+      mkConfigs = map (hostname: {name = "${hostname}";
         value = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = attrs;
@@ -54,7 +60,7 @@
           ] else [
             {
               environment.systemPackages = with nixpkgs.lib; [
-                deep-research.packages.${system}.deep-research
+                deep-research.packages."${system}".deep-research
               ];
             }
             nix-topology.nixosModules.default
@@ -65,7 +71,7 @@
             nixos-dns.nixosModules.dns
             {
               nixpkgs.overlays = [ nur.overlays.default ];
-              home-manager.extraSpecialArgs = attrs;
+              home-manager.extraSpecialArgs = attrs // { systemHostName = "${hostname}"; };
               networking.hostName = "${hostname}";
             }
             (./. + "/systems/${hostname}/default.nix")
@@ -74,12 +80,7 @@
       });
     in {
       # add new systems here
-      nixosConfigurations = builtins.listToAttrs (mkConfigs [
-        "affinity"
-        "continuity"
-        "installer"
-        "spontaneity"
-      ]);
+      nixosConfigurations = builtins.listToAttrs (mkConfigs hostnames);
 
       topology."${system}" = import nix-topology {
         pkgs = import nixpkgs {

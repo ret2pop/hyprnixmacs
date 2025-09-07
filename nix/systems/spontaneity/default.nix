@@ -15,6 +15,8 @@
         grub.enable = true;
       };
     };
+
+    boot.loader.grub.device = "nodev";
     networking = {
       firewall.allowedTCPPorts = [
         80
@@ -44,6 +46,7 @@
           "mail.${config.monorepo.vars.remoteHost}" = {};
 
           "nullring.xyz" = {};
+          "git.nullring.xyz" = {};
           "matrix.nullring.xyz" = {};
           "talk.nullring.xyz" = {};
           "mail.nullring.xyz" = {};

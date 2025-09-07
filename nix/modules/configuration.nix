@@ -78,7 +78,7 @@
 
     loader = {
   	  systemd-boot.enable = lib.mkForce (! config.monorepo.profiles.grub.enable);
-  	  efi.canTouchEfiVariables = lib.mkDefault (! config.monorepo.profiles.grub.enable);
+  	  efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
     };
 
     kernelModules = [
@@ -273,7 +273,7 @@
 
     auditd.enable = true;
     audit.enable = true;
-    chromiumSuidSandbox.enable = true;
+    chromiumSuidSandbox.enable = (! config.monorepo.profiles.ttyonly.enable);
     sudo.enable = true;
   };
 
