@@ -8,8 +8,8 @@
       passBlock = ''
 <Pass password>
   Method = sha256
-  Hash = d4abdd69aa24de69693885c5bd83a4a0e9ee989e1a69a905041b0dad9abc06ea
-  Salt = sDY,?H5AxC-!gH3a.:)D
+  Hash = ${config.sops.secrets.znc_password_hash}
+  Salt = ${config.sops.secrets.znc_password_salt}
 </Pass>
 '';
       modules = [

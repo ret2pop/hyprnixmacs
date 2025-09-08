@@ -2,11 +2,11 @@
 {
   programs.firefox = {
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    package = pkgs.firefox-bin;
     policies = {
       EnableTrackingProtection = true;
       OfferToSaveLogins = false;
     };
-    package = pkgs.firefox-wayland;
     profiles = {
       default = {
         id = 0;

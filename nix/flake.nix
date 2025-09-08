@@ -87,7 +87,7 @@
 
       mkDiskoFiles = map (hostname: {
         name = "${hostname}";
-        value = self.nixosConfigurations."${hostname}".config.monorepo.vars.myDiskoSpec;
+        value = self.nixosConfigurations."${hostname}".config.monorepo.vars.diskoSpec;
       });
 
     in {

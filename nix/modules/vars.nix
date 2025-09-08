@@ -8,7 +8,7 @@
       description = "device that NixOS is installed to";
     };
 
-    myDiskoSpec = lib.mkOption {
+    diskoSpec = lib.mkOption {
       type = lib.types.attrs;
       description = "retains a copy of the disko spec for reflection";
     };

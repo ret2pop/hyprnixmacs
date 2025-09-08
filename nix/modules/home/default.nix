@@ -1,6 +1,7 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, sops-nix, ... }:
 {
   imports = [
+    sops-nix.homeManagerModules.sops
     ../vars.nix
     ./fcitx.nix
     ./secrets.nix

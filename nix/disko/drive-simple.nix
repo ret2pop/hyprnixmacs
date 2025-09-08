@@ -37,6 +37,6 @@ let
   };
 in
 {
-  monorepo.vars.myDiskoSpec = spec;
+  monorepo.vars.diskoSpec = spec;
   disko.devices = spec.disko.devices;
 }

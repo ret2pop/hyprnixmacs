@@ -53,6 +53,10 @@
 
 
   boot = {
+
+    extraModprobeConfig = ''
+  options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
+'';
     extraModulePackages = [ ];
 
     initrd = {
@@ -89,6 +93,7 @@
     ];
 
     kernelParams = [
+      "usbcore.autosuspend=-1"
   	  "debugfs=off"
   	  "page_alloc.shuffle=1"
   	  "slab_nomerge"
@@ -278,13 +283,13 @@
   };
 
   xdg.portal = {
-    enable = true;
+    enable = (! config.monorepo.profiles.ttyonly.enable);
     wlr.enable = true;
-    extraPortals = with pkgs; [
+    extraPortals = with pkgs; if (! config.monorepo.profiles.ttyonly.enable) then [
   	  xdg-desktop-portal-gtk
   	  xdg-desktop-portal
   	  xdg-desktop-portal-hyprland
-    ];
+    ] else [];
     config.common.default = "*";
   };
 

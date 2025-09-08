@@ -102,7 +102,7 @@ EOF
   gum input --placeholder "Press Enter to continue" >/dev/null
   vim "$HOME/monorepo/nix/systems/$SYSTEM/home.nix"
 
-  sed -i "/hostnames = \[/,/];/ { /];/i \        \"your-hostname-$SYSTEM\" }" "$HOME/monorepo/nix/flake.nix"
+  sed -i "/# add hostnames here/i \  \"$1\"" "$HOME/monorepo/nix/flake.nix"
 
   if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE" ]; then
     cp "$HOME/monorepo/nix/disko/drive-simple.nix" "$HOME/monorepo/nix/disko/$DRIVE"

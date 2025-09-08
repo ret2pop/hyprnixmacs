@@ -5,7 +5,7 @@
     settings = {
       PasswordAuthentication = lib.mkDefault (! config.monorepo.profiles.server.enable);
       AllowUsers = [ config.monorepo.vars.userName "root" "git" ];
-      PermitRootLogin = "yes";
+      PermitRootLogin = "prohibit-password";
       KbdInteractiveAuthentication = false;
     };
   };
