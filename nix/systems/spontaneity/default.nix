@@ -1,14 +1,14 @@
 { config, lib, ... }:
 {
   imports = [
+    ../includes.nix
     # nixos-anywhere generates this file
     ./hardware-configuration.nix
-    ../../disko/vda-simple.nix
-    ../../modules/default.nix
-    ../home.nix
+    ../../disko/drive-bios.nix
   ];
   config = {
     monorepo = {
+      vars.device = "/dev/vda";
       profiles = {
         server.enable = true;
         ttyonly.enable = true;

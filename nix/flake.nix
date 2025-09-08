@@ -42,13 +42,19 @@
         "spontaneity"
         # add hostnames here
       ];
+
       system = "x86_64-linux";
+
       pkgs = import nixpkgs { inherit system; };
+
       generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
+
       dnsConfig = {
         inherit (self) nixosConfigurations;
         extraConfig = import ./dns/default.nix;
       };
+
+      # function that generates all systems from hostnames
       mkConfigs = map (hostname: {name = "${hostname}";
         value = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -78,9 +84,16 @@
           ];
         };
       });
+
+      mkDiskoFiles = map (hostname: {
+        name = "${hostname}";
+        value = self.nixosConfigurations."${hostname}".config.monorepo.vars.myDiskoSpec;
+      });
+
     in {
-      # add new systems here
       nixosConfigurations = builtins.listToAttrs (mkConfigs hostnames);
+
+      evalDisko = builtins.listToAttrs (mkDiskoFiles (builtins.filter (x: x != "installer") hostnames));
 
       topology."${system}" = import nix-topology {
         pkgs = import nixpkgs {

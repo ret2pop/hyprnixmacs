@@ -25,7 +25,7 @@
       g = "git";
       v = "vim";
       py = "python3";
-      rb = "sudo nixos-rebuild switch --flake .#${systemHostName}";
+      rb = "sudo nixos-rebuild switch --flake $HOME/monorepo/nix#${systemHostName}";
       nfu = "cd ~/monorepo/nix && git add . && git commit -m \"new flake lock\" &&  nix flake update";
       usync =  "rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${config.monorepo.vars.remoteHost}:/var/www/ret2pop-website/";
       usite

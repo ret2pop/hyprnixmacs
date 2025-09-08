@@ -1,6 +1,18 @@
 { lib, ... }:
 {
   options.monorepo.vars = {
+    device = lib.mkOption {
+      type = lib.types.str;
+      default = "/dev/sda";
+      example = "/dev/nvme0n1";
+      description = "device that NixOS is installed to";
+    };
+
+    myDiskoSpec = lib.mkOption {
+      type = lib.types.attrs;
+      description = "retains a copy of the disko spec for reflection";
+    };
+
     userName = lib.mkOption {
       type = lib.types.str;
       default = "preston";

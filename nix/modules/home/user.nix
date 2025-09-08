@@ -25,7 +25,7 @@
 
     packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
       # wikipedia
-      kiwix kiwix-tools
+      # kiwix kiwix-tools
 
       # passwords
       age sops
@@ -37,7 +37,7 @@
       graphviz jq
 
       # Apps
-      octaveFull
+      # octaveFull
       vesktop grim swww vim telegram-desktop
 
       # Sound/media
@@ -65,14 +65,13 @@
       (writeShellScriptBin "remote-build"
         ''
 #!/bin/bash
-cd ~/monorepo/nix
-nixos-rebuild --use-remote-sudo --target-host "$1" switch --flake .#spontaneity
+nixos-rebuild --sudo --ask-sudo-password --target-host "$1" switch --flake $HOME/monorepo/nix#spontaneity
 ''
       )
       (writeShellScriptBin "install-vps"
         ''
 #!/bin/bash
-nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-config ./systems/spontaneity/hardware-configuration.nix --flake .#spontaneity --target-host "$1"
+nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-config $HOME/monorepo/nix/systems/spontaneity/hardware-configuration.nix --flake $HOME/monorepo/nix#spontaneity --target-host "$1"
         '')
     ] else [
       pfetch

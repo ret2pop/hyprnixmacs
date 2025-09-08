@@ -1,12 +1,12 @@
 { config, lib, home-manager, ... }:
 {
   imports = [
-    ../../modules/default.nix
-    ../../disko/nvme-simple.nix
-    ../home.nix
+    ../includes.nix
+    ../../disko/drive-simple.nix
   ];
   config = {
     monorepo = {
+      vars.device = "/dev/nvme0n1";
       profiles = {
         server.enable = false;
         cuda.enable = true;

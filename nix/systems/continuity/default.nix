@@ -1,8 +1,11 @@
 { ... }:
 {
   imports = [
-    ../../modules/default.nix
-    ../../disko/sda-simple.nix
-    ../home.nix
+    ../../disko/drive-simple.nix
+    ../includes.nix
   ];
+  config = {
+    # drive to install to
+    monorepo.vars.device = "/dev/sda";
+  };
 }
