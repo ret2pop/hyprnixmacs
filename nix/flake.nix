@@ -111,10 +111,9 @@
           fira-code
           python3
           poetry
+          statix
+          deadnix
         ];
-        shellHook = ''
-poetry shell
-        '';
       };
 
       packages."${system}" = {
