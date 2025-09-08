@@ -37,6 +37,7 @@
 	    lang-js.enable = lib.mkEnableOption "Enables javascript language support";
 	    lang-nix.enable = lib.mkEnableOption "Enables nix language support";
 	    lang-coq.enable = lib.mkEnableOption "Enables coq language support";
+      lang-lean.enable = lib.mkEnableOption "Enables lean language support";
 	    lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
 
 	    crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
@@ -129,6 +130,10 @@
 					          (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
 						          coq
 					          ]) else [])
+                    ++
+                    (if config.monorepo.profiles.lang-lean.enable then (with pkgs; [
+                      lean4
+                    ]) else [])
 					          ++
 					          (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
 						          nil
@@ -191,6 +196,7 @@
 	    lang-js.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-nix.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-coq.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-lean.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
 
 	    crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
