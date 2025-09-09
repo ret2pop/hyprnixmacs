@@ -51,6 +51,7 @@
         epkgs.magit
         epkgs.magit-delta
         epkgs.mu4e
+        epkgs.minuet
         epkgs.nix-mode
         epkgs.org-fragtog
         epkgs.org-journal
@@ -78,6 +79,7 @@
         epkgs.unicode-fonts
         epkgs.use-package
         epkgs.vterm
+        epkgs.wgrep
         epkgs.web-mode
         epkgs.websocket
         epkgs.which-key

@@ -176,7 +176,6 @@
 			                kdePackages.kdenlive
 			                # kicad
                       murmur
-                      silver-searcher
 					          ]) else []);
 
     monorepo.profiles = {

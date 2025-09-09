@@ -28,6 +28,8 @@
 	    man-pages
 	    man-pages-posix
       iproute2
+      silver-searcher
+      ripgrep
     ]);
     boot.loader.grub = lib.mkIf config.monorepo.profiles.grub.enable {
       enable = true;
