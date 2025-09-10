@@ -26,6 +26,8 @@
     packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
       # wikipedia
       # kiwix kiwix-tools
+      mupdf
+      zathura
 
       # passwords
       age sops
@@ -38,7 +40,7 @@
 
       # Apps
       # octaveFull
-      vesktop grim swww vim telegram-desktop
+      vesktop grim swww vim telegram-desktop qwen-code
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
