@@ -18,6 +18,12 @@
 
     boot.loader.grub.device = "nodev";
     networking = {
+      interfaces.ens3.ipv6.addresses = [
+        {
+          address = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
+          prefixLength = 64;
+        }
+      ];
       firewall.allowedTCPPorts = [
         80
         443

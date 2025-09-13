@@ -8,6 +8,13 @@
       description = "device that NixOS is installed to";
     };
 
+    fileSystem = lib.mkOption {
+      type = lib.types.str;
+      default = "ext4";
+      example = "btrfs";
+      description = "filesystem to install with disko";
+    };
+
     diskoSpec = lib.mkOption {
       type = lib.types.attrs;
       description = "retains a copy of the disko spec for reflection";

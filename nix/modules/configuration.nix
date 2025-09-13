@@ -284,7 +284,7 @@
 
   xdg.portal = {
     enable = (! config.monorepo.profiles.ttyonly.enable);
-    wlr.enable = true;
+    wlr.enable = (! config.monorepo.profiles.ttyonly.enable);
     extraPortals = with pkgs; if (! config.monorepo.profiles.ttyonly.enable) then [
   	  xdg-desktop-portal-gtk
   	  xdg-desktop-portal

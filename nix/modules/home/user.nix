@@ -29,6 +29,7 @@
       mupdf
       zathura
 
+      fzf
       # passwords
       age sops
 
@@ -64,6 +65,44 @@
       pfetch
       libnotify
       htop
+
+      (pkgs.writeShellScriptBin "help"
+        ''
+#!/usr/bin/env sh
+# Portable, colored, nicely aligned alias list
+
+# Generate uncolored alias pairs
+aliases=$(cat <<'EOF'
+${let aliases = config.programs.zsh.shellAliases;
+  in lib.concatStringsSep "\n" (lib.mapAttrsToList (name: value:
+    "${name} -> ${value}"
+  ) aliases)}
+EOF
+                               )
+
+# Align and color using awk
+echo "$aliases" | awk '
+BEGIN {
+    GREEN="\033[0;32m";
+    YELLOW="\033[0;33m";
+    RESET="\033[0m";
+    maxlen=0;
+               }
+{
+    # Split line on " -> "
+    split($0, parts, / -> /);
+    name[NR]=parts[1];
+    cmd[NR]=parts[2];
+    if(length(parts[1])>maxlen) maxlen=length(parts[1]);
+}
+END {
+    for(i=1;i<=NR;i++) {
+        # printf with fixed width for alias name
+        printf "%s%-*s%s -> %s%s%s\n", GREEN, maxlen, name[i], RESET, YELLOW, cmd[i], RESET;
+        }
+}'
+'')
+
       (writeShellScriptBin "remote-build"
         ''
 #!/bin/bash

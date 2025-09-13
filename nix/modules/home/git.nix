@@ -14,10 +14,13 @@
     };
 
     aliases = {
+      pl = "pull";
+      ps = "push";
       co = "checkout";
       c = "commit";
       a = "add";
-      s = "switch";
+      st = "status";
+      sw = "switch";
       b = "branch";
     };
   };

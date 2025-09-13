@@ -21,6 +21,9 @@
     };
 
     shellAliases = {
+      se = "sops edit";
+      f = "vim $(fzf)";
+      e = "cd $(find . -type d -print | fzf)";
       c = "clear";
       g = "git";
       v = "vim";

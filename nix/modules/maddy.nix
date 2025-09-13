@@ -3,7 +3,7 @@
   services.maddy = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     openFirewall = true;
-    primaryDomain = "ret2pop.net";
+    primaryDomain = "${config.monorepo.vars.remoteHost}";
     tls = {
       loader = "acme";
     };
