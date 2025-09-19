@@ -2,7 +2,7 @@
 {
   assertions = [
     {
-      assertion = ! (config.monorepo.profiles.impermanence.enable && (! (config.monorepo.vars.filesystem == "btrfs")));
+      assertion = (! config.monorepo.profiles.impermanence.enable && (! (config.monorepo.vars.fileSystem == "btrfs")));
       message = "Impermanence requires btrfs filesystem.";
     }
   ];
