@@ -32,9 +32,11 @@
     umount /btrfs_tmp
   '' else "");
 
-  boot.initrd.luks.devices = (if config.monorepo.profiles.impermanence.enable then [
-    { name = "crypted"; device = "/dev/disk/by-partlabel/disk-main-luks"; }
-  ] else []);
+  boot.initrd.luks.devices = (if config.monorepo.profiles.impermanence.enable then {
+    crypted = {
+      device = "/dev/disk/by-partlabel/disk-main-luks";
+    };
+  } else {});
 
   fileSystems = if (config.monorepo.profiles.impermanence.enable) then {
     "/persistent" = {
