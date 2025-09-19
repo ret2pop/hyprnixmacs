@@ -32,7 +32,7 @@
     umount /btrfs_tmp
   '' else "");
 
-  filesystems = if (config.monorepo.profiles.impermanence.enable) then {
+  fileSystems = if (config.monorepo.profiles.impermanence.enable) then {
     "/persistent" = {
       neededForBoot = true;
     };
