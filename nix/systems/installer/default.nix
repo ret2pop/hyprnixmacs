@@ -58,6 +58,13 @@ cd "$HOME"
 
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
 
+if [ ! -d "$HOME/monorepo/" ]; then
+  git clone ${commits.monorepoUrl}
+  cd "$HOME/monorepo"
+  git checkout "${commits.monorepoCommitHash}"
+  cd "$HOME"
+fi
+
 gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select `new` in order to create a new system."
 
 SYSTEM="$(gum choose $(find "$HOME/monorepo/nix/systems" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep -v -E 'installer'; printf "New"))"
@@ -73,13 +80,6 @@ if [[ "$SYSTEM" == "New" ]]; then
     gum style --border normal --margin "1" --padding "1 2" "Choose a name to call your drive file."
     DRIVE="$(gum input --placeholder "drive file name (ex: partition_scheme.nix)")"
   fi
-fi
-
-if [ ! -d "$HOME/monorepo/" ]; then
-  git clone ${commits.monorepoUrl}
-  cd "$HOME/monorepo"
-  git checkout "${commits.monorepoCommitHash}"
-  cd "$HOME"
 fi
 
 
