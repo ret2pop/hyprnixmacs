@@ -1,7 +1,7 @@
 { ... }:
 {
   imports = [
-    ../../disko/drive-simple.nix
+    ../../disko/btrfs-simple.nix
     ../common.nix
   ];
   config = {
