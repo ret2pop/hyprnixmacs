@@ -31,7 +31,13 @@
     btrfs subvolume create /btrfs_tmp/root
     umount /btrfs_tmp
   '' else "");
-  
+
+  filesystems = if (config.monorepo.profiles.impermanence.enable) then {
+    "/persistent" = {
+      neededForBoot = true;
+    };
+  } else {};
+
   environment.persistence."/persistent" = {
     enable = config.monorepo.profiles.impermanence.enable;
     hideMounts = true;
