@@ -7,8 +7,8 @@
     hostName = "0.0.0.0";
     welcometext = "Wecome to the Null Murmur instance!";
     registerName = "nullring";
-    registerHostname = "nullring.xyz";
-    sslCert = "/var/lib/acme/nullring.xyz/fullchain.pem";
-    sslKey = "/var/lib/acme/nullring.xyz/sslKey.pem";
+    registerHostname = "${config.monorepo.vars.orgHost}";
+    sslCert = "/var/lib/acme/${config.monorepo.vars.orgHost}/fullchain.pem";
+    sslKey = "/var/lib/acme/${config.monorepo.vars.orgHost}/sslKey.pem";
   };
 }

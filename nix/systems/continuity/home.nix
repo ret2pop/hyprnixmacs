@@ -1,7 +1,7 @@
 { lib, config, pkgs, ... }:
 {
   imports = [
-    ../../modules/home/default.nix
+    ../home-common.nix
   ];
   config.monorepo.profiles.workstation.enable = false;
 }

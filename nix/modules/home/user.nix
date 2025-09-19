@@ -2,8 +2,8 @@
 {
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''
-    if [ ! -d "/home/${config.monorepo.vars.userName}/email/ret2pop/" ]; then
-      mkdir -p /home/${config.monorepo.vars.userName}/email/ret2pop/
+    if [ ! -d "/home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/" ]; then
+      mkdir -p /home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/
     fi
     if [ ! -d "/home/${config.monorepo.vars.userName}/music" ]; then
       mkdir -p /home/${config.monorepo.vars.userName}/music
@@ -41,7 +41,7 @@
 
       # Apps
       # octaveFull
-      vesktop grim swww vim telegram-desktop qwen-code
+      vesktop grim swww vim telegram-desktop qwen-code fluffychat
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
@@ -53,7 +53,7 @@
       torsocks tor-browser
 
       # fonts
-      nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6
+      nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6 victor-mono
       (aspellWithDicts
         (dicts: with dicts; [ en en-computers en-science ]))
 

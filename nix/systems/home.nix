@@ -1,7 +1,6 @@
 { config, sops-nix, ... }:
 {
   home-manager = {
-
     sharedModules = [
       sops-nix.homeManagerModules.sops
     ];

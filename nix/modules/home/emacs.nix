@@ -5,10 +5,14 @@
       enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
       package = pkgs.emacs-pgtk;
       extraConfig = ''
-      (setq debug-on-error t)
-      (org-babel-load-file
-        (expand-file-name "~/monorepo/config/emacs.org"))'';
+(setq debug-on-error t)
+(setq system-email "${config.monorepo.profiles.email.email}")
+(setq system-username "${config.monorepo.vars.internetName}")
+(setq system-fullname "${config.monorepo.vars.fullName}")
+(org-babel-load-file
+  (expand-file-name "~/${config.monorepo.vars.repoName}/config/emacs.org"))'';
       extraPackages = epkgs: [
+        epkgs.agda2-mode
         epkgs.all-the-icons
         epkgs.auctex
         epkgs.catppuccin-theme
@@ -17,6 +21,7 @@
         epkgs.company-solidity
         epkgs.counsel
         epkgs.dashboard
+        epkgs.doom-themes
         epkgs.doom-modeline
         epkgs.elfeed
         epkgs.elfeed-org
@@ -39,6 +44,7 @@
         epkgs.gruvbox-theme
         epkgs.haskell-mode
         epkgs.htmlize
+        epkgs.idris-mode
         epkgs.irony-eldoc
         epkgs.ivy
         epkgs.ivy-pass
@@ -48,6 +54,7 @@
         epkgs.lsp-mode
         epkgs.lsp-haskell
         epkgs.lyrics-fetcher
+        epkgs.mastodon
         epkgs.magit
         epkgs.magit-delta
         epkgs.mu4e

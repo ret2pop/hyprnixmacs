@@ -1,4 +1,7 @@
 { lib, ... }:
+let
+  vars = import ../flakevars.nix;
+in
 {
   options.monorepo.vars = {
     device = lib.mkOption {
@@ -6,6 +9,20 @@
       default = "/dev/sda";
       example = "/dev/nvme0n1";
       description = "device that NixOS is installed to";
+    };
+
+    internetName = lib.mkOption {
+      type = lib.types.str;
+      default = "${vars.internetName}";
+      example = "myinternetname";
+      description = "Internet name to be used for internet usernames";
+    };
+
+    repoName = lib.mkOption {
+      type = lib.types.str;
+      default = "monorepo";
+      example = "myreponame";
+      description = "Name of this repository";
     };
 
     fileSystem = lib.mkOption {
@@ -43,9 +60,16 @@
 
     remoteHost = lib.mkOption {
       type = lib.types.str;
-      default = "ret2pop.net";
+      default = "${vars.remoteHost}";
       example = "example.com";
       description = "Address to push to and pull from for website and git repos";
+    };
+
+    orgHost = lib.mkOption {
+      type = lib.types.str;
+      default = "${vars.orgHost}";
+      example = "orgname.org";
+      description = "Domain name of your organization";
     };
 
     timeZone = lib.mkOption {

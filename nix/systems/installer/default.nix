@@ -50,6 +50,10 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
+gum style --border normal --margin "1" --padding "1 2" "Notice: if using full disk encryption, write to /tmp/secret.key first with your password."
+
+sleep 3
+
 cd "$HOME"
 
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
@@ -102,7 +106,7 @@ EOF
   gum input --placeholder "Press Enter to continue" >/dev/null
   vim "$HOME/monorepo/nix/systems/$SYSTEM/home.nix"
 
-  sed -i "/# add hostnames here/i \  \"$1\"" "$HOME/monorepo/nix/flake.nix"
+  sed -i "/hostnames = \[/,/];/ s/];/  \"$1\"\n    ];/" "$HOME/monorepo/nix/flake.nix"
 
   if [ ! -f "$HOME/monorepo/nix/disko/$DRIVE" ]; then
     cp "$HOME/monorepo/nix/disko/drive-simple.nix" "$HOME/monorepo/nix/disko/$DRIVE"

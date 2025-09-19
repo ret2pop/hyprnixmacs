@@ -8,7 +8,7 @@
         SSL = true;
       };
       local-matrix = {
-        Homeserver = "https://social.nullring.xyz";
+        Homeserver = "https://matrix.${config.monorepo.vars.orgHost}";
         ListenAddress = "127.0.0.1";
         ListenPort = "8008";
       };

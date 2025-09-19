@@ -16,7 +16,7 @@
     };
 
     virtualHosts = {
-      "matrix.${config.monorepo.vars.remoteHost}" = {
+      "matrix.${config.monorepo.vars.orgHost}" = {
         enableACME = true;
         forceSSL = true;
         listen = [
@@ -55,14 +55,14 @@
       };
 	    "${config.monorepo.vars.remoteHost}" = {
         serverName = "${config.monorepo.vars.remoteHost}";
-        serverAliases = [ "ret2pop.nullring.xyz" ];
-	      root = "/var/www/ret2pop-website/";
+        serverAliases = [ "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" ];
+	      root = "/var/www/${config.monorepo.vars.internetName}-website/";
 	      addSSL = true;
 	      enableACME = true;
 	    };
 
-      "nullring.xyz" = {
-        serverName = "nullring.xyz";
+      "${config.monorepo.vars.orgHost}" = {
+        serverName = "${config.monorepo.vars.orgHost}";
         root = "/var/www/nullring/";
         addSSL = true;
         enableACME = true;

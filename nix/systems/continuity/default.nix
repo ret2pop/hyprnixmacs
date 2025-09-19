@@ -2,10 +2,15 @@
 {
   imports = [
     ../../disko/drive-simple.nix
-    ../includes.nix
+    ../common.nix
   ];
   config = {
-    # drive to install to
-    monorepo.vars.device = "/dev/sda";
+    monorepo = {
+      profiles.impermanence.enable = true;
+      vars = {
+        device = "/dev/sda";
+        fileSystem = "btrfs";
+      };
+    };
   };
 }

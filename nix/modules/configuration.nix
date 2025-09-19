@@ -2,6 +2,7 @@
 {
   imports = [
     ./matterbridge.nix
+    ./mautrix.nix
     ./xserver.nix
     ./ssh.nix
     ./pipewire.nix
@@ -20,6 +21,7 @@
     ./ngircd.nix
     ./znc.nix
     ./docker.nix
+    ./impermanence.nix
   ];
 
   documentation = {
@@ -162,7 +164,7 @@
   	  "kernel.kptr_restrict" = 2;
 
   	  # madaidan
-            "kernel.smtcontrol" = "on";
+      "kernel.smtcontrol" = "on";
   	  "vm.swappiness" = 1;
   	  "vm.unprivileged_userfaultfd" = 0;
   	  "dev.tty.ldisc_autoload" = 0;

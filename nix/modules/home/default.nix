@@ -36,6 +36,8 @@
 	    lang-openscad.enable = lib.mkEnableOption "Enables openscad language support";
 	    lang-js.enable = lib.mkEnableOption "Enables javascript language support";
 	    lang-nix.enable = lib.mkEnableOption "Enables nix language support";
+	    lang-idris.enable = lib.mkEnableOption "Enables idris language support";
+	    lang-agda.enable = lib.mkEnableOption "Enables agda language support";
 	    lang-coq.enable = lib.mkEnableOption "Enables coq language support";
       lang-lean.enable = lib.mkEnableOption "Enables lean language support";
 	    lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
@@ -81,6 +83,7 @@
 						          gnumake
 						          bear
 						          clang-tools
+                      autotools-language-server
 					          ]) else [])
                     ++
                     (if config.monorepo.profiles.workstation.enable then (with pkgs; [
@@ -134,6 +137,15 @@
                     (if config.monorepo.profiles.lang-lean.enable then (with pkgs; [
                       lean4
                     ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-agda.enable then (with pkgs; [
+                      agda
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-idris.enable then (with pkgs; [
+                      idris
+                      idris2Packages.idris2Lsp
+					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
 						          nil
@@ -197,6 +209,8 @@
 	    lang-coq.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-lean.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-idris.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-agda.enable = lib.mkDefault config.monorepo.profiles.enable;
 
 	    crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    art.enable = lib.mkDefault config.monorepo.profiles.enable;

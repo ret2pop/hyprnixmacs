@@ -3,7 +3,7 @@
   programs.mbsync = {
     enable = lib.mkDefault config.monorepo.profiles.email.enable;
     extraConfig = ''
-      IMAPAccount ret2pop
+      IMAPAccount ${config.monorepo.vars.internetName}
       Host ${config.monorepo.profiles.email.imapsServer}
       User ${config.monorepo.profiles.email.email}
       PassCmd "cat ${config.sops.secrets.mail.path}"
@@ -12,17 +12,17 @@
       AuthMechs *
       CertificateFile /etc/ssl/certs/ca-certificates.crt
 
-      IMAPStore ret2pop-remote
-      Account ret2pop
+      IMAPStore ${config.monorepo.vars.internetName}-remote
+      Account ${config.monorepo.vars.internetName}
 
-      MaildirStore ret2pop-local
-      Path ~/email/ret2pop/
-      Inbox ~/email/ret2pop/INBOX
+      MaildirStore ${config.monorepo.vars.internetName}-local
+      Path ~/email/${config.monorepo.vars.internetName}/
+      Inbox ~/email/${config.monorepo.vars.internetName}/INBOX
       SubFolders Verbatim
 
-      Channel ret2pop 
-      Far :ret2pop-remote:
-      Near :ret2pop-local:
+      Channel ${config.monorepo.vars.internetName} 
+      Far :${config.monorepo.vars.internetName}-remote:
+      Near :${config.monorepo.vars.internetName}-local:
       Patterns *
       Create Near
       Sync All

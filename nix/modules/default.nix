@@ -18,19 +18,27 @@
         ttyonly.enable = lib.mkEnableOption "TTY only, no xserver";
         grub.enable = lib.mkEnableOption "Enables grub instead of systemd-boot";
         workstation.enable = lib.mkEnableOption "Enables workstation services";
+        impermanence.enable = lib.mkEnableOption "Enables imperamanence";
 	    };
     };
   };
 
   config = {
-    environment.systemPackages = lib.mkIf config.monorepo.profiles.documentation.enable (with pkgs; [
+    environment.systemPackages = lib.mkIf config.monorepo.profiles.documentation.enable ((with pkgs; [
 	    linux-manual
 	    man-pages
 	    man-pages-posix
       iproute2
       silver-searcher
       ripgrep
-    ]);
+    ]) ++
+    (if (config.monorepo.vars.fileSystem == "btrfs") then with pkgs; [
+      btrfs-progs
+      btrfs-snap
+      btrfs-list
+      btrfs-heatmap
+    ] else []));
+
     boot.loader.grub = lib.mkIf config.monorepo.profiles.grub.enable {
       enable = true;
     };
@@ -41,6 +49,7 @@
 		    pipewire.enable = lib.mkDefault true;
 		    tor.enable = lib.mkDefault true;
 		    home.enable = lib.mkDefault true;
+        impermanence.enable = lib.mkDefault false;
 	    };
     };
   };

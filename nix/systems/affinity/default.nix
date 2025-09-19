@@ -1,7 +1,7 @@
 { config, lib, home-manager, ... }:
 {
   imports = [
-    ../includes.nix
+    ../common.nix
     ../../disko/drive-simple.nix
   ];
   config = {

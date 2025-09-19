@@ -64,6 +64,7 @@
         "$mod, B, exec, bitcoin-qt"
         "$mod, M, exec, monero-wallet-gui"
         "$mod, V, exec, vesktop"
+        "$mod, C, exec, fluffychat"
         "$mod, D, exec, wofi --show run"
         "$mod, P, exec, bash ${scripts}/powermenu.sh"
         "$mod, Q, killactive"

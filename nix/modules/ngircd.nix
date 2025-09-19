@@ -4,7 +4,7 @@
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     config = ''
 [Global]
-	Name = nullring.xyz
+	Name = ${config.monorepo.vars.orgHost}
 	Info = NullRing IRC Instance
   Listen = 0.0.0.0
   MotdFile = /etc/motd.txt
@@ -13,9 +13,9 @@
 [Options]
 	PAM = no
 [SSL]
-	CertFile = /var/lib/acme/nullring.xyz/fullchain.pem
+	CertFile = /var/lib/acme/${config.monorepo.vars.orgHost}/fullchain.pem
 	CipherList = HIGH:!aNULL:@STRENGTH:!SSLv3
-	KeyFile = /var/lib/acme/nullring.xyz/key.pem
+	KeyFile = /var/lib/acme/${config.monorepo.vars.orgHost}/key.pem
 	Ports = 6697
 '';
   };
