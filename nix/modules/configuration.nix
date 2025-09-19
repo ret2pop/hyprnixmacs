@@ -259,6 +259,12 @@
     apparmor = {
   	  enable = true;
   	  killUnconfinedConfinables = true;
+      packages = with pkgs; [
+        apparmor-profiles
+      ];
+      policies = {
+        firefox.path = "${pkgs.apparmor-profiles}/share/apparmor/extra-profiles/firefox";
+      };
     };
 
     pam.loginLimits = [
