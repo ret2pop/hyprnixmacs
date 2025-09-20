@@ -52,6 +52,8 @@
       # Tor
       torsocks tor-browser
 
+      # For transfering secrets onto new system
+      magic-wormhole
       # fonts
       nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6 victor-mono
       (aspellWithDicts
