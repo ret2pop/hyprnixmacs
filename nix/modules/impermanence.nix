@@ -32,7 +32,7 @@
     umount /btrfs_tmp
   '' else "");
 
-  boot.initrd.luks.devices = (if (! (config.monorepo.vars.fileSystem == "btrfs")) then {
+  boot.initrd.luks.devices = (if (config.monorepo.vars.fileSystem == "btrfs") then {
     crypted = {
       device = "/dev/disk/by-partlabel/disk-main-luks";
     };
