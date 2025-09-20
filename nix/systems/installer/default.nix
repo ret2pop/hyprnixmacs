@@ -65,7 +65,10 @@ if [ ! -d "$HOME/monorepo/" ]; then
   cd "$HOME"
 fi
 
-gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select `new` in order to create a new system."
+gum style --border normal --margin "1" --padding "1 2" "Enter a password for the encrypted disk. If you're not installing a profile with an encrypted disk, you can leave this blank."
+echo "$(gum input --password)" > /tmp/secret.key
+
+gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select \`new\` in order to create a new system."
 
 SYSTEM="$(gum choose $(find "$HOME/monorepo/nix/systems" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep -v -E 'installer'; printf "New"))"
 

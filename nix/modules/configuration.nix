@@ -22,6 +22,7 @@
     ./znc.nix
     ./docker.nix
     ./impermanence.nix
+    ./firejail.nix
   ];
 
   documentation = {
@@ -55,7 +56,10 @@
 
 
   boot = {
-
+    supportedFilesystems = {
+      btrfs = true;
+      ext4 = true;
+    };
     extraModprobeConfig = ''
   options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
 '';
@@ -185,9 +189,49 @@
   };
 
   networking = {
-    useDHCP = lib.mkDefault true;
+    useDHCP = false;
+    dhcpcd.enable = false;
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
     networkmanager = {
   	  enable = true;
+      wifi.powersave = false;
+      ensureProfiles = {
+        profiles = {
+          home-wifi = {
+            connection = {
+              id = "home-wifi";
+              permissions = "";
+              type = "wifi";
+            };
+            ipv4 = {
+              dns-search = "";
+              method = "auto";
+            };
+            ipv6 = {
+              addr-gen-mode = "stable-privacy";
+              dns-search = "";
+              method = "auto";
+            };
+            wifi = {
+              mac-address-blacklist = "";
+              mode = "infrastructure";
+              ssid = "TELUS6572";
+            };
+            wifi-security = {
+              auth-alg = "open";
+              key-mgmt = "wpa-psk";
+              # when someone actually steals my internet then I will be concerned.
+              # This password only matters if you actually show up to my house in real life.
+              # That would perhaps allow for some nasty networking related shenanigans.
+              # I guess we'll cross that bridge when I get there.
+              psk = "b4xnrv6cG6GX";
+            };
+          };
+        };
+      };
     };
     firewall = {
   	  allowedTCPPorts = [ 22 11434 ];
@@ -275,6 +319,7 @@
 
     lockKernelModules = true;
     protectKernelImage = true;
+
     allowSimultaneousMultithreading = true;
     forcePageTableIsolation = true;
 
