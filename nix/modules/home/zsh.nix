@@ -21,6 +21,7 @@
     };
 
     shellAliases = {
+      clone-secrets = "git clone ssh://\"$1\"/home/preston/secrets \"$HOME/secrets\"";
       get-channel-id = "yt-dlp --print \"%(channel_id)s\" --playlist-end 1 \"$1\"";
       se = "sops edit";
       f = "vim $(fzf)";

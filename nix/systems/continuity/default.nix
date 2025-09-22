@@ -6,7 +6,10 @@
   ];
   config = {
     monorepo = {
-      profiles.impermanence.enable = true;
+      profiles = {
+        impermanence.enable = true;
+        secureBoot = true;
+      };
       vars = {
         device = "/dev/sda";
         fileSystem = "btrfs";

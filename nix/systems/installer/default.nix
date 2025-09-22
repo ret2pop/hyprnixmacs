@@ -50,10 +50,6 @@ if [ "$(id -u)" -eq 0 ]; then
   exit 1
 fi
 
-gum style --border normal --margin "1" --padding "1 2" "Notice: if using full disk encryption, write to /tmp/secret.key first with your password."
-
-sleep 3
-
 cd "$HOME"
 
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui

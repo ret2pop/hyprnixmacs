@@ -53,7 +53,8 @@
       torsocks tor-browser
 
       # For transfering secrets onto new system
-      magic-wormhole
+      magic-wormhole stow
+
       # fonts
       nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6 victor-mono
       (aspellWithDicts
@@ -115,6 +116,14 @@ nixos-rebuild --sudo --ask-sudo-password --target-host "$1" switch --flake $HOME
         ''
 #!/bin/bash
 nix run github:nix-community/nixos-anywhere -- --generate-hardware-config nixos-generate-config $HOME/monorepo/nix/systems/spontaneity/hardware-configuration.nix --flake $HOME/monorepo/nix#spontaneity --target-host "$1"
+        '')
+      (writeShellScriptBin "secrets"
+        ''
+#!/bin/bash
+cd "$HOME/secrets"
+git pull # repo is over LAN
+stow */ # manage secrets with gnu stow
+cd "$HOME"
         '')
     ] else [
       pfetch
