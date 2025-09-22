@@ -83,7 +83,7 @@
 
     lanzaboote = {
   	  enable = config.monorepo.profiles.secureBoot.enable;
-  	  pkiBundle = "/etc/secureboot";
+  	  pkiBundle = "/var/lib/sbctl";
     };
 
     loader = {
