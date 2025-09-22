@@ -8,7 +8,7 @@
     monorepo = {
       profiles = {
         impermanence.enable = true;
-        secureBoot = true;
+        secureBoot.enable = true;
       };
       vars = {
         device = "/dev/sda";
