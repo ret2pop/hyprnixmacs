@@ -5,15 +5,19 @@
     if [ ! -d "/home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/" ]; then
       mkdir -p /home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/
     fi
+
     if [ ! -d "/home/${config.monorepo.vars.userName}/music" ]; then
       mkdir -p /home/${config.monorepo.vars.userName}/music
     fi
+
     if [ ! -d /home/${config.monorepo.vars.userName}/org ]; then
       mkdir -p /home/${config.monorepo.vars.userName}/org
     fi
+
     if [ ! -d /home/${config.monorepo.vars.userName}/src ]; then
       mkdir -p /home/${config.monorepo.vars.userName}/src
     fi
+
     touch /home/${config.monorepo.vars.userName}/org/agenda.org
     touch /home/${config.monorepo.vars.userName}/org/notes.org
     '';
