@@ -21,6 +21,7 @@
     ./mpd.nix
     ./mako.nix
     ./user.nix
+    ./gtk.nix
   ];
 
   options = {

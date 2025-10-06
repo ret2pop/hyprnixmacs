@@ -22,7 +22,6 @@
     ./znc.nix
     ./docker.nix
     ./impermanence.nix
-    ./firejail.nix
   ];
 
   documentation = {
@@ -87,7 +86,7 @@
     };
 
     loader = {
-  	  systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) || (! config.monorepo.profiles.secureBoot.enable));
+  	  systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
   	  efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
     };
 
@@ -189,12 +188,8 @@
   };
 
   networking = {
-    useDHCP = false;
-    dhcpcd.enable = false;
-    nameservers = [
-      "1.1.1.1"
-      "8.8.8.8"
-    ];
+    nameservers = [ "8.8.8.8" "1.1.1.1"];
+    dhcpcd.enable = (! config.monorepo.profiles.server.enable);
     networkmanager = {
   	  enable = true;
       wifi.powersave = false;

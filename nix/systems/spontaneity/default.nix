@@ -23,6 +23,12 @@ in
 
     boot.loader.grub.device = "nodev";
     networking = {
+      interfaces.ens3.ipv4.addresses = [
+        {
+          address = ipv4addr;
+          prefixLength = 24;
+        }
+      ];
       interfaces.ens3.ipv6.addresses = [
         {
           address = ipv6addr;

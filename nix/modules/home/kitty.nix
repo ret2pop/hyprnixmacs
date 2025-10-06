@@ -7,7 +7,7 @@
       font_family = "Iosevka Nerd Font";
       font_size = 14;
       confirm_os_window_close = 0;
-      background_opacity = "0.9";
+      background_opacity = "0.7";
       # Catppuccin theme
       foreground = "#cdd6f4";
       background = "#1e1e2e";

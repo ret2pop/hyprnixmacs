@@ -16,7 +16,7 @@
       exec-once = [
         "waybar"
         "swww-daemon --format xrgb"
-        "swww img ${wallpapers}/imagination.png"
+        "sh -c 'swww img \"$(find ${wallpapers} -type f \\( -iname \"*.jpg\" -o -iname \"*.png\" \\) | shuf -n1)\"'"
         "fcitx5-remote -r"
         "fcitx5 -d --replace"
         "fcitx5-remote -r"
@@ -30,8 +30,8 @@
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "ELECTRON_OZONE_PLATFORM_HINT,auto"
       ];
-      blurls = [
-        "waybar"
+      layerrule = [
+        "blur,waybar"
       ];
       monitor = [
         "Unknown-1,disable"
@@ -47,6 +47,7 @@
         "workspace 3, title:^(.*fluffychat.*)$"
         "workspace 3, class:^(.*element-desktop.*)$"
         "workspace 4, class:^(.*qpwgraph.*)$"
+        "workspace 4, class:^(.*pavucontrol.*)$"
         "workspace 4, class:^(.*mpv.*)$"
         "workspace 5, title:^(.*Monero.*)$"
         "workspace 5, title:^(.*org\.bitcoin\..*)$"
@@ -58,10 +59,10 @@
       ];
       bind = [
         "$mod, F, exec, firefox"
-        "$mod, T, exec, tor-browser"
         "$mod, Return, exec, kitty"
         "$mod, E, exec, emacs"
         "$mod, B, exec, bitcoin-qt"
+        "$mod, S, exec, pavucontrol"
         "$mod, M, exec, monero-wallet-gui"
         "$mod, V, exec, vesktop"
         "$mod, C, exec, fluffychat"
@@ -72,12 +73,18 @@
         "$mod SHIFT, L, movewindow, r"
         "$mod SHIFT, K, movewindow, u"
         "$mod SHIFT, J, movewindow, d"
+        "$mod, T, togglefloating"
         "$mod, H, movefocus, l"
         "$mod, L, movefocus, r"
         "$mod, K, movefocus, u"
         "$mod, J, movefocus, d"
         ", XF86AudioPlay, exec, mpc toggle"
         ", Print, exec, grim"
+
+        "$mod, right, resizeactive, 30 0"
+        "$mod, left, resizeactive, -30 0"
+        "$mod, up, resizeactive, 0 -30"
+        "$mod, down, resizeactive, 0 30"
       ]
       ++ (
         builtins.concatLists (builtins.genList
@@ -113,8 +120,14 @@
       decoration = {
         blur = {
           enabled = true;
-          size = 5;
-          passes = 2;
+          size = 9;
+          passes = 4;
+          contrast = 0.8;
+          brightness = 1.1;
+          noise = 0.02;
+          new_optimizations = true;
+          ignore_opacity = true;
+          xray = false;
         };
         rounding = 5;
       };
