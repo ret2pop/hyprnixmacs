@@ -45,13 +45,13 @@
 
       # Apps
       # octaveFull
-      vesktop grim swww vim telegram-desktop qwen-code fluffychat
+      vesktop grim swww vim telegram-desktop qwen-code fluffychat jami
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
 
       # Net
-      curl rsync git iamb
+      curl rsync git iamb ungoogled-chromium
 
       # Tor
       torsocks tor-browser
@@ -151,12 +151,5 @@ cd "$HOME"
   };
 
   programs.bash.enable = true;
-
-  gtk = {
-    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
-    theme = null;
-    iconTheme = null;
-  };
-
   fonts.fontconfig.enable = true;
 }

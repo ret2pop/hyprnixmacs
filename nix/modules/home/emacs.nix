@@ -9,17 +9,18 @@
 (setq system-email "${config.monorepo.profiles.email.email}")
 (setq system-username "${config.monorepo.vars.internetName}")
 (setq system-fullname "${config.monorepo.vars.fullName}")
-(org-babel-load-file
-  (expand-file-name "~/${config.monorepo.vars.repoName}/config/emacs.org"))'';
+(load "${pkgs.writeText "init.el" (builtins.readFile ../../init.el)}")
+'';
+
       extraPackages = epkgs: [
         epkgs.agda2-mode
         epkgs.all-the-icons
         epkgs.auctex
         epkgs.catppuccin-theme
-        epkgs.chatgpt-shell
         epkgs.company
         epkgs.company-solidity
         epkgs.counsel
+        epkgs.centaur-tabs
         epkgs.dashboard
         epkgs.doom-themes
         epkgs.doom-modeline

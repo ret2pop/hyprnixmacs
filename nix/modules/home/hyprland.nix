@@ -73,7 +73,10 @@
         "$mod SHIFT, L, movewindow, r"
         "$mod SHIFT, K, movewindow, u"
         "$mod SHIFT, J, movewindow, d"
-        "$mod, T, togglefloating"
+
+        "$mod SHIFT, T, togglefloating"
+        "$mod SHIFT, F, fullscreen"
+
         "$mod, H, movefocus, l"
         "$mod, L, movefocus, r"
         "$mod, K, movefocus, u"
