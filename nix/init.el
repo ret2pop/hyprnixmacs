@@ -481,14 +481,14 @@
 
     "h r r" '(lambda () (interactive) (org-babel-load-file (expand-file-name "~/monorepo/config/emacs.org")))))
 
-(use-package ellama
-  :custom
-  (ellama-sessions-directory "~/org/ellama/" "Set org directory for LLM sessions")
-  :init
-  (require 'llm-ollama)
-  (setopt ellama-provider (make-llm-ollama
-	     :host "localhost"
-	     :chat-model "qwen2.5:14b")))
+;; (use-package ellama
+;;   :custom
+;;   (ellama-sessions-directory "~/org/ellama/" "Set org directory for LLM sessions")
+;;   :init
+;;   (require 'llm-ollama)
+;;   (setopt ellama-provider (make-llm-ollama
+;; 	     :host "localhost"
+;; 	     :chat-model "qwen2.5:14b")))
 
 (use-package minuet
     :bind

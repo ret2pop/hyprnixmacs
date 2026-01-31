@@ -6,7 +6,7 @@
 [Global]
 	Name = ${config.monorepo.vars.orgHost}
 	Info = NullRing IRC Instance
-  Listen = 0.0.0.0
+  Listen = ::,0.0.0.0
   MotdFile = /etc/motd.txt
 	Network = NullRing
 	Ports = 6667

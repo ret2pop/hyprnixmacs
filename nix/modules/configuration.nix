@@ -99,17 +99,17 @@
 
     kernelParams = [
       "usbcore.autosuspend=-1"
-  	  "debugfs=off"
+  	  # "debugfs=off"
   	  "page_alloc.shuffle=1"
   	  "slab_nomerge"
-  	  "page_poison=1"
+  	  # "page_poison=1"
 
   	  # madaidan
   	  "pti=on"
   	  "randomize_kstack_offset=on"
   	  "vsyscall=none"
   	  "module.sig_enforce=1"
-  	  "lockdown=confidentiality"
+  	  # "lockdown=confidentiality"
 
   	  # cpu
   	  "spectre_v2=on"
@@ -122,14 +122,10 @@
   	  "extra_latent_entropy"
 
   	  # mineral
-  	  "init_on_alloc=1"
+  	  # "init_on_alloc=1"
   	  "random.trust_cpu=off"
   	  "random.trust_bootloader=off"
-  	  "intel_iommu=on"
-  	  "amd_iommu=force_isolation"
-  	  "iommu=force"
-  	  "iommu.strict=1"
-  	  "init_on_free=1"
+  	  # "init_on_free=1"
   	  "quiet"
   	  "loglevel=0"
     ];
@@ -240,8 +236,8 @@
     graphics.enable = ! config.monorepo.profiles.ttyonly.enable;
 
     bluetooth = {
-  	  enable = true;
-  	  powerOnBoot = true;
+  	  enable = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
+  	  powerOnBoot = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
     };
   };
 
@@ -264,15 +260,15 @@
     # Misc.
     udev = {
   	  extraRules = '''';
-  	  packages = with pkgs; [ 
+  	  packages = if config.monorepo.profiles.workstation.enable then with pkgs; [ 
   	    platformio-core
   	    platformio-core.udev
   	    openocd
-  	  ];
+  	  ] else [];
     };
 
-    printing.enable = true;
-    udisks2.enable = true;
+    printing.enable = lib.mkDefault config.monorepo.profiles.workstation.enable;
+    udisks2.enable = (! config.monorepo.profiles.ttyonly.enable);
   };
 
   programs = {
@@ -421,11 +417,20 @@
   };
 
   nixpkgs.config.permittedInsecurePackages = [
+    "python3.13-ecdsa-0.19.1"
     "olm-3.2.16"
   ];
 
   nix = {
     settings = {
+      max-jobs = 4; 
+      cores = 0;
+      substituters = [
+        "https://cache.nixos-cuda.org"
+      ];
+      trusted-public-keys = [
+        "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+      ];
       experimental-features = "nix-command flakes ca-derivations";
       trusted-users = [ "@wheel" ];
     };

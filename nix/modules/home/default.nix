@@ -109,7 +109,7 @@
 					          (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
                       poetry
 						          python3
-						          python312Packages.jedi
+                      python314Packages.python-lsp-server
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.lang-sol.enable then (with pkgs; [
@@ -151,13 +151,13 @@
 					          (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
 						          nil
 						          nixd
-						          nixfmt-rfc-style
+						          nixfmt
                       nix-prefetch-scripts
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.crypto.enable then (with pkgs; [
 						          bitcoin
-						          electrum
+						          # electrum
 						          monero-cli
 						          monero-gui
 					          ]) else [])
@@ -168,7 +168,7 @@
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.music.enable then (with pkgs; [
-						          mpc-cli
+						          mpc
 						          sox
 					          ]) else [])
 					          ++

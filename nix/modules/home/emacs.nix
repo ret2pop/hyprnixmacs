@@ -28,7 +28,6 @@
         epkgs.elfeed-org
         epkgs.elfeed-tube
         epkgs.elfeed-tube-mpv
-        epkgs.ellama
         epkgs.elpher
         epkgs.ement
         epkgs.emmet-mode

@@ -9,7 +9,6 @@
     windowManager = {
 	    i3 = {
 	      enable = ! config.monorepo.profiles.ttyonly.enable;
-	      package = pkgs.i3-gaps;
 	    };
     };
 

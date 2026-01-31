@@ -8,10 +8,12 @@
     settings = {
       "$mod" = "SUPER";
       bezier = [
-        "overshot,0,1,0,0.95"
+        "overshot, 0.05, 0.9, 0.1, 1.05"
       ];
       animation = [
-        "workspaces, 1, 10, overshot"
+        # "workspaces, 1, 10, overshot"
+        "windows, 1, 2, default"
+        "workspaces, 1, 2, default, slidefade 20%"
       ];
       exec-once = [
         "waybar"
@@ -30,10 +32,11 @@
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "ELECTRON_OZONE_PLATFORM_HINT,auto"
       ];
-      layerrule = [
-        "blur,waybar"
-      ];
+      # layerrule = [
+      #   "blur:top,waybar"
+      # ];
       monitor = [
+        "DP-4,2560x1440@165.000000,0x0,1"
         "Unknown-1,disable"
       ];
       windowrulev2 = [
@@ -134,15 +137,14 @@
         };
         rounding = 5;
       };
-      device = {
-        name = "beken-usb-gaming-mouse-1";
-        sensitivity = -0.5;
-      };
       input = {
+        scroll_method = "on_button_down";
+        scroll_button = 276;
+        sensitivity = -0.5;
         kb_options = "caps:swapescape";
         repeat_delay = 300;
         repeat_rate = 50;
-        natural_scroll = true;
+        natural_scroll = false;
         touchpad = {
           natural_scroll = true;
           disable_while_typing = true;

@@ -3,7 +3,7 @@
   hardware = {
     graphics.extraPackages = (if config.monorepo.profiles.cuda.enable
                               then with pkgs; [
-                                vaapiVdpau
+                                libva-vdpau-driver
                                 libvdpau-va-gl
                                 nvidia-vaapi-driver
                               ] else []);
@@ -15,7 +15,7 @@
 		    finegrained = false;
 	    };
 	    nvidiaSettings = lib.mkDefault config.monorepo.profiles.cuda.enable;
-	    open = lib.mkDefault false;
+	    open = config.monorepo.profiles.cuda.enable;
 	    package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
   };

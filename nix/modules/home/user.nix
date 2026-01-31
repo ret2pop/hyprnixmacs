@@ -60,12 +60,12 @@
       magic-wormhole stow
 
       # fonts
-      nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-emoji fira-code font-awesome_6 victor-mono
+      nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-color-emoji fira-code font-awesome_6 victor-mono
       (aspellWithDicts
         (dicts: with dicts; [ en en-computers en-science ]))
 
       # Misc.
-      pinentry
+      pinentry-gnome3
       x11_ssh_askpass
       xdg-utils
       acpilight

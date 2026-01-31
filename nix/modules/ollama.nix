@@ -1,8 +1,9 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 {
+  # services.open-webui.enable = lib.mkDefault (!config.monorepo.profiles.server.enable);
   services.ollama = {
     enable = lib.mkDefault (!config.monorepo.profiles.server.enable);
-    acceleration = if (config.monorepo.profiles.workstation.enable) then "cuda" else null;
+    package = if (config.monorepo.profiles.workstation.enable) then pkgs.ollama-cuda else pkgs.ollama-vulkan;
     loadModels = if (config.monorepo.profiles.workstation.enable) then [
       "qwen3:30b"
       "qwen3-coder:latest"
