@@ -14,6 +14,5 @@
         fileSystem = "btrfs";
       };
     };
-    networking.networkmanager.wifi.backend = "iwd";
   };
 }

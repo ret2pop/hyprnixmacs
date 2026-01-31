@@ -42,6 +42,9 @@
     "/persistent" = {
       neededForBoot = true;
     };
+    "/home" = {
+      neededForBoot = true;
+    };
   } else {};
 
   environment.persistence."/persistent" = {
