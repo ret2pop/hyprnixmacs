@@ -8,7 +8,7 @@
 
     windowManager = {
 	    i3 = {
-	      enable = ! config.monorepo.profiles.ttyonly.enable;
+	      enable = (! config.monorepo.profiles.ttyonly.enable);
 	    };
     };
 

@@ -32,34 +32,53 @@
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "ELECTRON_OZONE_PLATFORM_HINT,auto"
       ];
-      # layerrule = [
-      #   "blur:top,waybar"
-      # ];
+
       monitor = [
         "DP-4,2560x1440@165.000000,0x0,1"
         "Unknown-1,disable"
       ];
-      windowrulev2 = [
-        "workspace 1, class:^(emacs)$"
-        "workspace 2, class:^(firefox)$"
-        "workspace 2, title:^(.*Tor Browser.*)$"
-        "workspace 2, title:^(.*Chromium-browser.*)$"
-        "workspace 2, class:^(chromium)$"
-        "workspace 3, class:^(discord)$"
-        "workspace 3, class:^(vesktop)$"
-        "workspace 3, title:^(.*fluffychat.*)$"
-        "workspace 3, class:^(.*element-desktop.*)$"
-        "workspace 4, class:^(.*qpwgraph.*)$"
-        "workspace 4, class:^(.*pavucontrol.*)$"
-        "workspace 4, class:^(.*mpv.*)$"
-        "workspace 5, title:^(.*Monero.*)$"
-        "workspace 5, title:^(.*org\.bitcoin\..*)$"
-        "workspace 5, title:^(.*Bitcoin Core - preston.*)$"
-        "workspace 5, title:^(.*org\.getmonero\..*)$"
-        "workspace 5, title:^(.*Monero - preston.*)$"
-        "workspace 5, title:^(.*electrum.*)$"
-        "pseudo,title:fcitx"
+
+      layerrule = [
+        {
+          name = "waybar blur";
+          "match:namespace" = "waybar";
+          blur = "on";
+        }
       ];
+
+      windowrule = [ 
+        {
+          name = "emacs";
+          "match:class" = "emacs";
+          workspace = 1;
+        }
+        {
+          name = "firefox";
+          "match:class" = "firefox";
+          workspace = 2;
+        }
+        {
+          name = "vesktop";
+          "match:class" = "vesktop";
+          workspace = 3;
+        }
+        {
+          name = "pavucontrol";
+          "match:class" = "pavucontrol";
+          workspace = 4;
+        }
+        {
+          name = "qpwgraph";
+          "match:class" = "qpwgraph";
+          workspace = 4;
+        }
+        {
+          name = "mpv";
+          "match:class" = "mpv";
+          workspace = 4;
+        }
+      ];
+
       bind = [
         "$mod, F, exec, firefox"
         "$mod, Return, exec, kitty"

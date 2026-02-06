@@ -40,11 +40,10 @@
   };
 
   systemd = {
+    services.NetworkManager-wait-online.enable = false;
     coredump.enable = false;
     network.config.networkConfig.IPv6PrivacyExtensions = "kernel";
     tmpfiles.settings = {
-  	  "restricthome"."/home/*".Z.mode = "~0700";
-
   	  "restrictetcnixos"."/etc/nixos/*".Z = {
   	    mode = "0000";
   	    user = "root";
@@ -108,7 +107,6 @@
   	  "pti=on"
   	  "randomize_kstack_offset=on"
   	  "vsyscall=none"
-  	  "module.sig_enforce=1"
   	  # "lockdown=confidentiality"
 
   	  # cpu
@@ -123,11 +121,10 @@
 
   	  # mineral
   	  # "init_on_alloc=1"
-  	  "random.trust_cpu=off"
-  	  "random.trust_bootloader=off"
+  	  # "random.trust_bootloader=off"
   	  # "init_on_free=1"
   	  "quiet"
-  	  "loglevel=0"
+  	  # "loglevel=0"
     ];
 
     blacklistedKernelModules = [
@@ -250,7 +247,7 @@
     };
 
     jitterentropy-rngd.enable = true;
-    resolved.dnssec = true;
+    resolved.settings.Resolve.DNSSEC = true;
     # usbguard.enable = true;
     usbguard.enable = false;
     dbus.apparmor = "enabled";

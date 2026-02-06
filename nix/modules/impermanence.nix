@@ -9,7 +9,7 @@
 
   boot.initrd.postResumeCommands = (if config.monorepo.profiles.impermanence.enable then lib.mkAfter ''
     mkdir /btrfs_tmp
-    mount /dev/mapper/crypted /btrfs_tmp
+    mount -t btrfs -n -o subvol=/ /dev/mapper/crypted /btrfs_tmp
     if [[ -e /btrfs_tmp/root ]]; then
         mkdir -p /btrfs_tmp/old_roots
         timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
@@ -29,7 +29,7 @@
     done
 
     btrfs subvolume create /btrfs_tmp/root
-    umount /btrfs_tmp
+    umount -n /btrfs_tmp
   '' else "");
 
   boot.initrd.luks.devices = (if (config.monorepo.vars.fileSystem == "btrfs") then {

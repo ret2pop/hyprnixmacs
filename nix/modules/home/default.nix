@@ -186,7 +186,7 @@
 			                imagemagick
                       supercollider
 			                inkscape
-			                kdePackages.kdenlive
+			                # kdePackages.kdenlive
 			                # kicad
                       murmur
 					          ]) else []);

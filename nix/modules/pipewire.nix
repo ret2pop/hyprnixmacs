@@ -3,12 +3,12 @@
   services.pipewire = {
     enable = lib.mkDefault config.monorepo.profiles.pipewire.enable;
     alsa = {
-      enable = true;
+      enable = lib.mkDefault config.monorepo.profiles.pipewire.enable;
       support32Bit = true;
     };
-    pulse.enable = true;
-    jack.enable = true;
-    wireplumber.enable = true;
+    pulse.enable = lib.mkDefault config.monorepo.profiles.pipewire.enable;
+    jack.enable = lib.mkDefault config.monorepo.profiles.pipewire.enable;
+    wireplumber.enable = lib.mkDefault config.monorepo.profiles.pipewire.enable;
     extraConfig = {
       pipewire."92-low-latency" = {
         "context.properties" = {

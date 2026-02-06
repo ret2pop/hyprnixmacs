@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
   let
     ipv4addr = "66.42.84.130";
     ipv6addr = "2001:19f0:5401:10d0:5400:5ff:fe4a:7794";
@@ -38,6 +38,7 @@
             prefixLength = 64;
           }
         ];
+        defaultGateway = "66.42.84.1";
         firewall.allowedTCPPorts = [
           80
           143

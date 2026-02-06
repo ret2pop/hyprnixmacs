@@ -25,6 +25,12 @@
           useSSL = true;
           modules = [ "simple_away" ];
         };
+        "nullring" = {
+          server = "nullring.xyz";
+          port = 6697;
+          useSSL = true;
+          modules = [ "simple_away" "log" ];
+        };
       };
     };
   };

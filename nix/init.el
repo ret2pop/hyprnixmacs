@@ -638,6 +638,10 @@
   (emms-player-mpd-server-name "localhost" "Connect to localhost")
   (emms-player-mpd-server-port "6600" "Connect to port 6600")
   (emms-player-list '(emms-player-mpd) "Use mpd")
+  (emms-lyrics-display-on-modeline t)
+  :hook
+  ((emms-playlist-mode . emms-lyrics-mode)
+   (emms-player-started . emms-lyrics-lrclib-get))
   :init
   (emms-all)
   (add-to-list 'emms-info-functions 'emms-info-mpd)
