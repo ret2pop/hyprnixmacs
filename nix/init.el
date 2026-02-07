@@ -383,31 +383,43 @@
 (use-package magit)
 
 (use-package erc
+  :hook
+  ((erc-mode . erc-notifications-mode))
   :custom
   (erc-nick system-username "sets erc username to the one set in nix config")
   (erc-user-full-name system-fullname "sets erc fullname to the one set in nix config"))
 
 (use-package general
   :init
+  (defun znc ()
+    (interactive)
+    (erc-tls :server "ret2pop.net"
+             :port "5000"))
+
   (defun prestonpan ()
     (interactive)
     (erc-tls :server "nullring.xyz"
 	     :port   "6697"))
+
   (defun liberachat ()
     (interactive)
     (erc-tls :server "irc.libera.chat"
 	     :port   "6697"))
+
   (defun efnet ()
     (interactive)
     (erc-tls :server "irc.prison.net"
 	     :port   "6697"))
+
   (defun matrix-org ()
     (interactive)
     (ement-connect))
+
   (defun gimp-org ()
     (interactive)
     (erc-tls :server "irc.gimp.org"
 	     :port "6697"))
+
   :config
   (general-create-definer leader-key :prefix "SPC")
   (leader-key 'normal
@@ -468,6 +480,7 @@
     "i l c" '(liberachat :wk "Connect to libera chat server")
     "i e c" '(efnet :wk "Connect to efnet chat server")
     "i g c" '(gimp-org :wk "Connect to gimp chat server")
+    "i z c" '(znc :wk "Connect to my ZNC instance")
 
     ;; Documentation
     "h" '(:ignore t :wk "Documentation")
