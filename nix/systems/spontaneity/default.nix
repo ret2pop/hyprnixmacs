@@ -26,6 +26,10 @@
 
       boot.loader.grub.device = "nodev";
       networking = {
+        extraHosts = ''
+    127.0.0.1 livekit.${config.monorepo.vars.orgHost}
+    127.0.0.1 matrix.${config.monorepo.vars.orgHost}
+  '';
         interfaces.ens3.ipv4.addresses = [
           {
             address = ipv4addr;
@@ -39,17 +43,29 @@
           }
         ];
         defaultGateway = "66.42.84.1";
-        firewall.allowedTCPPorts = [
-          80
-          143
-          443
-          465
-          587
-          993
-          6697
-          6667
-          8448
-        ];
+        firewall = {
+          allowedTCPPorts = [
+            80
+            143
+            443
+            465
+            587
+            993
+            3478
+            5349
+            6697
+            6667
+            7881
+            8443
+            8448
+          ];
+          allowedUDPPorts = [
+            3478 5349 7882
+          ];
+          allowedUDPPortRanges = [
+            { from = 49152; to = 65535; }
+          ];
+        };
         domains = {
           enable = true;
           baseDomains = {
@@ -64,12 +80,14 @@
           };
           subDomains = {
             "${config.monorepo.vars.remoteHost}" = {};
+            "notes.${config.monorepo.vars.remoteHost}" = {
+              a.data = "45.76.87.125";
+            };
             "matrix.${config.monorepo.vars.remoteHost}" = {};
             "www.${config.monorepo.vars.remoteHost}" = {};
-            "mail.${config.monorepo.vars.remoteHost}" = {
-              mx.data = "10 mail.${config.monorepo.vars.remoteHost}.";
-            };
+            "mail.${config.monorepo.vars.remoteHost}" = {};
 
+            "livekit.${config.monorepo.vars.orgHost}" = {};
             "${config.monorepo.vars.orgHost}" = {};
             "git.${config.monorepo.vars.orgHost}" = {};
             "matrix.${config.monorepo.vars.orgHost}" = {};

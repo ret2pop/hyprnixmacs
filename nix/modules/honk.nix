@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   services.honk = {
-    enable = config.monorepo.vars.ttyonly;
+    enable = lib.mkDefault config.monorepo.profiles.server.enable;
     servername = "ret2pop.net";
     username = "ret2pop";
   };

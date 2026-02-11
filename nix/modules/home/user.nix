@@ -45,7 +45,7 @@
 
       # Apps
       # octaveFull
-      vesktop grim swww vim telegram-desktop qwen-code fluffychat jami
+      vesktop grim swww vim kotatogram-desktop tg qwen-code element-desktop jami
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum

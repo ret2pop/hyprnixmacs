@@ -24,19 +24,20 @@
         always_on       "yes" # prevent MPD from disconnecting all listeners when playback is stopped.
         tags            "yes" # httpd supports sending tags to listening streams.
       }
-audio_output {
-    type        "shout"
-    encoding    "ogg"
-    name        "my cool stream"
-    host        "localhost"
-    port        "8000"
-    mount       "/example.ogg"
-    user        "source"
-    password    "<source-password>"
 
-    bitrate     "64"
-    format      "44100:16:1"
-    description "Nullring public radio"
+audio_output {
+    type            "shout"
+    name            "My VPS Stream"
+    host            "127.0.0.1"
+    port            "8888"             # This must match your SSH tunnel local port
+    mount           "/stream"          # The URL path (e.g. http://vps:8000/stream)
+    password        "SuperSecretSourcePass"
+    bitrate         "128"
+    format          "44100:16:2"
+    protocol        "icecast2"         # Essential for modern Icecast
+    user            "source"           # Default icecast source user
+    description     "My MPD Stream"
+    genre           "Mixed"
 }
     '';
   };

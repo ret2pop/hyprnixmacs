@@ -2,7 +2,7 @@
 {
   services.mautrix-discord = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
-    environmentFile = "/etc/mautrix";
+    environmentFile = "/run/secrets/mautrix_env";
     settings = {
       bridge = {
         animated_sticker = {

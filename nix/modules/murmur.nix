@@ -1,7 +1,8 @@
 { lib, config, ... }:
 {
   services.murmur = {
-    enable = lib.mkDefault config.monorepo.profiles.server.enable;
+#    enable = lib.mkDefault config.monorepo.profiles.server.enable;
+    enable = false;
     openFirewall = true;
     hostName = "0.0.0.0";
     welcometext = "Wecome to the Null Murmur instance!";

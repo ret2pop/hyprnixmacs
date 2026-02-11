@@ -14,9 +14,9 @@
 		    enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
 		    finegrained = false;
 	    };
-	    nvidiaSettings = lib.mkDefault config.monorepo.profiles.cuda.enable;
 	    open = config.monorepo.profiles.cuda.enable;
 	    package = config.boot.kernelPackages.nvidiaPackages.stable;
+      nvidiaSettings = false;
     };
   };
 }

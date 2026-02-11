@@ -4,7 +4,6 @@
     sops-nix.homeManagerModules.sops
     ../vars.nix
     ./fcitx.nix
-    ./secrets.nix
     ./emacs.nix
     ./firefox.nix
     ./git.nix
@@ -22,6 +21,7 @@
     ./mako.nix
     ./user.nix
     ./gtk.nix
+    ./secrets.nix
   ];
 
   options = {

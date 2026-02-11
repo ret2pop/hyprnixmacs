@@ -11,6 +11,7 @@
     ./nvidia.nix
     ./cuda.nix
     ./nginx.nix
+    ./secrets.nix
     ./git-daemon.nix
     ./ollama.nix
     ./i2pd.nix
@@ -22,7 +23,12 @@
     ./znc.nix
     ./docker.nix
     ./impermanence.nix
+    ./coturn.nix
   ];
+
+  environment.etc."wpa_supplicant.conf".text = ''
+country=CA
+'';
 
   documentation = {
     enable = lib.mkDefault config.monorepo.profiles.documentation.enable;
@@ -60,6 +66,13 @@
     };
     extraModprobeConfig = ''
   options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
+  options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
+  options rtw88_pci disable_msi=y disable_aspm=y
+  options rtw_core disable_lps_deep=y
+  options rtw_pci disable_msi=y disable_aspm=y
+  options rtw89_core disable_ps_mode=y
+  options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
+  options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
 '';
     extraModulePackages = [ ];
 
@@ -97,7 +110,10 @@
     ];
 
     kernelParams = [
+      "cfg80211.reg_alpha2=CA"
       "usbcore.autosuspend=-1"
+      "pcie_aspm=off"
+      "pci=noaer"
   	  # "debugfs=off"
   	  "page_alloc.shuffle=1"
   	  "slab_nomerge"
@@ -169,14 +185,15 @@
   	  "kernel.perf_event_paranoid" = 3;
 
   	  # net
+      "net.ipv4.ip_forward" = 1;
   	  "net.ipv4.icmp_echo_ignore_broadcasts" = true;
 
-  	  "net.ipv4.conf.all.accept_redirects" = false;
-  	  "net.ipv4.conf.all.secure_redirects" = false;
-  	  "net.ipv4.conf.default.accept_redirects" = false;
-  	  "net.ipv4.conf.default.secure_redirects" = false;
-  	  "net.ipv6.conf.all.accept_redirects" = false;
-  	  "net.ipv6.conf.default.accept_redirects" = false;
+  	  # "net.ipv4.conf.all.accept_redirects" = false;
+  	  # "net.ipv4.conf.all.secure_redirects" = false;
+  	  # "net.ipv4.conf.default.accept_redirects" = false;
+  	  # "net.ipv4.conf.default.secure_redirects" = false;
+  	  # "net.ipv6.conf.all.accept_redirects" = false;
+  	  # "net.ipv6.conf.default.accept_redirects" = false;
     };
   };
 
@@ -185,40 +202,42 @@
     dhcpcd.enable = (! config.monorepo.profiles.server.enable);
     networkmanager = {
   	  enable = true;
-      wifi.powersave = false;
+      wifi = {
+        powersave = false;
+      };
       ensureProfiles = {
-        profiles = {
-          home-wifi = {
-            connection = {
-              id = "home-wifi";
-              permissions = "";
-              type = "wifi";
-            };
-            ipv4 = {
-              dns-search = "";
-              method = "auto";
-            };
-            ipv6 = {
-              addr-gen-mode = "stable-privacy";
-              dns-search = "";
-              method = "auto";
-            };
-            wifi = {
-              mac-address-blacklist = "";
-              mode = "infrastructure";
-              ssid = "TELUS6572";
-            };
-            wifi-security = {
-              auth-alg = "open";
-              key-mgmt = "wpa-psk";
-              # when someone actually steals my internet then I will be concerned.
-              # This password only matters if you actually show up to my house in real life.
-              # That would perhaps allow for some nasty networking related shenanigans.
-              # I guess we'll cross that bridge when I get there.
-              psk = "b4xnrv6cG6GX";
-            };
-          };
-        };
+        # profiles = {
+        #   home-wifi = {
+        #     connection = {
+        #       id = "TELUS6572";
+        #       permissions = "";
+        #       type = "wifi";
+        #     };
+        #     ipv4 = {
+        #       dns-search = "";
+        #       method = "auto";
+        #     };
+        #     ipv6 = {
+        #       addr-gen-mode = "stable-privacy";
+        #       dns-search = "";
+        #       method = "auto";
+        #     };
+        #     wifi = {
+        #       mac-address-blacklist = "";
+        #       mode = "infrastructure";
+        #       ssid = "TELUS6572";
+        #     };
+        #     wifi-security = {
+        #       auth-alg = "open";
+        #       key-mgmt = "wpa-psk";
+        #       # when someone actually steals my internet then I will be concerned.
+        #       # This password only matters if you actually show up to my house in real life.
+        #       # That would perhaps allow for some nasty networking related shenanigans.
+        #       # I guess we'll cross that bridge when I get there.
+        #       psk = "b4xnrv6cG6GX";
+        #     };
+        #   };
+        # };
       };
     };
     firewall = {
@@ -228,6 +247,7 @@
   };
 
   hardware = {
+    wirelessRegulatoryDatabase = true;
     enableAllFirmware = true;
     cpu.intel.updateMicrocode = true;
     graphics.enable = ! config.monorepo.profiles.ttyonly.enable;
@@ -345,6 +365,8 @@
     restic
     sbctl
     git
+    git-lfs
+    git-lfs-transfer
     vim
     curl
     nmap
@@ -363,12 +385,23 @@
   users.groups.git = lib.mkDefault {};
   users.groups.ircd = lib.mkDefault {};
   users.groups.ngircd = lib.mkDefault {};
+  users.groups.conduit = lib.mkDefault {};
+  users.groups.livekit = lib.mkDefault {};
+  users.groups.matterbridge = lib.mkDefault {};
 
   users.users = {
-
+    matterbridge = {
+      isSystemUser = lib.mkDefault true;
+      group = "matterbridge";
+    };
     ngircd = {
       isSystemUser = lib.mkDefault true;
       group = "ngircd";
+      extraGroups = [ "acme" "nginx" ];
+    };
+    livekit = {
+      isSystemUser = lib.mkDefault true;
+      group = "livekit";
       extraGroups = [ "acme" "nginx" ];
     };
 
@@ -393,7 +426,7 @@
     git = {
   	  isSystemUser = true;
   	  home = "/srv/git";
-  	  shell = "${pkgs.git}/bin/git-shell";
+  	  shell = "/bin/sh";
       group = "git";
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
@@ -404,6 +437,7 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
       ];
 
+      linger = true;
   	  initialPassword = "${config.monorepo.vars.userName}";
   	  isNormalUser = true;
   	  description = config.monorepo.vars.fullName;
@@ -420,6 +454,9 @@
 
   nix = {
     settings = {
+      keep-outputs = true;
+      keep-derivations = true;
+      auto-optimise-store = true;
       max-jobs = 4; 
       cores = 0;
       substituters = [
@@ -431,6 +468,7 @@
       experimental-features = "nix-command flakes ca-derivations";
       trusted-users = [ "@wheel" ];
     };
+    gc.automatic = true;
   };
   time.timeZone = config.monorepo.vars.timeZone;
   i18n.defaultLocale = "en_CA.UTF-8";

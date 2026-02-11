@@ -59,7 +59,6 @@
     ];
     files = [
       "/etc/machine-id"
-      "/etc/matterbridge.toml"
       { file = "/var/keys/secret_file"; parentDirectory = { mode = "u=rwx,g=,o="; }; }
     ];
     users."${config.monorepo.vars.userName}" = {

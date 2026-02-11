@@ -1,11 +1,15 @@
 { config, ... }:
 {
   sops = {
-    defaultSopsFile = ../../secrets/secrets.yaml;
+    defaultSopsFile = if config.monorepo.profiles.graphics.enable
+                      then ../../secrets/secrets.yaml
+                      else ../../secrets/vps_secrets.yaml;
+
     age = {
-      keyFile = "/home/${config.monorepo.vars.userName}/.ssh/keys.txt";
+      keyFile = "/home/${config.monorepo.vars.userName}/.config/sops/age/keys.txt";
     };
-    secrets = {
+
+    secrets = if config.monorepo.profiles.graphics.enable then {
       mail = {
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/mail";
@@ -22,24 +26,7 @@
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/dn42";
       };
-      znc = {
-        format = "yaml";
-        path = "${config.sops.defaultSymlinkPath}/znc";
-      };
-      znc_password_salt = {
-        format = "yaml";
-        path = "${config.sops.defaultSymlinkPath}/znc_password_salt";
-      };
-
-      znc_password_hash = {
-        format = "yaml";
-        path = "${config.sops.defaultSymlinkPath}/znc_password_hash";
-      };
-
-      matrix_bridge = {
-        format = "yaml";
-        path = "${config.sops.defaultSymlinkPath}/matrix_bridge";
-      };
+    } else {
     };
     defaultSymlinkPath = "/run/user/1000/secrets";
     defaultSecretsMountPoint = "/run/user/1000/secrets.d";

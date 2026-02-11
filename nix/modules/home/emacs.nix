@@ -77,6 +77,7 @@
         epkgs.solidity-flycheck
         epkgs.solidity-mode
         epkgs.sudo-edit
+        epkgs.telega
         epkgs.treemacs
         epkgs.treemacs-evil
         epkgs.treemacs-magit

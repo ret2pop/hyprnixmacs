@@ -1,61 +1,104 @@
 { config, ... }:
 {
   sops = {
-    defaultSopsFile = ../../secrets/secrets.yaml;
+    defaultSopsFile = if config.monorepo.profiles.server.enable
+                      then ../secrets/vps_secrets.yaml
+                      else ../secrets/secrets.yaml;
+
+
+    templates = if config.monorepo.profiles.server.enable then {
+      "matterbridge" = {
+        owner = "matterbridge";
+        content = ''
+[irc.myirc]
+Server="127.0.0.1:6667"
+Nick="bridge"
+RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+UseTLS=false
+
+[telegram.mytelegram]
+Token="${config.sops.placeholder.telegram_token}"
+RemoteNickFormat="<({PROTOCOL}){NICK}> "
+MessageFormat="HTMLNick :"
+QuoteFormat="{MESSAGE} (re @{QUOTENICK}: {QUOTEMESSAGE})"
+QuoteLengthLimit=46
+IgnoreMessages="^/"
+
+[discord.mydiscord]
+Token="${config.sops.placeholder.discord_token}"
+Server="Null Identity"
+AutoWebHooks=true
+RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+PreserveThreading=true
+
+[[gateway]]
+name="gateway1"
+enable=true
+
+[[gateway.inout]]
+account="irc.myirc"
+channel="#nullring"
+
+[[gateway.inout]]
+account="discord.mydiscord"
+channel="ID:996282946879242262"
+
+[[gateway.inout]]
+account="telegram.mytelegram"
+channel="-5290629325"
+'';
+      };
+    } else {};
+
     age = {
-      keyFile = "/home/${config.monorepo.vars.userName}/.ssh/keys.txt";
+      keyFile = "/home/${config.monorepo.vars.userName}/.config/sops/age/keys.txt";
     };
-    secrets = {
+
+    secrets = if ! config.monorepo.profiles.server.enable then {
       mail = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/mail";
       };
       cloudflare-dns = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-        path = "${config.sops.defaultSymlinkPath}/cloudflare-dns";
       };
       digikey = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-        path = "${config.sops.defaultSymlinkPath}/digikey";
       };
       dn42 = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/dn42";
       };
+    } else {
       znc = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/znc";
       };
       znc_password_salt = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/znc_password_salt";
       };
-
       znc_password_hash = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/znc_password_hash";
       };
-
       matrix_bridge = {
         format = "yaml";
-        sopsFile = config.sops.defaultSopsFile;
-#        sopsFile = ../../secrets/secrets.yaml;
-        path = "${config.sops.defaultSymlinkPath}/matrix_bridge";
+      };
+      livekit_secret = {
+        format = "yaml";
+        mode = "0444";
+      };
+      livekit = {
+        format = "yaml";
+      };
+      conduit_secrets = {
+        format = "yaml";
+      };
+      mautrix_env = {
+        format = "yaml";
+      };
+      telegram_token = {
+        format = "yaml";
+      };
+      discord_token = {
+        format = "yaml";
       };
     };
-    defaultSymlinkPath = "/run/user/1000/secrets";
-    defaultSecretsMountPoint = "/run/user/1000/secrets.d";
   };
 }
