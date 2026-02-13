@@ -110,6 +110,12 @@ country=CA
   	  "snd-rawmidi"
   	  "xhci_hcd"
   	  "kvm_intel"
+      "crm"
+      "ctr"
+      "cmac"
+      "arc4"
+      "ecb"
+      "michael_mic"
     ];
 
     kernelParams = [
