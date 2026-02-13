@@ -143,6 +143,16 @@
         };
       };
 
+      "ntfy.${config.monorepo.vars.remoteHost}" = {
+        serverName = "ntfy.${config.monorepo.vars.remoteHost}";
+        enableACME = true;
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://localhost:2586";
+          proxyWebsockets = true;
+        };
+      };
+
 	    "${config.monorepo.vars.remoteHost}" = {
         serverName = "${config.monorepo.vars.remoteHost}";
         serverAliases = [ "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" ];

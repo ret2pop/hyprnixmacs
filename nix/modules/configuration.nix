@@ -24,6 +24,9 @@
     ./docker.nix
     ./impermanence.nix
     ./coturn.nix
+    ./maddy.nix
+    ./ntfy-sh.nix
+    ./fail2ban.nix
   ];
 
   environment.etc."wpa_supplicant.conf".text = ''
@@ -206,38 +209,38 @@ country=CA
         powersave = false;
       };
       ensureProfiles = {
-        # profiles = {
-        #   home-wifi = {
-        #     connection = {
-        #       id = "TELUS6572";
-        #       permissions = "";
-        #       type = "wifi";
-        #     };
-        #     ipv4 = {
-        #       dns-search = "";
-        #       method = "auto";
-        #     };
-        #     ipv6 = {
-        #       addr-gen-mode = "stable-privacy";
-        #       dns-search = "";
-        #       method = "auto";
-        #     };
-        #     wifi = {
-        #       mac-address-blacklist = "";
-        #       mode = "infrastructure";
-        #       ssid = "TELUS6572";
-        #     };
-        #     wifi-security = {
-        #       auth-alg = "open";
-        #       key-mgmt = "wpa-psk";
-        #       # when someone actually steals my internet then I will be concerned.
-        #       # This password only matters if you actually show up to my house in real life.
-        #       # That would perhaps allow for some nasty networking related shenanigans.
-        #       # I guess we'll cross that bridge when I get there.
-        #       psk = "b4xnrv6cG6GX";
-        #     };
-        #   };
-        # };
+        profiles = {
+          home-wifi = {
+            connection = {
+              id = "TELUS6572";
+              permissions = "";
+              type = "wifi";
+            };
+            ipv4 = {
+              dns-search = "";
+              method = "auto";
+            };
+            ipv6 = {
+              addr-gen-mode = "stable-privacy";
+              dns-search = "";
+              method = "auto";
+            };
+            wifi = {
+              mac-address-blacklist = "";
+              mode = "infrastructure";
+              ssid = "TELUS6572";
+            };
+            wifi-security = {
+              auth-alg = "open";
+              key-mgmt = "wpa-psk";
+              # when someone actually steals my internet then I will be concerned.
+              # This password only matters if you actually show up to my house in real life.
+              # That would perhaps allow for some nasty networking related shenanigans.
+              # I guess we'll cross that bridge when I get there.
+              psk = "b4xnrv6cG6GX";
+            };
+          };
+        };
       };
     };
     firewall = {
@@ -370,6 +373,7 @@ country=CA
     vim
     curl
     nmap
+    exiftool
     (writeShellScriptBin "new-repo"
       ''
   #!/bin/bash
@@ -388,12 +392,31 @@ country=CA
   users.groups.conduit = lib.mkDefault {};
   users.groups.livekit = lib.mkDefault {};
   users.groups.matterbridge = lib.mkDefault {};
+  users.groups.maddy = lib.mkDefault {};
+  users.groups.ntfy-sh = lib.mkDefault {};
 
   users.users = {
+    conduit = {
+      isSystemUser = lib.mkDefault true;
+      group = "conduit";
+    };
     matterbridge = {
       isSystemUser = lib.mkDefault true;
       group = "matterbridge";
     };
+
+    maddy = {
+      isSystemUser = lib.mkDefault true;
+      group = "maddy";
+      extraGroups = [ "acme" "nginx" ];
+    };
+
+    ntfy-sh = {
+      isSystemUser = lib.mkDefault true;
+      group = "ntfy-sh";
+      extraGroups = [ "acme" "nginx" ];
+    };
+
     ngircd = {
       isSystemUser = lib.mkDefault true;
       group = "ngircd";

@@ -87,6 +87,10 @@ channel="-5290629325"
       livekit = {
         format = "yaml";
       };
+      mail_password = {
+        format = "yaml";
+        owner = "maddy";
+      };
       conduit_secrets = {
         format = "yaml";
       };
@@ -98,6 +102,10 @@ channel="-5290629325"
       };
       discord_token = {
         format = "yaml";
+      };
+      ntfy = {
+        format = "yaml";
+        owner = "ntfy-sh";
       };
     };
   };

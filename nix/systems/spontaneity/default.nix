@@ -25,7 +25,28 @@
       };
 
       boot.loader.grub.device = "nodev";
+      boot.kernel.sysctl = {
+        "net.ipv6.conf.ens3.autoconf" = 0;
+        # Keep accept_ra = 1 so you still get the default gateway/route!
+        "net.ipv6.conf.ens3.accept_ra" = 1; 
+      };
+
+      systemd.network.enable = true;
+      systemd.network.networks."40-ens3" = {
+        matchConfig.Name = "ens3";
+        networkConfig = {
+          # This is the magic combo for Vultr:
+          IPv6AcceptRA = true;         # Accept routes (so we know where the internet is)
+          IPv6PrivacyExtensions = false; # No random privacy IPs
+        };
+        ipv6AcceptRAConfig = {
+          UseAutonomousPrefix = false; # Do NOT generate an IP address from the RA
+        };
+      };
       networking = {
+        useDHCP = lib.mkForce false;
+        networkmanager.enable = lib.mkForce false;
+        tempAddresses = "disabled";
         extraHosts = ''
     127.0.0.1 livekit.${config.monorepo.vars.orgHost}
     127.0.0.1 matrix.${config.monorepo.vars.orgHost}
@@ -36,6 +57,7 @@
             prefixLength = 24;
           }
         ];
+        interfaces.ens3.useDHCP = lib.mkForce false;
         interfaces.ens3.ipv6.addresses = [
           {
             address = ipv6addr;
@@ -76,6 +98,16 @@
             "${config.monorepo.vars.orgHost}" = {
               a.data = ipv4addr;
               aaaa.data = ipv6addr;
+
+              mx.data = [
+                {
+                  preference = 10;
+                  exchange = "mail.${config.monorepo.vars.orgHost}";
+                }
+              ];
+              txt = {
+                data = "v=spf1 ip4:${ipv4addr} ip6:${ipv6addr} -all";
+              };
             };
           };
           subDomains = {
@@ -83,9 +115,24 @@
             "notes.${config.monorepo.vars.remoteHost}" = {
               a.data = "45.76.87.125";
             };
+
+            "_dmarc.${config.monorepo.vars.orgHost}" = {
+              txt = {
+                data = "v=DMARC1; p=none";
+              };
+            };
+
+            "default._domainkey.${config.monorepo.vars.orgHost}" = {
+              txt = {
+                data = "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsC9GpfjvQlldPrHAC7Yt+ZF0aduUIVV4j2+KUkF0j6NsrpOgvU6COWKQSod/B/qyPBLWf+w5P5YiJ9XnOgw6Db/I9C67eusEHnV/cbvokXLQjSBvXee1OEdrT9i+6iUgDeGWP4CrD1DcwvXzAcCI9exy3yALHVlbkyYvi0KAYofs8dVQ3JCwSCMlol71lA6ULJ2zbCIWeSOv9/C6QZ5HOIeeoFLesX6O/YvF4FYxWbSHy244TXYuczQKuayjKgD6e8gIT5WJRQj8IAWOQ2podWw6hSuB3Ig+ekoOfnl5ivJGOMbAzFTj8FtbS4ncyidLU1kIOeuLfiILeDDLlIeYTwIDAQAB";
+              };
+            };
+
+            "ntfy.${config.monorepo.vars.remoteHost}" = {};
             "matrix.${config.monorepo.vars.remoteHost}" = {};
             "www.${config.monorepo.vars.remoteHost}" = {};
-            "mail.${config.monorepo.vars.remoteHost}" = {};
+            "mail.${config.monorepo.vars.remoteHost}" = {
+            };
 
             "livekit.${config.monorepo.vars.orgHost}" = {};
             "${config.monorepo.vars.orgHost}" = {};

@@ -8,7 +8,7 @@
     zramSwap = {
       enable = true;
       algorithm = "zstd";
-      memoryPercent = 50; # Creates ~16GB of compressed swap space
+      memoryPercent = 50;
     };
     monorepo = {
       vars.device = "/dev/nvme0n1";
