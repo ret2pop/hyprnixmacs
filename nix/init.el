@@ -625,6 +625,8 @@
 
 (use-package mu4e
   :after smtpmail
+  :hook
+  ((mu4e-compose-mode . mml-secure-message-sign-pgpmime))
   :custom
   (mu4e-drafts-folder "/Drafts" "Set drafts folder mu db")
   (mu4e-sent-folder   "/Sent" "Set sent folder in mu db")
@@ -642,6 +644,10 @@
   (mu4e-headers-auto-update t "Auto-updates feed")
   (mu4e-view-show-images t "Shows images")
   (mu4e-compose-signature-auto-include nil)
+  (mml-secure-openpgp-sign-with-sender t)
+  (mml-secure-openpgp-signers (list system-gpgkey))
+  (mail-user-agent 'mu4e-user-agent)
+  (message-mail-user-agent 'mu4e-user-agent)
   (mu4e-use-fancy-chars t "Random option to make mu4e look nicer"))
 
 (use-package emms

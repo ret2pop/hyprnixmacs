@@ -80,6 +80,7 @@
             7881
             8443
             8448
+            9418
           ];
           allowedUDPPorts = [
             3478 5349 7882
@@ -131,6 +132,7 @@
             "ntfy.${config.monorepo.vars.remoteHost}" = {};
             "matrix.${config.monorepo.vars.remoteHost}" = {};
             "www.${config.monorepo.vars.remoteHost}" = {};
+            "music.${config.monorepo.vars.remoteHost}" = {};
             "mail.${config.monorepo.vars.remoteHost}" = {
             };
 
@@ -138,6 +140,8 @@
             "${config.monorepo.vars.orgHost}" = {};
             "git.${config.monorepo.vars.orgHost}" = {};
             "matrix.${config.monorepo.vars.orgHost}" = {};
+            "social.${config.monorepo.vars.orgHost}" = {};
+            "list.${config.monorepo.vars.orgHost}" = {};
             "talk.${config.monorepo.vars.orgHost}" = {};
             "mail.${config.monorepo.vars.orgHost}" = {};
             "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" = {};

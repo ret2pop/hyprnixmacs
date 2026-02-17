@@ -1,6 +1,7 @@
 { config, sops-nix, ... }:
 {
   home-manager = {
+    backupFileExtension = "backup";
     sharedModules = [
       sops-nix.homeManagerModules.sops
     ];

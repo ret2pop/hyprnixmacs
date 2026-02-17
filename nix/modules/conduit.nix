@@ -18,7 +18,7 @@
   services.lk-jwt-service = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     port = 6495;
-    livekitUrl = "wss://livekit.nullring.xyz";
+    livekitUrl = "wss://livekit.${config.monorepo.vars.orgHost}";
     keyFile = "/run/secrets/livekit_secret";
   };
   services.livekit = {

@@ -7,6 +7,15 @@
 
 
     templates = if config.monorepo.profiles.server.enable then {
+      "public-inbox-netrc" = {
+        owner = "public-inbox";
+        group = "public-inbox";
+        mode = "0400";
+        content = ''
+machine mail.${config.monorepo.vars.orgHost} login monorepo@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}
+machine mail.${config.monorepo.vars.orgHost} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}
+    '';
+      };
       "matterbridge" = {
         owner = "matterbridge";
         content = ''
@@ -91,6 +100,17 @@ channel="-5290629325"
         format = "yaml";
         owner = "maddy";
       };
+
+      mail_monorepo_password = {
+        format = "yaml";
+        owner = "maddy";
+      };
+
+      mail_monorepo_password_pi = {
+        format = "yaml";
+        owner = "public-inbox";
+      };
+
       conduit_secrets = {
         format = "yaml";
       };
@@ -102,6 +122,10 @@ channel="-5290629325"
       };
       discord_token = {
         format = "yaml";
+      };
+      mpd_password = {
+        format = "yaml";
+        owner = "nginx";
       };
       ntfy = {
         format = "yaml";

@@ -30,6 +30,8 @@
     packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
       # wikipedia
       # kiwix kiwix-tools
+      gnupg
+      unzip
       mupdf
       zathura
 
@@ -147,6 +149,12 @@ cd "$HOME"
       allow-emacs-pinentry
       allow-loopback-pinentry
     '';
+    };
+  };
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "x-scheme-handler/mailto" = "emacsclient-mail.desktop";
     };
   };
 

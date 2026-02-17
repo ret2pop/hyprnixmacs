@@ -29,6 +29,12 @@
       "${config.monorepo.vars.internetName}@${config.monorepo.vars.orgHost}" = {
         passwordFile = "/run/secrets/mail_password";
       };
+      "monorepo@${config.monorepo.vars.orgHost}" = {
+        passwordFile = "/run/secrets/mail_monorepo_password";
+      };
+      "discussion@${config.monorepo.vars.orgHost}" = {
+        passwordFile = "/run/secrets/mail_monorepo_password";
+      };
     };
   };
 }

@@ -53,19 +53,19 @@
 	    email = {
 		    email = lib.mkOption {
 			    type = lib.types.str;
-			    default = "ret2pop@gmail.com";
+			    default = "ret2pop@nullring.xyz";
 			    example = "john@example.com";
 			    description = "Email address and imaps/smtps account";
 		    };
 		    imapsServer = lib.mkOption {
 			    type = lib.types.str;
-			    default = "imap.gmail.com";
+			    default = "mail.nullring.xyz";
 			    example = "imap.example.com";
 			    description = "imaps server address";
 		    };
 		    smtpsServer = lib.mkOption {
 			    type = lib.types.str;
-			    default = "smtp.gmail.com";
+			    default = "mail.nullring.xyz";
 			    example = "smtp.example.com";
 			    description = "smtp server address";
 		    };

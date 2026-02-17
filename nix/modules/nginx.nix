@@ -10,7 +10,7 @@
 
     gitweb = {
       enable = true;
-      virtualHost = "${config.monorepo.vars.remoteHost}";
+      virtualHost = "${config.monorepo.vars.orgHost}";
     };
 
     virtualHosts = {
@@ -49,11 +49,12 @@
         };
         locations."= /.well-known/matrix/server" = {
           extraConfig = ''
+      default_type application/json;
       add_header Content-Type application/json;
       add_header Access-Control-Allow-Origin *;
     '';
           
-          return = ''200 '{"m.server": "matrix.nullring.xyz:443"}' ''; 
+          return = ''200 '{"m.server": "matrix.${config.monorepo.vars.orgHost}:443"}' ''; 
         };
         locations."/.well-known/matrix/client" = {
           extraConfig = ''
@@ -115,8 +116,8 @@
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            # proxy_set_header Upgrade $http_upgrade;
-            # proxy_set_header Connection "upgrade";
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
 
             # --- CORS CONFIGURATION START ---
             # 1. Allow all origins (including app.element.io)
@@ -160,6 +161,39 @@
 	      addSSL = true;
 	      enableACME = true;
 	    };
+
+      "list.${config.monorepo.vars.orgHost}" = {
+        forceSSL = true;
+        enableACME = true;
+        locations."/" = {
+          proxyPass = "http://localhost:9090";
+          extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+        };
+      };
+
+      # the port comes from ssh tunnelling
+      "music.${config.monorepo.vars.remoteHost}" = {
+        addSSL = true;
+        enableACME = true;
+        basicAuthFile = config.sops.secrets."mpd_password".path;
+        locations."/" = {
+          proxyPass = "http://localhost:8000";
+          extraConfig = ''
+proxy_buffering off;
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_read_timeout 36000s;
+'';
+        };
+      };
 
       "${config.monorepo.vars.orgHost}" = {
         serverName = "${config.monorepo.vars.orgHost}";

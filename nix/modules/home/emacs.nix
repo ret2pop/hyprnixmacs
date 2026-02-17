@@ -9,6 +9,7 @@
 (setq system-email "${config.monorepo.profiles.email.email}")
 (setq system-username "${config.monorepo.vars.internetName}")
 (setq system-fullname "${config.monorepo.vars.fullName}")
+(setq system-gpgkey "${config.monorepo.vars.gpgKey}")
 (load "${pkgs.writeText "init.el" (builtins.readFile ../../init.el)}")
 '';
 
