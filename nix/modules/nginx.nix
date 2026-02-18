@@ -162,6 +162,10 @@
 	      enableACME = true;
 	    };
 
+      "git.${config.monorepo.vars.orgHost}" = {
+        forceSSL = true;
+        enableACME = true;
+      };
       "list.${config.monorepo.vars.orgHost}" = {
         forceSSL = true;
         enableACME = true;

@@ -15,6 +15,7 @@
       # Allow the service to see the file it just created
       BindPaths = [ 
         "/var/lib/public-inbox" 
+        "/srv/git/"
       ];
       ReadOnlyPaths = [ "/var/lib/public-inbox/style.css" ];
       # Ensure it can actually write to the directory during preStart
@@ -54,6 +55,10 @@
   services.public-inbox = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     settings = {
+      coderepo."nullerbot".dir = "/srv/git/nullerbot.git";
+      coderepo."nullerbot".cgitUrl = "https://git.nullring.xyz/nullerbot.git";
+      coderepo."monorepo".dir = "/srv/git/monorepo.git";
+      coderepo."monorepo".cgitUrl = "https://git.nullring.xyz/monorepo.git";
       publicinbox.css = ["/var/lib/public-inbox/style.css"];
       publicinbox.wwwlisting = "all";
     };
@@ -68,6 +73,9 @@
         inboxdir = "/var/lib/public-inbox/monorepo";
         url = "https://list.${config.monorepo.vars.orgHost}/monorepo";
         watch = [ "imaps://monorepo%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
+        coderepo = [
+          "monorepo"
+        ];
       };
 
       "discussion" = {
@@ -76,6 +84,17 @@
         inboxdir = "/var/lib/public-inbox/discuss";
         url = "https://list.${config.monorepo.vars.orgHost}/discussion";
         watch = [ "imaps://discussion%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
+      };
+
+      "nullerbot" = {
+        description = "Discussion of Nullerbot Matrix Bot";
+        address = [ "nullerbot@${config.monorepo.vars.orgHost}" ];
+        inboxdir = "/var/lib/public-inbox/nullerbot";
+        url = "https://list.${config.monorepo.vars.orgHost}/nullerbot";
+        watch = [ "imaps://nullerbot%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
+        coderepo = [
+          "nullerbot"
+        ];
       };
     };
   };

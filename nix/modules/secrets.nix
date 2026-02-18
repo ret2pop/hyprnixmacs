@@ -14,6 +14,7 @@
         content = ''
 machine mail.${config.monorepo.vars.orgHost} login monorepo@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}
 machine mail.${config.monorepo.vars.orgHost} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}
+machine mail.${config.monorepo.vars.orgHost} login nullerbot@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}
     '';
       };
       "matterbridge" = {

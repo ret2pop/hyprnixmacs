@@ -36,7 +36,7 @@ in
     ];
     nixos = {
       packages = with pkgs; [
-        git
+        gitFull
         curl
         gum
         (writeShellScriptBin "nix_installer"

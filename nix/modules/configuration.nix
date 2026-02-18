@@ -1,6 +1,21 @@
 { config, pkgs, lib, ... }:
+let
+  userGroups = [
+    "nginx"
+    "git"
+    "ircd"
+    "ngircd"
+    "conduit"
+    "livekit"
+    "matterbridge"
+    "maddy"
+    "ntfy-sh"
+    "public-inbox"
+  ];
+in
 {
   imports = [
+    ./cgit.nix
     ./public_inbox.nix
     ./matterbridge.nix
     ./mautrix.nix
@@ -378,7 +393,7 @@ country=CA
   environment.systemPackages = with pkgs; [
     restic
     sbctl
-    git
+    gitFull
     git-lfs
     git-lfs-transfer
     vim
@@ -396,55 +411,29 @@ country=CA
     )
   ];
 
-  users.groups.nginx = lib.mkDefault {};
-  users.groups.git = lib.mkDefault {};
-  users.groups.ircd = lib.mkDefault {};
-  users.groups.ngircd = lib.mkDefault {};
-  users.groups.conduit = lib.mkDefault {};
-  users.groups.livekit = lib.mkDefault {};
-  users.groups.matterbridge = lib.mkDefault {};
-  users.groups.maddy = lib.mkDefault {};
-  users.groups.ntfy-sh = lib.mkDefault {};
-  users.groups.public-inbox = lib.mkDefault {};
+  users.groups = lib.genAttrs userGroups (name: lib.mkDefault {});
 
-  users.users = {
+  users.users = lib.genAttrs userGroups (name: {
+    isSystemUser = lib.mkDefault true;
+    group = "${name}";
+    extraGroups = [ "acme" "nginx" ];
+  }) // {
     conduit = {
       isSystemUser = lib.mkDefault true;
       group = "conduit";
+      extraGroups = [];
     };
     matterbridge = {
       isSystemUser = lib.mkDefault true;
       group = "matterbridge";
-    };
-
-    maddy = {
-      isSystemUser = lib.mkDefault true;
-      group = "maddy";
-      extraGroups = [ "acme" "nginx" ];
-    };
-
-    ntfy-sh = {
-      isSystemUser = lib.mkDefault true;
-      group = "ntfy-sh";
-      extraGroups = [ "acme" "nginx" ];
+      extraGroups = [];
     };
 
     public-inbox = {
       isSystemUser = lib.mkDefault true;
       group = "public-inbox";
 
-      extraGroups = [ "acme" "nginx" ];
-    };
-    ngircd = {
-      isSystemUser = lib.mkDefault true;
-      group = "ngircd";
-      extraGroups = [ "acme" "nginx" ];
-    };
-
-    livekit = {
-      isSystemUser = lib.mkDefault true;
-      group = "livekit";
-      extraGroups = [ "acme" "nginx" ];
+      extraGroups = [ "acme" "nginx" "git" ];
     };
 
     ircd = {
