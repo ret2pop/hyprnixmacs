@@ -454,6 +454,9 @@
     "g p" '(magit-pull :wk "Pull from git")
     "g s" '(magit-status :wk "Change status of files")
     "g i" '(magit-init :wk "init new git project")
+    "g r" '(magit-rebase :wk "Rebase branch")
+    "g m" '(magit-merge :wk "Merge branches")
+    "g b" '(magit-branch :wk "Git branch")
 
     "o p" '(treemacs :wk "Project Drawer")
     "o P" '(treemacs-projectile :wk "Import Projectile project to treemacs")
