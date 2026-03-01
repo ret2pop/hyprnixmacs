@@ -23,7 +23,7 @@
         "fcitx5 -d --replace"
         "fcitx5-remote -r"
         "emacs"
-        "firefox"
+        "librewolf"
       ];
       env = [
         "LIBVA_DRIVER_NAME,nvidia"
@@ -53,9 +53,14 @@
           workspace = 1;
         }
         {
-          name = "firefox";
-          "match:class" = "firefox";
+          name = "librewolf";
+          "match:class" = "librewolf";
           workspace = 2;
+        }
+        {
+          name = "element-desktop";
+          "match:class" = "element-desktop";
+          workspace = 3;
         }
         {
           name = "vesktop";
@@ -80,13 +85,13 @@
       ];
 
       bind = [
-        "$mod, F, exec, firefox"
+        "$mod, F, exec, librewolf"
         "$mod, Return, exec, kitty"
         "$mod, E, exec, emacs"
         "$mod, B, exec, bitcoin-qt"
         "$mod, S, exec, pavucontrol"
         "$mod, M, exec, monero-wallet-gui"
-        "$mod, V, exec, vesktop"
+        "$mod, V, exec, element-desktop"
         "$mod, C, exec, fluffychat"
         "$mod, D, exec, wofi --show run"
         "$mod, P, exec, bash ${scripts}/powermenu.sh"

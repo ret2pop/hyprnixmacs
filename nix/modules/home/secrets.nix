@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, super, ... }:
 {
   sops = {
     defaultSopsFile = if config.monorepo.profiles.graphics.enable
@@ -6,7 +6,7 @@
                       else ../../secrets/vps_secrets.yaml;
 
     age = {
-      keyFile = "/home/${config.monorepo.vars.userName}/.config/sops/age/keys.txt";
+      keyFile = "/home/${super.monorepo.vars.userName}/.config/sops/age/keys.txt";
     };
 
     secrets = if config.monorepo.profiles.graphics.enable then {

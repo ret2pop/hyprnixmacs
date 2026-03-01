@@ -26,7 +26,7 @@
           modules = [ "simple_away" ];
         };
         "nullring" = {
-          server = "nullring.xyz";
+          server = "${config.monorepo.vars.orgHost}";
           port = 6697;
           useSSL = true;
           modules = [ "simple_away" "log" ];

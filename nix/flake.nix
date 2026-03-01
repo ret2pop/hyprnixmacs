@@ -41,6 +41,11 @@
       url = "github:nixpak/nixpak";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -94,7 +99,9 @@
                                     nixos-dns.nixosModules.dns
                                     {
                                       nixpkgs.overlays = [ nur.overlays.default ];
-                                      home-manager.extraSpecialArgs = attrs // { systemHostName = "${hostname}"; };
+                                      home-manager.extraSpecialArgs = attrs // {
+                                        systemHostName = "${hostname}";
+                                      };
                                       networking.hostName = "${hostname}";
                                     }
                                     (./. + "/systems/${hostname}/default.nix")

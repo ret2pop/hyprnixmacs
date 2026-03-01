@@ -9,7 +9,7 @@
 (warning-minimum-level :emergency "Supress emacs warnings")
 (confirm-kill-processes nil "Don't ask to quit")
 (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
-(browse-url-generic-program "firefox")
+(browse-url-generic-program "librewolf")
 (browse-url-secondary-browser-function 'browse-url-generic)
 (browse-url-browser-function 'browse-url-generic)
 
@@ -19,6 +19,7 @@
 (mouse-wheel-follow-mouse 't "Scroll correct window")
 (scroll-conservatively 101 "Sort of smooth scrolling")
 (scroll-step 1 "Scroll one line at a time")
+(debug-on-error nil "Don't make the annoying popups")
 (display-time-24hr-format t "Use 24 hour format to read the time")
     (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
     (use-short-answers t "Use y instead of yes")
@@ -589,7 +590,7 @@
   :after (org)
   :custom
   (org-roam-db-update-on-save t "Update org-roam db")
-  (org-roam-graph-viewer "firefox" "Use firefox to view org-roam graph")
+  (org-roam-graph-viewer "librewolf" "Use librewolf to view org-roam graph")
   (org-roam-directory (file-truename "~/monorepo/mindmap") "Set org-roam directory inside monorepo")
   (org-roam-capture-templates '(("d" "default" plain "%?"
 				 :target (file+head "${title}.org"
@@ -607,7 +608,7 @@
   (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
   (org-roam-ui-follow t "Have cool visual while editing org-roam")
   (org-roam-ui-update-on-save t "This option is obvious")
-  (org-roam-ui-open-on-start t "Have cool visual open in firefox when emacs loads"))
+  (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads"))
 
 (use-package pinentry
   :custom (epa-pinentry-mode `loopback "Set this option to match gpg-agent.conf")

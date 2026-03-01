@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
   services.cgit."my-projects" = {
-    enable = true;
-    scanPath = "/srv/git"; 
+    enable = lib.mkDefault config.monorepo.profiles.server.enable;
+    scanPath = "${config.users.users.git.home}"; 
     settings = {
       root-title = "Nullring Git Server";
       root-desc = "Projects and cool things";

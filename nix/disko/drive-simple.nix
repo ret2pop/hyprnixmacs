@@ -3,7 +3,7 @@ let
   spec = {
     disko.devices = {
       disk = {
-        my-disk = {
+        main = {
           device = config.monorepo.vars.device;
           type = "disk";
           content = {

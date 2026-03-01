@@ -25,24 +25,15 @@
       "imap tls://0.0.0.0:993 tcp://0.0.0.0:143"
       "submission tls://0.0.0.0:465 tcp://0.0.0.0:587"
     ] options.services.maddy.config.default;
-    ensureAccounts = [
+    ensureAccounts = (builtins.map (x: "${x}@${config.monorepo.vars.orgHost}") config.monorepo.vars.projects) ++ [
       "${config.monorepo.vars.internetName}@${config.monorepo.vars.orgHost}"
-      "monorepo@${config.monorepo.vars.orgHost}"
-      "nullerbot@${config.monorepo.vars.orgHost}"
       "discussion@${config.monorepo.vars.orgHost}"
     ];
-    ensureCredentials = {
+    ensureCredentials = lib.genAttrs config.services.maddy.ensureAccounts (name: {
+      passwordFile = "/run/secrets/mail_monorepo_password";
+    }) // {
       "${config.monorepo.vars.internetName}@${config.monorepo.vars.orgHost}" = {
         passwordFile = "/run/secrets/mail_password";
-      };
-      "monorepo@${config.monorepo.vars.orgHost}" = {
-        passwordFile = "/run/secrets/mail_monorepo_password";
-      };
-      "nullerbot@${config.monorepo.vars.orgHost}" = {
-        passwordFile = "/run/secrets/mail_monorepo_password";
-      };
-      "discussion@${config.monorepo.vars.orgHost}" = {
-        passwordFile = "/run/secrets/mail_monorepo_password";
       };
     };
   };

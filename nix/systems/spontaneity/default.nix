@@ -125,7 +125,7 @@
 
             "default._domainkey.${config.monorepo.vars.orgHost}" = {
               txt = {
-                data = "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsC9GpfjvQlldPrHAC7Yt+ZF0aduUIVV4j2+KUkF0j6NsrpOgvU6COWKQSod/B/qyPBLWf+w5P5YiJ9XnOgw6Db/I9C67eusEHnV/cbvokXLQjSBvXee1OEdrT9i+6iUgDeGWP4CrD1DcwvXzAcCI9exy3yALHVlbkyYvi0KAYofs8dVQ3JCwSCMlol71lA6ULJ2zbCIWeSOv9/C6QZ5HOIeeoFLesX6O/YvF4FYxWbSHy244TXYuczQKuayjKgD6e8gIT5WJRQj8IAWOQ2podWw6hSuB3Ig+ekoOfnl5ivJGOMbAzFTj8FtbS4ncyidLU1kIOeuLfiILeDDLlIeYTwIDAQAB";
+                data = "v=DKIM1; k=rsa; p=${config.monorepo.vars.dkimKey}";
               };
             };
 

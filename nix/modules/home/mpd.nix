@@ -10,14 +10,14 @@
   network.listenAddress = "0.0.0.0";
   extraConfig = ''
       audio_output {
-        type "pipewire"
-        name "pipewire output"
+        type            "pipewire"
+        name            "pipewire output"
       }
 
       audio_output {
         type		"httpd"
         name		"Ret2pop's Music Stream"
-        encoder		"opus"		# optional
+        encoder		"opus"
         port		"8000"
         bitrate		"128000"
         format		"48000:16:1"
@@ -25,20 +25,20 @@
         tags            "yes"
       }
 
-audio_output {
-    type            "shout"
-    name            "My VPS Stream"
-    host            "127.0.0.1"
-    port            "8888"             # This must match your SSH tunnel local port
-    mount           "/stream"          # The URL path (e.g. http://vps:8000/stream)
-    password        "SuperSecretSourcePass"
-    bitrate         "128"
-    format          "44100:16:2"
-    protocol        "icecast2"         # Essential for modern Icecast
-    user            "source"           # Default icecast source user
-    description     "My MPD Stream"
-    genre           "Mixed"
-}
+      audio_output {
+        type            "shout"
+        name            "My VPS Stream"
+        host            "127.0.0.1"
+        port            "8888"
+        mount           "/stream"
+        password        "SuperSecretSourcePass"
+        bitrate         "128"
+        format          "44100:16:2"
+        protocol        "icecast2"
+        user            "source"
+        description     "My MPD Stream"
+        genre           "Mixed"
+    }
     '';
   };
 }

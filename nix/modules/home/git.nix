@@ -1,25 +1,26 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, super, ... }:
 {
   programs.git = {
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     package = pkgs.gitFull;
     lfs.enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
-    userName = config.monorepo.vars.fullName;
-    userEmail = config.monorepo.profiles.email.email;
+    userName = super.monorepo.vars.fullName;
+    userEmail = "${super.monorepo.vars.email}";
     signing = {
-      key = config.monorepo.vars.gpgKey;
+      key = super.monorepo.vars.gpgKey;
       signByDefault = true;
     };
 
     extraConfig = {
       init.defaultBranch = "main";
-      credential."${config.monorepo.profiles.email.smtpsServer}" = {
-        username = "${config.monorepo.profiles.email.email}";
+      credential."mail.${super.monorepo.vars.orgHost}" = {
+        username = "${super.monorepo.vars.email}";
         helper = "!f() { test \"$1\" = get && echo \"password=$(cat /run/user/1000/secrets/mail)\"; }; f";
       };
+
       sendemail = {
-        smtpserver = "${config.monorepo.profiles.email.smtpsServer}";
-        smtpuser = "${config.monorepo.profiles.email.email}";
+        smtpserver = "mail.${super.monorepo.vars.orgHost}";
+        smtpuser = "${super.monorepo.vars.email}";
         smtpserverport = 465;
         smtpencryption = "ssl";
       };

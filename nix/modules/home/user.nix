@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, super, pkgs, ... }:
 {
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''
@@ -47,7 +47,7 @@
 
       # Apps
       # octaveFull
-      vesktop grim swww vim kotatogram-desktop tg qwen-code element-desktop thunderbird jami
+      grim swww vim kotatogram-desktop tg qwen-code element-desktop signal-desktop thunderbird jami
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum
@@ -59,7 +59,7 @@
       torsocks tor-browser
 
       # For transfering secrets onto new system
-      magic-wormhole stow
+      stow
 
       # fonts
       nerd-fonts.iosevka noto-fonts noto-fonts-cjk-sans noto-fonts-color-emoji fira-code font-awesome_6 victor-mono
@@ -133,7 +133,6 @@ cd "$HOME"
         '')
     ] else [
       pfetch
-
       # net
       curl
       torsocks
@@ -155,6 +154,13 @@ cd "$HOME"
     enable = true;
     defaultApplications = {
       "x-scheme-handler/mailto" = "emacsclient-mail.desktop";
+        "text/html" = "librewolf.desktop";
+        "text/xml" = "librewolf.desktop";
+        "application/xhtml+xml" = "librewolf.desktop";
+        "x-scheme-handler/http" = "librewolf.desktop";
+        "x-scheme-handler/https" = "librewolf.desktop";
+        "x-scheme-handler/about" = "librewolf.desktop";
+        "x-scheme-handler/unknown" = "librewolf.desktop";
     };
   };
 

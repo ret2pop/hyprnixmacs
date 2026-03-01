@@ -11,6 +11,7 @@ let
     "maddy"
     "ntfy-sh"
     "public-inbox"
+    "plugdev"
   ];
 in
 {
@@ -31,7 +32,6 @@ in
     ./git-daemon.nix
     ./ollama.nix
     ./i2pd.nix
-    ./gitweb.nix
     ./conduit.nix
     ./bitcoin.nix
     ./murmur.nix
@@ -83,6 +83,7 @@ country=CA
       btrfs = true;
       ext4 = true;
     };
+
     extraModprobeConfig = ''
   options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
   options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
@@ -122,10 +123,10 @@ country=CA
     };
 
     kernelModules = [
-  	  "snd-seq"
-  	  "snd-rawmidi"
-  	  "xhci_hcd"
-  	  "kvm_intel"
+      "snd-seq"
+      "snd-rawmidi"
+      "xhci_hcd"
+      "kvm_intel"
       "af_packet"
       "ccm"
       "ctr"
@@ -200,29 +201,28 @@ country=CA
     ];
 
     kernel.sysctl = {
-  	  "kernel.ftrace_enabled" = false;
-  	  "net.core.bpf_jit_enable" = false;
-  	  "kernel.kptr_restrict" = 2;
+      "kernel.ftrace_enabled" = false;
+      "net.core.bpf_jit_enable" = false;
+      "kernel.kptr_restrict" = 2;
 
-  	  # madaidan
+      # madaidan
       "kernel.smtcontrol" = "on";
-  	  "vm.swappiness" = 1;
-  	  "vm.unprivileged_userfaultfd" = 0;
-  	  "dev.tty.ldisc_autoload" = 0;
-  	  "kernel.kexec_load_disabled" = 1;
-  	  "kernel.sysrq" = 4;
-  	  "kernel.perf_event_paranoid" = 3;
+      "vm.swappiness" = 1;
+      "vm.unprivileged_userfaultfd" = 0;
+      "dev.tty.ldisc_autoload" = 0;
+      "kernel.kexec_load_disabled" = 1;
+      "kernel.sysrq" = 4;
+      "kernel.perf_event_paranoid" = 3;
 
-  	  # net
+      # net
       "net.ipv4.ip_forward" = 1;
-  	  "net.ipv4.icmp_echo_ignore_broadcasts" = true;
-
-  	  # "net.ipv4.conf.all.accept_redirects" = false;
-  	  # "net.ipv4.conf.all.secure_redirects" = false;
-  	  # "net.ipv4.conf.default.accept_redirects" = false;
-  	  # "net.ipv4.conf.default.secure_redirects" = false;
-  	  # "net.ipv6.conf.all.accept_redirects" = false;
-  	  # "net.ipv6.conf.default.accept_redirects" = false;
+      "net.ipv4.icmp_echo_ignore_broadcasts" = true;
+      # "net.ipv4.conf.all.accept_redirects" = false;
+      # "net.ipv4.conf.all.secure_redirects" = false;
+      # "net.ipv4.conf.default.accept_redirects" = false;
+      # "net.ipv4.conf.default.secure_redirects" = false;
+      # "net.ipv6.conf.all.accept_redirects" = false;
+      # "net.ipv6.conf.default.accept_redirects" = false;
     };
   };
 
@@ -282,17 +282,17 @@ country=CA
     graphics.enable = ! config.monorepo.profiles.ttyonly.enable;
 
     bluetooth = {
-  	  enable = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
-  	  powerOnBoot = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
+      enable = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
+      powerOnBoot = lib.mkDefault (! config.monorepo.profiles.ttyonly.enable);
     };
   };
 
   services = {
     pulseaudio.enable = ! config.monorepo.profiles.pipewire.enable;
     chrony = {
-  	  enable = true;
-  	  enableNTS = true;
-  	  servers = [ "time.cloudflare.com" "ptbtime1.ptb.de" "ptbtime2.ptb.de" ];
+      enable = true;
+      enableNTS = true;
+      servers = [ "time.cloudflare.com" "ptbtime1.ptb.de" "ptbtime2.ptb.de" ];
     };
 
     jitterentropy-rngd.enable = true;
@@ -301,16 +301,14 @@ country=CA
     usbguard.enable = false;
     dbus.apparmor = "enabled";
 
-    kanata.enable = true;
-
     # Misc.
     udev = {
-  	  extraRules = '''';
-  	  packages = if config.monorepo.profiles.workstation.enable then with pkgs; [ 
-  	    platformio-core
-  	    platformio-core.udev
-  	    openocd
-  	  ] else [];
+      extraRules = '''';
+      packages = if config.monorepo.profiles.workstation.enable then with pkgs; [ 
+        platformio-core
+        platformio-core.udev
+        openocd
+      ] else [];
     };
 
     printing.enable = lib.mkDefault config.monorepo.profiles.workstation.enable;
@@ -327,8 +325,8 @@ country=CA
   nixpkgs = {
     hostPlatform = lib.mkDefault "x86_64-linux";
     config = {
-  	  allowUnfree = true;
-  	  cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
+      allowUnfree = true;
+      cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
     };
   };
 
@@ -338,19 +336,19 @@ country=CA
       defaults.email = "ret2pop@gmail.com";
     };
     apparmor = {
-  	  enable = true;
-  	  killUnconfinedConfinables = true;
+      enable = true;
+      killUnconfinedConfinables = true;
       packages = with pkgs; [
         apparmor-profiles
       ];
-      policies = {
-        firefox.path = "${pkgs.apparmor-profiles}/share/apparmor/extra-profiles/firefox";
-      };
+      # policies = {
+      #   firefox.path = "${pkgs.apparmor-profiles}/share/apparmor/extra-profiles/firefox";
+      # };
     };
 
     pam.loginLimits = [
-  	  { domain = "*"; item = "nofile"; type = "-"; value = "32768"; }
-  	  { domain = "*"; item = "memlock"; type = "-"; value = "32768"; }
+      { domain = "*"; item = "nofile"; type = "-"; value = "32768"; }
+      { domain = "*"; item = "memlock"; type = "-"; value = "32768"; }
     ];
     rtkit.enable = true;
 
@@ -361,9 +359,9 @@ country=CA
     forcePageTableIsolation = true;
 
     tpm2 = {
-  	  enable = true;
-  	  pkcs11.enable = true;
-  	  tctiEnvironment.enable = true;
+      enable = true;
+      pkcs11.enable = true;
+      tctiEnvironment.enable = true;
     };
 
     auditd.enable = true;
@@ -376,9 +374,9 @@ country=CA
     enable = (! config.monorepo.profiles.ttyonly.enable);
     wlr.enable = (! config.monorepo.profiles.ttyonly.enable);
     extraPortals = with pkgs; if (! config.monorepo.profiles.ttyonly.enable) then [
-  	  xdg-desktop-portal-gtk
-  	  xdg-desktop-portal
-  	  xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal
+      xdg-desktop-portal-hyprland
     ] else [];
     config.common.default = "*";
   };
@@ -403,7 +401,7 @@ country=CA
     (writeShellScriptBin "new-repo"
       ''
   #!/bin/bash
-  cd /srv/git
+  cd ${config.users.users.git.home}
   git init --bare "$1"
   vim "$1/description"
   chown -R git:git "$1"
@@ -445,37 +443,36 @@ country=CA
     nginx = {
       group = "nginx";
       isSystemUser = lib.mkDefault true;
-      extraGroups = [
-        "acme"
-      ];
+      extraGroups = [ "acme" ];
     };
 
     root.openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+      config.monorepo.vars.sshKey
     ];
 
     git = {
-  	  isSystemUser = true;
-  	  home = "/srv/git";
-  	  shell = "/bin/sh";
+      isSystemUser = true;
+      home = "/srv/git";
+      shell = "/bin/sh";
       group = "git";
       openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+        config.monorepo.vars.sshKey
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIEF+mcL9nDkzVhCYyYWCIrP+b6oRiiaV509jywbD0Vq nix-on-droid@localhost"
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCedJm0yYB0qLah/Y7PqLVgNh6qp+yujssGtuR05KbZLzSnsLUjUMObMyjFB9xTKrSGDqyoMkNe2l5VXMBJ9wBKLbzqMWbkakAWOj7EC/qZ6dFWA075mniwAuWKY/Q8QYohAJbbeU4j0ObWrltd4ar2Ac9vsVyftYF5efg8PEqVdOxzrBn5taY1zCCRjee5ISeRDIovnBbq7x86jsx5VnXTjMN9FZCI2qmz992Sg/PPXpXat+O1YQlG0eBHEny2Ug9gaAYnGOVr6kZKE4lrjz47nrXVXO6lJsNXmuzTVnEgo30DAA3dV4fws/M5ptM5Pgg2qe94HyHWhhmtXOekWmGtP3YxpVe3M/SPl31UL570ZDuuCcpJTsbe90ZyXC3CiSJkLKbmFkfOgZ6DI2LT8KSp09/2NCtZYriLN/nXObn6gQzByGMxVyKNx2hh8ENt9hzTCAk5lYDK3g3wS8eLCY3EH/caEqT9mLZEZeRHtAhtfozo1VJL7sSZ0Zm7wiIxHylwOshh1sYI1gb1MgMqNnrr1t8+8UK+Q0NERQW3yiphG36HXWy/DdCG0EF+N850KbgH1FFur+m+3hZCZCFVp3tGCcOC+bxWMBT3+9yC6LARi5cFjLQaWLsNO5xEs4vqX3+s3QjJ0pAYDkgtoeY2Fbh+imN+JasWn/cSy5p3UdE4ZQ== andrei@kiss"
       ];
     };
     "${config.monorepo.vars.userName}" = {
       openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
+        config.monorepo.vars.sshKey
       ];
 
       linger = true;
-  	  initialPassword = "${config.monorepo.vars.userName}";
-  	  isNormalUser = true;
-  	  description = config.monorepo.vars.fullName;
-  	  extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" "docker" ];
-  	  shell = pkgs.zsh;
-  	  packages = [];
+      initialPassword = "${config.monorepo.vars.userName}";
+      isNormalUser = true;
+      description = config.monorepo.vars.fullName;
+      extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" "docker" "plugdev" ];
+      shell = pkgs.zsh;
+      packages = [];
     };
   };
 

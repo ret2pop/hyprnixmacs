@@ -18,11 +18,39 @@ in
       description = "Internet name to be used for internet usernames";
     };
 
+    sshKey = lib.mkOption {
+      type = lib.types.str;
+      default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell";
+      example = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell";
+      description = "Admin public key for managing multiple configurations";
+    };
+
+    dkimKey = lib.mkOption {
+      type = lib.types.str;
+      default = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsC9GpfjvQlldPrHAC7Yt+ZF0aduUIVV4j2+KUkF0j6NsrpOgvU6COWKQSod/B/qyPBLWf+w5P5YiJ9XnOgw6Db/I9C67eusEHnV/cbvokXLQjSBvXee1OEdrT9i+6iUgDeGWP4CrD1DcwvXzAcCI9exy3yALHVlbkyYvi0KAYofs8dVQ3JCwSCMlol71lA6ULJ2zbCIWeSOv9/C6QZ5HOIeeoFLesX6O/YvF4FYxWbSHy244TXYuczQKuayjKgD6e8gIT5WJRQj8IAWOQ2podWw6hSuB3Ig+ekoOfnl5ivJGOMbAzFTj8FtbS4ncyidLU1kIOeuLfiILeDDLlIeYTwIDAQAB";
+      example = "string_after_p=";
+      description = "dkim key to put in host record for email";
+    };
+
     repoName = lib.mkOption {
       type = lib.types.str;
       default = "monorepo";
       example = "myreponame";
       description = "Name of this repository";
+    };
+
+    projects = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "monorepo"
+        "nullerbot"
+      ];
+      example = [
+        "project1"
+        "project2"
+        "project3"
+      ];
+      description = "Names of repos that will have mailing lists";
     };
 
     fileSystem = lib.mkOption {
@@ -37,18 +65,18 @@ in
       description = "retains a copy of the disko spec for reflection";
     };
 
-    userName = lib.mkOption {
-      type = lib.types.str;
-      default = "preston";
-      example = "myUser";
-      description = "system username";
-    };
-
     fullName = lib.mkOption {
       type = lib.types.str;
       default = "Preston Pan";
       example = "John Doe";
       description = "Full Name";
+    };
+
+    userName = lib.mkOption {
+      type = lib.types.str;
+      default = "preston";
+      example = "myUser";
+      description = "system username";
     };
 
     gpgKey = lib.mkOption {
@@ -69,7 +97,14 @@ in
       type = lib.types.str;
       default = "${vars.orgHost}";
       example = "orgname.org";
-      description = "Domain name of your organization";
+      description = "Domain name of your organization, points to same VPS as remoteHost";
+    };
+
+    email = lib.mkOption {
+      type = lib.types.str;
+      default = "${vars.internetName}@${vars.orgHost}";
+      example = "example@example.org";
+      description = "Admin email address";
     };
 
     timeZone = lib.mkOption {

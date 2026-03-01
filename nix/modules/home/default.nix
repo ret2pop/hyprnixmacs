@@ -1,4 +1,4 @@
-{ lib, config, pkgs, sops-nix, ... }:
+{ lib, config, pkgs, sops-nix, super, ... }:
 {
   imports = [
     sops-nix.homeManagerModules.sops
@@ -42,35 +42,13 @@
 	    lang-coq.enable = lib.mkEnableOption "Enables coq language support";
       lang-lean.enable = lib.mkEnableOption "Enables lean language support";
 	    lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
-
 	    crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
 	    art.enable = lib.mkEnableOption "Enables various art programs";
 	    music.enable = lib.mkEnableOption "Enables mpd";
 	    workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
 	    cuda.enable = lib.mkEnableOption "Enables CUDA user package builds";
 	    hyprland.enable = lib.mkEnableOption "Enables hyprland";
-
-	    email = {
-		    email = lib.mkOption {
-			    type = lib.types.str;
-			    default = "ret2pop@nullring.xyz";
-			    example = "john@example.com";
-			    description = "Email address and imaps/smtps account";
-		    };
-		    imapsServer = lib.mkOption {
-			    type = lib.types.str;
-			    default = "mail.nullring.xyz";
-			    example = "imap.example.com";
-			    description = "imaps server address";
-		    };
-		    smtpsServer = lib.mkOption {
-			    type = lib.types.str;
-			    default = "mail.nullring.xyz";
-			    example = "smtp.example.com";
-			    description = "smtp server address";
-		    };
-		    enable = lib.mkEnableOption "Enables email";
-	    };
+	    email.enable = lib.mkEnableOption "Enables email";
     };
   };
 
@@ -198,7 +176,7 @@
 	    email.enable = lib.mkDefault config.monorepo.profiles.enable;
 
 	    # Programming
-      graphics.enable = lib.mkDefault  config.monorepo.profiles.enable;
+      graphics.enable = lib.mkDefault (! super.monorepo.profiles.ttyonly.enable);
 	    lang-c.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-rust.enable = lib.mkDefault config.monorepo.profiles.enable;
 	    lang-python.enable = lib.mkDefault config.monorepo.profiles.enable;

@@ -1,28 +1,28 @@
-{ lib, config, ... }:
+{ lib, config, super, ... }:
 {
   programs.mbsync = {
     enable = lib.mkDefault config.monorepo.profiles.email.enable;
     extraConfig = ''
-      IMAPAccount ${config.monorepo.vars.internetName}
-      Host ${config.monorepo.profiles.email.imapsServer}
-      User ${config.monorepo.profiles.email.email}
+      IMAPAccount ${super.monorepo.vars.internetName}
+      Host mail.${super.monorepo.vars.orgHost}
+      User ${super.monorepo.vars.email}
       PassCmd "cat ${config.sops.secrets.mail.path}"
       Port 993
       TLSType IMAPS
       AuthMechs *
       CertificateFile /etc/ssl/certs/ca-certificates.crt
 
-      IMAPStore ${config.monorepo.vars.internetName}-remote
-      Account ${config.monorepo.vars.internetName}
+      IMAPStore ${super.monorepo.vars.internetName}-remote
+      Account ${super.monorepo.vars.internetName}
 
-      MaildirStore ${config.monorepo.vars.internetName}-local
-      Path ~/email/${config.monorepo.vars.internetName}/
-      Inbox ~/email/${config.monorepo.vars.internetName}/INBOX
+      MaildirStore ${super.monorepo.vars.internetName}-local
+      Path ~/email/${super.monorepo.vars.internetName}/
+      Inbox ~/email/${super.monorepo.vars.internetName}/INBOX
       SubFolders Verbatim
 
-      Channel ${config.monorepo.vars.internetName} 
-      Far :${config.monorepo.vars.internetName}-remote:
-      Near :${config.monorepo.vars.internetName}-local:
+      Channel ${super.monorepo.vars.internetName} 
+      Far :${super.monorepo.vars.internetName}-remote:
+      Near :${super.monorepo.vars.internetName}-local:
       Patterns *
       Create Near
       Sync All

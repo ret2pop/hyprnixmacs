@@ -15,7 +15,7 @@
       # Allow the service to see the file it just created
       BindPaths = [ 
         "/var/lib/public-inbox" 
-        "/srv/git/"
+        "${config.users.users.git.home}"
       ];
       ReadOnlyPaths = [ "/var/lib/public-inbox/style.css" ];
       # Ensure it can actually write to the directory during preStart
@@ -55,10 +55,10 @@
   services.public-inbox = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     settings = {
-      coderepo."nullerbot".dir = "/srv/git/nullerbot.git";
-      coderepo."nullerbot".cgitUrl = "https://git.nullring.xyz/nullerbot.git";
-      coderepo."monorepo".dir = "/srv/git/monorepo.git";
-      coderepo."monorepo".cgitUrl = "https://git.nullring.xyz/monorepo.git";
+      coderepo = lib.genAttrs config.monorepo.vars.projects (name: {
+        dir = "${config.users.users.git.home}/${name}.git";
+        cgitUrl = "https://git.${config.monorepo.vars.orgHost}/${name}.git";
+      });
       publicinbox.css = ["/var/lib/public-inbox/style.css"];
       publicinbox.wwwlisting = "all";
     };
@@ -66,35 +66,20 @@
       enable = true;
       port = 9090;
     };
-    inboxes = {
-      "monorepo" = {
-        description = "discussion of ret2pop's monorepo project and related work.";
-        address = [ "monorepo@${config.monorepo.vars.orgHost}" ];
-        inboxdir = "/var/lib/public-inbox/monorepo";
-        url = "https://list.${config.monorepo.vars.orgHost}/monorepo";
-        watch = [ "imaps://monorepo%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
-        coderepo = [
-          "monorepo"
-        ];
-      };
-
+    inboxes = lib.genAttrs config.monorepo.vars.projects (name: {
+      description = "discussion of the ${name} project.";
+      address = [ "${name}@${config.monorepo.vars.orgHost}" ];
+      inboxdir = "/var/lib/public-inbox/${name}";
+      url = "https://list.${config.monorepo.vars.orgHost}/${name}";
+      watch = [ "imaps://${name}${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
+      coderepo = [ "${name}" ];
+    }) // {
       "discussion" = {
         description = "Main Nullring Discussion Mailing List";
         address = [ "discussion@${config.monorepo.vars.orgHost}" ];
         inboxdir = "/var/lib/public-inbox/discuss";
         url = "https://list.${config.monorepo.vars.orgHost}/discussion";
         watch = [ "imaps://discussion%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
-      };
-
-      "nullerbot" = {
-        description = "Discussion of Nullerbot Matrix Bot";
-        address = [ "nullerbot@${config.monorepo.vars.orgHost}" ];
-        inboxdir = "/var/lib/public-inbox/nullerbot";
-        url = "https://list.${config.monorepo.vars.orgHost}/nullerbot";
-        watch = [ "imaps://nullerbot%40${config.monorepo.vars.orgHost}@mail.${config.monorepo.vars.orgHost}/INBOX" ];
-        coderepo = [
-          "nullerbot"
-        ];
       };
     };
   };
