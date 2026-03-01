@@ -67,7 +67,10 @@
     let
       vars = import ./flakevars.nix;
       system = "x86_64-linux";
+
       pkgs = import nixpkgs { inherit system; };
+      armPkgs = import nixpkgs { inherit system; };
+
       generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
 
       dnsConfig = {
@@ -76,38 +79,50 @@
       };
 
       # function that generates all systems from hostnames
-      mkConfigs = map (hostname: {name = "${hostname}";
-                                value = nixpkgs.lib.nixosSystem {
-                                  inherit system;
-                                  specialArgs = attrs;
-                                  modules = if (hostname == "installer") then [
-                                    (./. + "/systems/${hostname}/default.nix")
-                                    { networking.hostName = "${hostname}"; }
-                                    nix-topology.nixosModules.default
-                                  ] else [
-                                    {
-                                      environment.systemPackages = with nixpkgs.lib; [
-                                        deep-research.packages."${system}".deep-research
-                                      ];
-                                    }
-                                    impermanence.nixosModules.impermanence
-                                    nix-topology.nixosModules.default
-                                    lanzaboote.nixosModules.lanzaboote
-                                    disko.nixosModules.disko
-                                    home-manager.nixosModules.home-manager
-                                    sops-nix.nixosModules.sops
-                                    nixos-dns.nixosModules.dns
-                                    {
-                                      nixpkgs.overlays = [ nur.overlays.default ];
-                                      home-manager.extraSpecialArgs = attrs // {
-                                        systemHostName = "${hostname}";
-                                      };
-                                      networking.hostName = "${hostname}";
-                                    }
-                                    (./. + "/systems/${hostname}/default.nix")
-                                  ];
-                                };
-                               });
+      mkConfigs = map (hostname:
+        let
+          isRpi = (builtins.match "rpi-.*" hostname) != null;
+          hostSystem = if isRpi then "aarch64-linux" else system;
+        in
+        {
+          name = "${hostname}";
+          value = nixpkgs.lib.nixosSystem {
+            system = hostSystem;
+            specialArgs = attrs;
+            modules = if (hostname == "installer") then [
+              (./. + "/systems/${hostname}/default.nix")
+              { networking.hostName = "${hostname}"; }
+              nix-topology.nixosModules.default
+            ] else (if isRpi then [
+              (./. + "/systems/${hostname}/default.nix")
+              disko.nixosModules.disko
+              home-manager.nixosModules.home-manager
+              sops-nix.nixosModules.sops
+              lanzaboote.nixosModules.lanzaboote
+            ] else ([
+              {
+                environment.systemPackages = with nixpkgs.lib; [
+                  deep-research.packages."${system}".deep-research
+                ];
+              }
+              impermanence.nixosModules.impermanence
+              nix-topology.nixosModules.default
+              lanzaboote.nixosModules.lanzaboote
+              disko.nixosModules.disko
+              home-manager.nixosModules.home-manager
+              sops-nix.nixosModules.sops
+              nixos-dns.nixosModules.dns
+              {
+                nixpkgs.overlays = [ nur.overlays.default ];
+                home-manager.extraSpecialArgs = attrs // {
+                  systemHostName = "${hostname}";
+                };
+                networking.hostName = "${hostname}";
+              }
+              (./. + "/systems/${hostname}/default.nix")
+            ]));
+          };
+        });
 
       mkDiskoFiles = map (hostname: {
         name = "${hostname}";

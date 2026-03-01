@@ -47,7 +47,7 @@
 
       # Apps
       # octaveFull
-      grim swww vim kotatogram-desktop tg qwen-code element-desktop signal-desktop thunderbird jami
+      grim swww vim kotatogram-desktop tg qwen-code element-desktop signal-desktop signal-cli thunderbird jami
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg helvum

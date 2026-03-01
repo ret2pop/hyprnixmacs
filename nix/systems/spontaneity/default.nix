@@ -35,12 +35,11 @@
       systemd.network.networks."40-ens3" = {
         matchConfig.Name = "ens3";
         networkConfig = {
-          # This is the magic combo for Vultr:
-          IPv6AcceptRA = true;         # Accept routes (so we know where the internet is)
-          IPv6PrivacyExtensions = false; # No random privacy IPs
+          IPv6AcceptRA = true;
+          IPv6PrivacyExtensions = false;
         };
         ipv6AcceptRAConfig = {
-          UseAutonomousPrefix = false; # Do NOT generate an IP address from the RA
+          UseAutonomousPrefix = false;
         };
       };
       networking = {

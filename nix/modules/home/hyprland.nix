@@ -58,13 +58,18 @@
           workspace = 2;
         }
         {
-          name = "element-desktop";
-          "match:class" = "element-desktop";
+          name = "chromium-browser";
+          "match:class" = "chromium-browser";
+          workspace = 2;
+        }
+        {
+          name = "signal";
+          "match:class" = "signal";
           workspace = 3;
         }
         {
-          name = "vesktop";
-          "match:class" = "vesktop";
+          name = "Element";
+          "match:class" = "Element";
           workspace = 3;
         }
         {
@@ -92,7 +97,7 @@
         "$mod, S, exec, pavucontrol"
         "$mod, M, exec, monero-wallet-gui"
         "$mod, V, exec, element-desktop"
-        "$mod, C, exec, fluffychat"
+        "$mod, C, exec, signal-desktop"
         "$mod, D, exec, wofi --show run"
         "$mod, P, exec, bash ${scripts}/powermenu.sh"
         "$mod, Q, killactive"

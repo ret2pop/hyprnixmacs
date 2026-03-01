@@ -22,6 +22,7 @@
     ./user.nix
     ./gtk.nix
     ./secrets.nix
+    ./pantalaimon.nix
   ];
 
   options = {

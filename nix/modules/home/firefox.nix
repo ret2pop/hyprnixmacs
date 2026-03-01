@@ -16,7 +16,9 @@
           vimium
           privacy-redirect
         ] ++ (lib.optional config.monorepo.profiles.crypto.enable pkgs.nur.repos.rycee.firefox-addons.metamask);
-
+        settings = {
+          "privacy.resistFingerprinting.letterboxing" = true;
+        };
       };
     };
   };

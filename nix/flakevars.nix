@@ -14,6 +14,7 @@ in
 
   # Hostnames of my systems
   hostnames = [
+    "rpi-zero"
     "affinity"
     "continuity"
     "spontaneity"

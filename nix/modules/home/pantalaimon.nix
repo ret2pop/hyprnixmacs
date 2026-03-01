@@ -1,17 +1,19 @@
 { lib, config, ... }:
 {
   services.pantalaimon = {
-    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    enable = lib.mkDefault config.monorepo.profiles.enable;
     settings = {
       Default = {
         LogLevel = "Debug";
         SSL = true;
       };
+
       local-matrix = {
-        Homeserver = "https://matrix.${config.monorepo.vars.orgHost}";
+        Homeserver = "https://matrix.nullring.xyz";
         ListenAddress = "127.0.0.1";
-        ListenPort = "8008";
+        ListenPort = 8008;
       };
     };
+
   };
 }
