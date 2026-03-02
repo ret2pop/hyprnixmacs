@@ -3,10 +3,11 @@
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication = lib.mkDefault (! config.monorepo.profiles.server.enable);
-      AllowUsers = [ config.monorepo.vars.userName "root" "git" ];
-      PermitRootLogin = "prohibit-password";
+      PasswordAuthentication = false;
+      AllowUsers = [ config.monorepo.vars.userName "git" ];
+      PermitRootLogin = "no";
       KbdInteractiveAuthentication = false;
     };
   };
+  networking.firewall.allowedTCPPorts = lib.mkIf config.services.openssh.enable [ 22 ];
 }

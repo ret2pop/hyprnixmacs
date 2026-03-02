@@ -1,19 +1,32 @@
 { pkgs, lib, config, ... }:
+let
+  serverName = "ntfy.${config.monorepo.vars.remoteHost}";
+  port = 2586;
+  ntfySecret = "ntfy";
+in
 {
+  sops.secrets."${ntfySecret}" = lib.mkIf config.services.ntfy-sh.enable {
+    format = "yaml";
+    owner = "ntfy-sh";
+  };
+
   services.ntfy-sh = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     settings = {
-      base-url = "https://ntfy.${config.monorepo.vars.remoteHost}";
-      listen-http = "127.0.0.1:2586";
-      envrionmentFile = "/run/secrets/ntfy";
+      base-url = "https://${serverName}";
+      listen-http = "127.0.0.1:${toString port}";
+      envrionmentFile = "/run/secrets/${ntfySecret}";
       auth-file = "/var/lib/ntfy-sh/user.db";
       auth-default-access = "deny-all";
       enable-login = true;
     };
   };
-  systemd.services.ntfy-sh = {
+
+  services.nginx.enable = config.services.ntfy-sh.enable;
+
+  systemd.services.ntfy-sh = lib.mkIf config.services.ntfy-sh.enable {
     serviceConfig = {
-      EnvironmentFile = "/run/secrets/ntfy";
+      EnvironmentFile = "/run/secrets/${ntfySecret}";
     };
     postStart = lib.mkForce ''
       # 1. Wait for the server to initialize the database
@@ -44,5 +57,23 @@
         echo "Admin user already exists."
       fi
     '';
+  };
+
+  networking.domains.subDomains."${serverName}" = lib.mkIf config.services.ntfy-sh.enable { };
+  services.nginx.virtualHosts."${serverName}" = lib.mkIf config.services.ntfy-sh.enable {
+    serverName = "${serverName}";
+    enableACME = true;
+    forceSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString port}";
+      proxyWebsockets = true;
+      extraConfig = ''
+        proxy_buffering off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      '';
+    };
   };
 }

@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   services.pantalaimon = {
-    enable = lib.mkDefault config.monorepo.profiles.enable;
+    enable = lib.mkDefault false;
     settings = {
       Default = {
         LogLevel = "Debug";

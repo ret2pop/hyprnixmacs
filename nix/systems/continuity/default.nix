@@ -8,6 +8,7 @@
     monorepo = {
       profiles = {
         impermanence.enable = true;
+        desktop.enable = true;
       };
       vars = {
         device = "/dev/sda";

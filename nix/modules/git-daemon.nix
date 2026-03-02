@@ -5,4 +5,7 @@
     exportAll = true;
     basePath = "${config.users.users.git.home}";
   };
+  networking.firewall.allowedTCPPorts = lib.mkIf config.services.gitDaemon.enable [
+    9418
+  ];
 }

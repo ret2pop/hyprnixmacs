@@ -14,7 +14,6 @@
     monorepo = {
       vars.device = "/dev/mmcblk0";
       profiles = {
-        server.enable = false;
         ttyonly.enable = true;
       };
     };

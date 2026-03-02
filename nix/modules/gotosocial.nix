@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   services.gotosocial = {
-    enable = lib.mkDefault config.monorepo.profiles.server.enable;
+    enable = lib.mkDefault false;
     setupPostgresqlDB = true;
     settings = {
       application-name = "Nullring GoToSocial Instance";
