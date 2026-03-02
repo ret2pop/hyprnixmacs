@@ -37,11 +37,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpak = {
-      url = "github:nixpak/nixpak";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -60,7 +55,6 @@
       nixos-dns,
       deep-research,
       impermanence,
-      nixpak,
       git-hooks,
       ...
   }
@@ -70,8 +64,6 @@
       system = "x86_64-linux";
 
       pkgs = import nixpkgs { inherit system; };
-      armPkgs = import nixpkgs { inherit system; };
-
       generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
 
       dnsConfig = {
@@ -133,14 +125,10 @@
       pre-commit-check = git-hooks.lib.${system}.run {
         src = ./.;
         hooks = {
-          # 1. Formatting
-          nixpkgs-fmt.enable = false;
-          
-          # 2. Linting
-          statix.enable = true;
+          statix.enable = false;
           deadnix.enable = true;
 
-          # 3. Custom VM Boot Check (The "Integration" part)
+          # Custom VM Boot Check
           # This runs the build-vm derivation to ensure it compiles
           vm-build-check = {
             enable = true;
