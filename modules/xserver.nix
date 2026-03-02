@@ -7,21 +7,21 @@
     };
 
     # windowManager = {
-    #   i3 = {
-    #     enable = (! config.monorepo.profiles.ttyonly.enable);
-    #   };
+	  #   i3 = {
+	  #     enable = (! config.monorepo.profiles.ttyonly.enable);
+	  #   };
     # };
 
     desktopManager = {
-      runXdgAutostartIfNone = true;
+	    runXdgAutostartIfNone = true;
     };
 
     # xkb = {
-    #   layout = "us";
-    #   variant = "";
-    #   options = "caps:escape";
+	  #   layout = "us";
+	  #   variant = "";
+	  #   options = "caps:escape";
     # };
 
-    videoDrivers = (if config.monorepo.profiles.cuda.enable then [ "nvidia" ] else [ ]);
+    videoDrivers = (if config.monorepo.profiles.cuda.enable then [ "nvidia" ] else []);
   };
 }

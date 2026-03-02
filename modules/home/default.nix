@@ -27,193 +27,175 @@
 
   options = {
     monorepo.profiles = {
-      enable = lib.mkEnableOption "Enables home manager desktop configuration";
-      # Programs
+	    enable = lib.mkEnableOption "Enables home manager desktop configuration";
+	    # Programs
       graphics.enable = lib.mkEnableOption "Enables graphical programs for user";
-      lang-c.enable = lib.mkEnableOption "Enables C language support";
-      lang-sh.enable = lib.mkEnableOption "Enables sh language support";
-      lang-rust.enable = lib.mkEnableOption "Enables Rust language support";
-      lang-python.enable = lib.mkEnableOption "Enables python language support";
-      lang-sol.enable = lib.mkEnableOption "Enables solidity language support";
-      lang-openscad.enable = lib.mkEnableOption "Enables openscad language support";
-      lang-js.enable = lib.mkEnableOption "Enables javascript language support";
-      lang-nix.enable = lib.mkEnableOption "Enables nix language support";
-      lang-idris.enable = lib.mkEnableOption "Enables idris language support";
-      lang-agda.enable = lib.mkEnableOption "Enables agda language support";
-      lang-coq.enable = lib.mkEnableOption "Enables coq language support";
+	    lang-c.enable = lib.mkEnableOption "Enables C language support";
+	    lang-sh.enable = lib.mkEnableOption "Enables sh language support";
+	    lang-rust.enable = lib.mkEnableOption "Enables Rust language support";
+	    lang-python.enable = lib.mkEnableOption "Enables python language support";
+	    lang-sol.enable = lib.mkEnableOption "Enables solidity language support";
+	    lang-openscad.enable = lib.mkEnableOption "Enables openscad language support";
+	    lang-js.enable = lib.mkEnableOption "Enables javascript language support";
+	    lang-nix.enable = lib.mkEnableOption "Enables nix language support";
+	    lang-idris.enable = lib.mkEnableOption "Enables idris language support";
+	    lang-agda.enable = lib.mkEnableOption "Enables agda language support";
+	    lang-coq.enable = lib.mkEnableOption "Enables coq language support";
       lang-lean.enable = lib.mkEnableOption "Enables lean language support";
-      lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
-      crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
-      art.enable = lib.mkEnableOption "Enables various art programs";
-      music.enable = lib.mkEnableOption "Enables mpd";
-      workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
-      cuda.enable = lib.mkEnableOption "Enables CUDA user package builds";
-      hyprland.enable = lib.mkEnableOption "Enables hyprland";
-      email.enable = lib.mkEnableOption "Enables email";
+	    lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
+	    crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
+	    art.enable = lib.mkEnableOption "Enables various art programs";
+	    music.enable = lib.mkEnableOption "Enables mpd";
+	    workstation.enable = lib.mkEnableOption "Enables workstation packages (music production and others)";
+	    cuda.enable = lib.mkEnableOption "Enables CUDA user package builds";
+	    hyprland.enable = lib.mkEnableOption "Enables hyprland";
+	    email.enable = lib.mkEnableOption "Enables email";
     };
   };
 
   config = {
-    home.packages = (if config.monorepo.profiles.email.enable then [ pkgs.mu ] else [ ])
-      ++
-      (if config.monorepo.profiles.lang-c.enable then
-        (with pkgs; [
-          autobuild
-          clang
-          gdb
-          gnumake
-          bear
-          clang-tools
-          autotools-language-server
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.workstation.enable then
-        (with pkgs; [
-          mumble
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-js.enable then
-        (with pkgs; [
-          nodejs
-          bun
-          yarn
-          typescript
-          typescript-language-server
-          vscode-langservers-extracted
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-rust.enable then
-        (with pkgs; [
-          cargo
-          rust-analyzer
-          rustfmt
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-python.enable then
-        (with pkgs; [
-          poetry
-          python3
-          python314Packages.python-lsp-server
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-sol.enable then
-        (with pkgs; [
-          solc
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-openscad.enable then
-        (with pkgs; [
-          openscad
-          openscad-lsp
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-sh.enable then
-        (with pkgs; [
-          bash-language-server
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-haskell.enable then
-        (with pkgs; [
-          haskell-language-server
-          haskellPackages.hlint
-          ghc
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-coq.enable then
-        (with pkgs; [
-          coq
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-lean.enable then
-        (with pkgs; [
-          lean4
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-agda.enable then
-        (with pkgs; [
-          agda
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-idris.enable then
-        (with pkgs; [
-          idris
-          idris2Packages.idris2Lsp
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.lang-nix.enable then
-        (with pkgs; [
-          nil
-          nixd
-          nixfmt
-          nix-prefetch-scripts
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.crypto.enable then
-        (with pkgs; [
-          bitcoin
-          # electrum
-          monero-cli
-          monero-gui
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.art.enable then
-        (with pkgs; [
-          inkscape
-          # krita
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.music.enable then
-        (with pkgs; [
-          mpc
-          sox
-        ]) else [ ])
-      ++
-      (if config.monorepo.profiles.workstation.enable then
-        (with pkgs; [
-          alsa-utils
-          alsa-scarlett-gui
-          ardour
-          audacity
-          # blender
-          foxdot
-          fluidsynth
-          qjackctl
-          qsynth
-          qpwgraph
-          imagemagick
-          supercollider
-          inkscape
-          # kdePackages.kdenlive
-          # kicad
-          murmur
-        ]) else [ ]);
+    home.packages = (if config.monorepo.profiles.email.enable then [ pkgs.mu ] else [])
+					          ++
+					          (if config.monorepo.profiles.lang-c.enable then (with pkgs; [
+						          autobuild
+						          clang
+						          gdb
+						          gnumake
+						          bear
+						          clang-tools
+                      autotools-language-server
+					          ]) else [])
+                    ++
+                    (if config.monorepo.profiles.workstation.enable then (with pkgs; [
+                      mumble
+                    ]) else [])
+                    ++
+					          (if config.monorepo.profiles.lang-js.enable then (with pkgs; [
+						          nodejs
+						          bun
+						          yarn
+						          typescript
+                      typescript-language-server
+						          vscode-langservers-extracted
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-rust.enable then (with pkgs; [
+						          cargo
+						          rust-analyzer
+						          rustfmt
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
+                      poetry
+						          python3
+                      python314Packages.python-lsp-server
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-sol.enable then (with pkgs; [
+						          solc
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-openscad.enable then (with pkgs; [
+						          openscad
+						          openscad-lsp
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-sh.enable then (with pkgs; [
+						          bash-language-server
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-haskell.enable then (with pkgs; [
+                      haskell-language-server
+                      haskellPackages.hlint
+                      ghc
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-coq.enable then (with pkgs; [
+						          coq
+					          ]) else [])
+                    ++
+                    (if config.monorepo.profiles.lang-lean.enable then (with pkgs; [
+                      lean4
+                    ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-agda.enable then (with pkgs; [
+                      agda
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-idris.enable then (with pkgs; [
+                      idris
+                      idris2Packages.idris2Lsp
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.lang-nix.enable then (with pkgs; [
+						          nil
+						          nixd
+						          nixfmt
+                      nix-prefetch-scripts
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.crypto.enable then (with pkgs; [
+						          bitcoin
+						          # electrum
+						          monero-cli
+						          monero-gui
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.art.enable then (with pkgs; [
+						          inkscape
+						          # krita
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.music.enable then (with pkgs; [
+						          mpc
+						          sox
+					          ]) else [])
+					          ++
+					          (if config.monorepo.profiles.workstation.enable then (with pkgs; [
+			                alsa-utils
+			                alsa-scarlett-gui
+				              ardour
+				              audacity
+					            # blender
+                      foxdot
+			                fluidsynth
+			                qjackctl
+			                qsynth
+			                qpwgraph
+			                imagemagick
+                      supercollider
+			                inkscape
+			                # kdePackages.kdenlive
+			                # kicad
+                      murmur
+					          ]) else []);
 
     monorepo.profiles = {
-      enable = lib.mkDefault super.monorepo.profiles.home.enable;
-      music.enable = lib.mkDefault config.monorepo.profiles.enable;
-      email.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    enable = lib.mkDefault super.monorepo.profiles.home.enable;
+	    music.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    email.enable = lib.mkDefault config.monorepo.profiles.enable;
       cuda.enable = lib.mkDefault super.monorepo.profiles.cuda.enable;
 
-      # Programming
+	    # Programming
       graphics.enable = lib.mkDefault (! super.monorepo.profiles.ttyonly.enable);
-      hyprland.enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
-      lang-c.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-rust.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-python.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-sol.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-sh.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-openscad.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-js.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-nix.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-coq.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-lean.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-idris.enable = lib.mkDefault config.monorepo.profiles.enable;
-      lang-agda.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    hyprland.enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+	    lang-c.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-rust.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-python.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-sol.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-sh.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-openscad.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-js.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-nix.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-coq.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-lean.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-idris.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    lang-agda.enable = lib.mkDefault config.monorepo.profiles.enable;
 
-      crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
-      art.enable = lib.mkDefault config.monorepo.profiles.enable;
-      workstation.enable = lib.mkDefault super.monorepo.profiles.workstation.enable;
+	    crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    art.enable = lib.mkDefault config.monorepo.profiles.enable;
+	    workstation.enable = lib.mkDefault super.monorepo.profiles.workstation.enable;
     };
   };
 }

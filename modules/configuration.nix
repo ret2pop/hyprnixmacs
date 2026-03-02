@@ -13,8 +13,8 @@ let
     "public-inbox"
     "plugdev"
   ];
-  allDomains =
-    (lib.attrNames config.networking.domains.baseDomains) ++
+  allDomains = 
+    (lib.attrNames config.networking.domains.baseDomains) ++ 
     (lib.attrNames config.networking.domains.subDomains);
 
   # 2. Generate BOTH possible outcomes in advance
@@ -53,8 +53,8 @@ in
   ];
 
   environment.etc."wpa_supplicant.conf".text = ''
-    country=CA
-  '';
+country=CA
+'';
   systemd.tmpfiles.rules = [
     "d /srv/git 0755 git git -"
   ];
@@ -67,7 +67,7 @@ in
 
   virtualisation.vmVariant = lib.mkIf config.monorepo.profiles.server.enable {
     sops.validateSopsFiles = false;
-    disko.devices = lib.mkForce { };
+    disko.devices = lib.mkForce {};
     virtualisation.forwardPorts = [
       { from = "host"; host.port = 10443; guest.port = 443; }
       { from = "host"; host.port = 9080; guest.port = 80; }
@@ -98,10 +98,10 @@ in
 
   environment = {
     etc = {
-      securetty.text = ''
-        	    # /etc/securetty: list of terminals on which root is allowed to login.
-        	    # See securetty(5) and login(1).
-        	    '';
+  	  securetty.text = ''
+  	    # /etc/securetty: list of terminals on which root is allowed to login.
+  	    # See securetty(5) and login(1).
+  	    '';
     };
   };
 
@@ -123,11 +123,11 @@ in
     coredump.enable = false;
     network.config.networkConfig.IPv6PrivacyExtensions = "kernel";
     tmpfiles.settings = {
-      "restrictetcnixos"."/etc/nixos/*".Z = {
-        mode = "0000";
-        user = "root";
-        group = "root";
-      };
+  	  "restrictetcnixos"."/etc/nixos/*".Z = {
+  	    mode = "0000";
+  	    user = "root";
+  	    group = "root";
+  	  };
     };
   };
 
@@ -139,41 +139,41 @@ in
     };
 
     extraModprobeConfig = ''
-      options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
-      options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
-      options rtw88_pci disable_msi=y disable_aspm=y
-      options rtw_core disable_lps_deep=y
-      options rtw_pci disable_msi=y disable_aspm=y
-      options rtw89_core disable_ps_mode=y
-      options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
-      options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
-    '';
+  options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
+  options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
+  options rtw88_pci disable_msi=y disable_aspm=y
+  options rtw_core disable_lps_deep=y
+  options rtw_pci disable_msi=y disable_aspm=y
+  options rtw89_core disable_ps_mode=y
+  options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
+  options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
+'';
     extraModulePackages = [ ];
 
     initrd = {
-      availableKernelModules = [
-        "xhci_pci"
-        "ahci"
-        "usb_storage"
-        "sd_mod"
-        "nvme"
-        "sd_mod"
-        "ehci_pci"
-        "rtsx_pci_sdmmc"
-        "usbhid"
-      ];
+  	  availableKernelModules = [
+  	    "xhci_pci"
+  	    "ahci"
+  	    "usb_storage"
+  	    "sd_mod"
+  	    "nvme"
+  	    "sd_mod"
+  	    "ehci_pci"
+  	    "rtsx_pci_sdmmc"
+  	    "usbhid"
+  	  ];
 
-      kernelModules = [ ];
+  	  kernelModules = [ ];
     };
 
     lanzaboote = {
-      enable = config.monorepo.profiles.secureBoot.enable;
-      pkiBundle = "/var/lib/sbctl";
+  	  enable = config.monorepo.profiles.secureBoot.enable;
+  	  pkiBundle = "/var/lib/sbctl";
     };
 
     loader = {
-      systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
-      efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
+  	  systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
+  	  efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
     };
 
     kernelModules = [
@@ -198,90 +198,89 @@ in
       "usbcore.autosuspend=-1"
       "pcie_aspm=off"
       "pci=noaer"
-      # "debugfs=off"
-      "page_alloc.shuffle=1"
-      "slab_nomerge"
-      # "page_poison=1"
+  	  # "debugfs=off"
+  	  "page_alloc.shuffle=1"
+  	  "slab_nomerge"
+  	  # "page_poison=1"
 
-      # madaidan
-      "pti=on"
-      "randomize_kstack_offset=on"
-      "vsyscall=none"
-      # "lockdown=confidentiality"
+  	  # madaidan
+  	  "pti=on"
+  	  "randomize_kstack_offset=on"
+  	  "vsyscall=none"
+  	  # "lockdown=confidentiality"
 
-      # cpu
-      "spectre_v2=on"
-      "spec_store_bypass_disable=on"
-      "tsx=off"
-      "l1tf=full,force"
-      "kvm.nx_huge_pages=force"
+  	  # cpu
+  	  "spectre_v2=on"
+  	  "spec_store_bypass_disable=on"
+  	  "tsx=off"
+  	  "l1tf=full,force"
+  	  "kvm.nx_huge_pages=force"
 
-      # hardened
-      "extra_latent_entropy"
+  	  # hardened
+  	  "extra_latent_entropy"
 
-      # mineral
-      # "init_on_alloc=1"
-      # "random.trust_bootloader=off"
-      # "init_on_free=1"
-      "quiet"
-      # "loglevel=0"
+  	  # mineral
+  	  # "init_on_alloc=1"
+  	  # "random.trust_bootloader=off"
+  	  # "init_on_free=1"
+  	  "quiet"
+  	  # "loglevel=0"
     ];
 
     blacklistedKernelModules = [
-      "netrom"
-      "rose"
+  	  "netrom"
+  	  "rose"
 
-      "adfs"
-      "affs"
-      "bfs"
-      "befs"
-      "cramfs"
-      "efs"
-      "erofs"
-      "exofs"
-      "freevxfs"
-      "f2fs"
-      "hfs"
-      "hpfs"
-      "jfs"
-      "minix"
-      "nilfs2"
-      "ntfs"
-      "omfs"
-      "qnx4"
-      "qnx6"
-      "sysv"
-      "ufs"
+  	  "adfs"
+  	  "affs"
+  	  "bfs"
+  	  "befs"
+  	  "cramfs"
+  	  "efs"
+  	  "erofs"
+  	  "exofs"
+  	  "freevxfs"
+  	  "f2fs"
+  	  "hfs"
+  	  "hpfs"
+  	  "jfs"
+  	  "minix"
+  	  "nilfs2"
+  	  "ntfs"
+  	  "omfs"
+  	  "qnx4"
+  	  "qnx6"
+  	  "sysv"
+  	  "ufs"
     ];
 
-    kernel.sysctl =
-      if config.monorepo.profiles.server.enable then {
-        "net.ipv6.conf.${config.monorepo.profiles.server.interface}.autoconf" = 0;
-        "net.ipv6.conf.${config.monorepo.profiles.server.interface}.accept_ra" = 1;
-      } else {
-        "kernel.ftrace_enabled" = false;
-        "net.core.bpf_jit_enable" = false;
-        "kernel.kptr_restrict" = 2;
+    kernel.sysctl = if config.monorepo.profiles.server.enable then {
+      "net.ipv6.conf.${config.monorepo.profiles.server.interface}.autoconf" = 0;
+      "net.ipv6.conf.${config.monorepo.profiles.server.interface}.accept_ra" = 1; 
+    } else {
+      "kernel.ftrace_enabled" = false;
+      "net.core.bpf_jit_enable" = false;
+      "kernel.kptr_restrict" = 2;
 
-        # madaidan
-        "kernel.smtcontrol" = "on";
-        "vm.swappiness" = 1;
-        "vm.unprivileged_userfaultfd" = 0;
-        "dev.tty.ldisc_autoload" = 0;
-        "kernel.kexec_load_disabled" = 1;
-        "kernel.sysrq" = 4;
-        "kernel.perf_event_paranoid" = 3;
+      # madaidan
+      "kernel.smtcontrol" = "on";
+      "vm.swappiness" = 1;
+      "vm.unprivileged_userfaultfd" = 0;
+      "dev.tty.ldisc_autoload" = 0;
+      "kernel.kexec_load_disabled" = 1;
+      "kernel.sysrq" = 4;
+      "kernel.perf_event_paranoid" = 3;
 
-        # net
-        "net.ipv4.ip_forward" = 1;
-        "net.ipv4.icmp_echo_ignore_broadcasts" = true;
-        # "net.ipv4.conf.all.accept_redirects" = false;
-        # "net.ipv4.conf.all.secure_redirects" = false;
-        # "net.ipv4.conf.default.accept_redirects" = false;
-        # "net.ipv4.conf.default.secure_redirects" = false;
-        # "net.ipv6.conf.all.accept_redirects" = false;
-        # "net.ipv6.conf.default.accept_redirects" = false;
-      };
+      # net
+      "net.ipv4.ip_forward" = 1;
+      "net.ipv4.icmp_echo_ignore_broadcasts" = true;
+      # "net.ipv4.conf.all.accept_redirects" = false;
+      # "net.ipv4.conf.all.secure_redirects" = false;
+      # "net.ipv4.conf.default.accept_redirects" = false;
+      # "net.ipv4.conf.default.secure_redirects" = false;
+      # "net.ipv6.conf.all.accept_redirects" = false;
+      # "net.ipv6.conf.default.accept_redirects" = false;
+    };
   };
 
   networking = {
@@ -326,10 +325,10 @@ in
     };
 
 
-    nameservers = [ "8.8.8.8" "1.1.1.1" ];
+    nameservers = [ "8.8.8.8" "1.1.1.1"];
     dhcpcd.enable = (! config.monorepo.profiles.server.enable);
     networkmanager = {
-      enable = lib.mkForce (! config.monorepo.profiles.server.enable); # rpis need network
+  	  enable = lib.mkForce (! config.monorepo.profiles.server.enable); # rpis need network
       wifi = {
         powersave = false;
       };
@@ -369,8 +368,8 @@ in
       };
     };
     firewall = {
-      allowedTCPPorts = [ 22 11434 ];
-      allowedUDPPorts = [ ];
+  	  allowedTCPPorts = [ 22 11434 ];
+  	  allowedUDPPorts = [ ];
     };
   };
 
@@ -403,12 +402,11 @@ in
     # Misc.
     udev = {
       extraRules = '''';
-      packages =
-        if config.monorepo.profiles.workstation.enable then with pkgs; [
-          platformio-core
-          platformio-core.udev
-          openocd
-        ] else [ ];
+      packages = if config.monorepo.profiles.workstation.enable then with pkgs; [ 
+        platformio-core
+        platformio-core.udev
+        openocd
+      ] else [];
     };
 
     printing.enable = lib.mkDefault config.monorepo.profiles.workstation.enable;
@@ -477,16 +475,16 @@ in
       xdg-desktop-portal-gtk
       xdg-desktop-portal
       xdg-desktop-portal-hyprland
-    ] else [ ];
+    ] else [];
     config.common.default = "*";
   };
 
   environment.etc."gitconfig".text = ''
-    [init]
-    defaultBranch = main
+  [init]
+  defaultBranch = main
   '';
   environment.extraInit = ''
-    umask 0022
+  umask 0022
   '';
   environment.systemPackages = with pkgs; [
     restic
@@ -500,32 +498,31 @@ in
     exiftool
     (writeShellScriptBin "new-repo"
       ''
-        #!/bin/bash
-        cd ${config.users.users.git.home}
-        git init --bare "$1"
-        vim "$1/description"
-        chown -R git:git "$1"
-      ''
+  #!/bin/bash
+  cd ${config.users.users.git.home}
+  git init --bare "$1"
+  vim "$1/description"
+  chown -R git:git "$1"
+  ''
     )
   ];
 
-  users.groups = lib.genAttrs userGroups (name: lib.mkDefault { });
+  users.groups = lib.genAttrs userGroups (name: lib.mkDefault {});
 
-  users.users = lib.genAttrs userGroups
-    (name: {
-      isSystemUser = lib.mkDefault true;
-      group = "${name}";
-      extraGroups = [ "acme" "nginx" ];
-    }) // {
+  users.users = lib.genAttrs userGroups (name: {
+    isSystemUser = lib.mkDefault true;
+    group = "${name}";
+    extraGroups = [ "acme" "nginx" ];
+  }) // {
     conduit = {
       isSystemUser = lib.mkDefault true;
       group = "conduit";
-      extraGroups = [ ];
+      extraGroups = [];
     };
     matterbridge = {
       isSystemUser = lib.mkDefault true;
       group = "matterbridge";
-      extraGroups = [ ];
+      extraGroups = [];
     };
 
     public-inbox = {
@@ -540,7 +537,7 @@ in
       group = "ircd";
       home = "/home/ircd";
     };
-
+    
     nginx = {
       group = "nginx";
       isSystemUser = lib.mkDefault true;
@@ -573,7 +570,7 @@ in
       description = config.monorepo.vars.fullName;
       extraGroups = [ "networkmanager" "wheel" "video" "docker" "jackaudio" "tss" "dialout" "docker" "plugdev" ];
       shell = pkgs.zsh;
-      packages = [ ];
+      packages = [];
     };
   };
 
@@ -587,7 +584,7 @@ in
       keep-outputs = true;
       keep-derivations = true;
       auto-optimise-store = true;
-      max-jobs = 4;
+      max-jobs = 4; 
       cores = 0;
       substituters = [
         "https://cache.nixos-cuda.org"

@@ -5,7 +5,7 @@ in
 {
   services.cgit."my-projects" = {
     enable = lib.mkDefault config.services.gitDaemon.enable;
-    scanPath = "${config.users.users.git.home}";
+    scanPath = "${config.users.users.git.home}"; 
     settings = {
       root-title = "Nullring Git Server";
       root-desc = "Projects and cool things";
@@ -26,7 +26,7 @@ in
     };
   };
 
-  networking.domains.subDomains."${serverName}" = lib.mkIf config.services.cgit."my-projects".enable { };
+  networking.domains.subDomains."${serverName}" = lib.mkIf config.services.cgit."my-projects".enable {};
   services.nginx.virtualHosts."${serverName}" = lib.mkIf config.services.cgit."my-projects".enable {
     forceSSL = true;
     enableACME = true;

@@ -59,7 +59,7 @@ in
     '';
   };
 
-  networking.domains.subDomains."${serverName}" = lib.mkIf config.services.ntfy-sh.enable { };
+  networking.domains.subDomains."${serverName}" = lib.mkIf config.services.ntfy-sh.enable {};
   services.nginx.virtualHosts."${serverName}" = lib.mkIf config.services.ntfy-sh.enable {
     serverName = "${serverName}";
     enableACME = true;
@@ -68,12 +68,12 @@ in
       proxyPass = "http://127.0.0.1:${toString port}";
       proxyWebsockets = true;
       extraConfig = ''
-        proxy_buffering off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      '';
+proxy_buffering off;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+'';
     };
   };
 }

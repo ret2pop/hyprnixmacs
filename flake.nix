@@ -18,18 +18,18 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
+	    url = "github:nix-community/home-manager/release-25.05";
+	    inputs.nixpkgs.follows = "nixpkgs";
     };
 
     disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
+	    url = "github:nix-community/disko";
+	    inputs.nixpkgs.follows = "nixpkgs";
     };
 
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.1";
-      inputs.nixpkgs.follows = "nixpkgs";
+	    url = "github:nix-community/lanzaboote/v0.4.1";
+	    inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixos-dns = {
@@ -48,23 +48,23 @@
     };
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , home-manager
-    , nur
-    , disko
-    , lanzaboote
-    , sops-nix
-    , nix-topology
-    , nixos-dns
-    , deep-research
-    , impermanence
-    , nixpak
-    , git-hooks
-    , ...
-    }
-      @attrs:
+  outputs = {
+    self,
+      nixpkgs,
+      home-manager,
+      nur,
+      disko,
+      lanzaboote,
+      sops-nix,
+      nix-topology,
+      nixos-dns,
+      deep-research,
+      impermanence,
+      nixpak,
+      git-hooks,
+      ...
+  }
+    @attrs:
     let
       vars = import ./flakevars.nix;
       system = "x86_64-linux";
@@ -90,41 +90,38 @@
           value = nixpkgs.lib.nixosSystem {
             system = hostSystem;
             specialArgs = attrs;
-            modules =
-              if (hostname == "installer") then [
-                (./. + "/systems/${hostname}/default.nix")
-                { networking.hostName = "${hostname}"; }
-                nix-topology.nixosModules.default
-              ] else
-                (if isRpi then [
-                  (./. + "/systems/${hostname}/default.nix")
-                  disko.nixosModules.disko
-                  home-manager.nixosModules.home-manager
-                  sops-nix.nixosModules.sops
-                  lanzaboote.nixosModules.lanzaboote
-                ] else
-                  ([
-                    {
-                      environment.systemPackages = with nixpkgs.lib; [
-                        deep-research.packages."${system}".deep-research
-                      ];
-                    }
-                    impermanence.nixosModules.impermanence
-                    nix-topology.nixosModules.default
-                    lanzaboote.nixosModules.lanzaboote
-                    disko.nixosModules.disko
-                    home-manager.nixosModules.home-manager
-                    sops-nix.nixosModules.sops
-                    nixos-dns.nixosModules.dns
-                    {
-                      nixpkgs.overlays = [ nur.overlays.default ];
-                      home-manager.extraSpecialArgs = attrs // {
-                        systemHostName = "${hostname}";
-                      };
-                      networking.hostName = "${hostname}";
-                    }
-                    (./. + "/systems/${hostname}/default.nix")
-                  ]));
+            modules = if (hostname == "installer") then [
+              (./. + "/systems/${hostname}/default.nix")
+              { networking.hostName = "${hostname}"; }
+              nix-topology.nixosModules.default
+            ] else (if isRpi then [
+              (./. + "/systems/${hostname}/default.nix")
+              disko.nixosModules.disko
+              home-manager.nixosModules.home-manager
+              sops-nix.nixosModules.sops
+              lanzaboote.nixosModules.lanzaboote
+            ] else ([
+              {
+                environment.systemPackages = with nixpkgs.lib; [
+                  deep-research.packages."${system}".deep-research
+                ];
+              }
+              impermanence.nixosModules.impermanence
+              nix-topology.nixosModules.default
+              lanzaboote.nixosModules.lanzaboote
+              disko.nixosModules.disko
+              home-manager.nixosModules.home-manager
+              sops-nix.nixosModules.sops
+              nixos-dns.nixosModules.dns
+              {
+                nixpkgs.overlays = [ nur.overlays.default ];
+                home-manager.extraSpecialArgs = attrs // {
+                  systemHostName = "${hostname}";
+                };
+                networking.hostName = "${hostname}";
+              }
+              (./. + "/systems/${hostname}/default.nix")
+            ]));
           };
         });
 
@@ -138,7 +135,7 @@
         hooks = {
           # 1. Formatting
           nixpkgs-fmt.enable = false;
-
+          
           # 2. Linting
           statix.enable = true;
           deadnix.enable = true;
@@ -149,64 +146,64 @@
             enable = true;
             name = "vps-vm-build";
             description = "Ensure VPS configuration is buildable as a VM";
-            entry = "nix build .#nixosConfigurations.vps.config.system.build.vm --no-link";
+            entry = "nix build .#nixosConfigurations.spontaneity.config.system.build.vm --no-link";
             pass_filenames = false;
           };
         };
       };
     in
-    {
-      checks."${system}" = {
-        inherit pre-commit-check;
-      };
-
-      nixosConfigurations = builtins.listToAttrs (mkConfigs vars.hostnames);
-
-      evalDisko = builtins.listToAttrs (mkDiskoFiles (builtins.filter (x: x != "installer") vars.hostnames));
-
-      topology."${system}" = import nix-topology {
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ nix-topology.overlays.default ];
+      {
+        checks."${system}" = {
+          inherit pre-commit-check;
         };
-        modules = [
-          ./topology/default.nix
-          { nixosConfigurations = self.nixosConfigurations; }
-        ];
-      };
 
-      devShell."${system}" = with pkgs; mkShell {
-        inherit (pre-commit-check) shellHook;
-        buildInputs = [
-          fira-code
-          python3
-          poetry
-          statix
-          deadnix
-        ];
-      };
+        nixosConfigurations = builtins.listToAttrs (mkConfigs vars.hostnames);
 
-      packages."${system}" = {
-        zoneFiles = generate.zoneFiles dnsConfig;
-        octodns = generate.octodnsConfig {
-          inherit dnsConfig;
+        evalDisko = builtins.listToAttrs (mkDiskoFiles (builtins.filter (x: x != "installer") vars.hostnames));
 
-          config = {
-            providers = {
-              cloudflare = {
-                class = "octodns_cloudflare.CloudflareProvider";
-                token = "env/CLOUDFLARE_TOKEN";
-              };
-              config = {
-                check_origin = false;
+        topology."${system}" = import nix-topology {
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ nix-topology.overlays.default ];
+          };
+          modules = [
+            ./topology/default.nix
+            { nixosConfigurations = self.nixosConfigurations; }
+          ];
+        };
+
+        devShell."${system}" = with pkgs; mkShell {
+          inherit (pre-commit-check) shellHook;
+          buildInputs = [
+            fira-code
+            python3
+            poetry
+            statix
+            deadnix
+          ];
+        };
+
+        packages."${system}" = {
+          zoneFiles = generate.zoneFiles dnsConfig;
+          octodns = generate.octodnsConfig {
+            inherit dnsConfig;
+            
+            config = {
+              providers = {
+                cloudflare = {
+                  class = "octodns_cloudflare.CloudflareProvider";
+                  token = "env/CLOUDFLARE_TOKEN";
+                };
+                config = {
+                  check_origin = false;
+                };
               };
             };
-          };
-          zones = {
-            "${vars.remoteHost}." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
-            "${vars.orgHost}." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
+            zones = {
+              "${vars.remoteHost}." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
+              "${vars.orgHost}." = nixos-dns.utils.octodns.generateZoneAttrs [ "cloudflare" ];
+            };
           };
         };
       };
-    };
 }

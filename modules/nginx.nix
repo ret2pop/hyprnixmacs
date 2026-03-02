@@ -24,14 +24,14 @@
         locations."/" = {
           proxyPass = "http://localhost:8000";
           extraConfig = ''
-            proxy_buffering off;
-            proxy_http_version 1.1;
-            proxy_set_header Connection "";
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_read_timeout 36000s;
-          '';
+proxy_buffering off;
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_read_timeout 36000s;
+'';
         };
       };
 
@@ -47,8 +47,8 @@
   networking.firewall.allowedTCPPorts = lib.mkIf config.services.nginx.enable [ 80 443 ];
 
   networking.domains.subDomains = lib.mkIf config.services.nginx.enable {
-    "${config.monorepo.vars.remoteHost}" = { };
-    "${config.monorepo.vars.orgHost}" = { };
-    "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" = { };
+    "${config.monorepo.vars.remoteHost}" = {};
+    "${config.monorepo.vars.orgHost}" = {};
+    "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" = {};
   };
 }

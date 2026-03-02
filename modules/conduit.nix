@@ -74,8 +74,8 @@ in
     { from = 49152; to = 65535; }
   ];
 
-  networking.domains.subDomains."matrix.${config.monorepo.vars.orgHost}" = lib.mkIf config.services.matrix-conduit.enable { };
-  networking.domains.subDomains."livekit.${config.monorepo.vars.orgHost}" = lib.mkIf config.services.livekit.enable { };
+  networking.domains.subDomains."matrix.${config.monorepo.vars.orgHost}" = lib.mkIf config.services.matrix-conduit.enable {};
+  networking.domains.subDomains."livekit.${config.monorepo.vars.orgHost}" = lib.mkIf config.services.livekit.enable {};
 
   services.nginx.virtualHosts."matrix.${config.monorepo.vars.orgHost}" = lib.mkIf config.services.matrix-conduit.enable {
     enableACME = lib.mkDefault config.monorepo.profiles.server.enable;
@@ -105,44 +105,44 @@ in
     locations."/_matrix/" = {
       proxyPass = "http://127.0.0.1:${toString config.services.matrix-conduit.settings.global.port}";
       extraConfig = ''
-        proxy_set_header Host $host;
-        proxy_buffers 32 16k;
-        proxy_read_timeout 5m;
-      '';
+            proxy_set_header Host $host;
+            proxy_buffers 32 16k;
+            proxy_read_timeout 5m;
+          '';
     };
 
     locations."= /.well-known/matrix/server" = {
       extraConfig = ''
-        default_type application/json;
-        add_header Content-Type application/json;
-        add_header Access-Control-Allow-Origin *;
-      '';
-
-      return = ''200 '{"m.server": "matrix.${config.monorepo.vars.orgHost}:443"}' '';
+      default_type application/json;
+      add_header Content-Type application/json;
+      add_header Access-Control-Allow-Origin *;
+    '';
+      
+      return = ''200 '{"m.server": "matrix.${config.monorepo.vars.orgHost}:443"}' ''; 
     };
 
     locations."/.well-known/matrix/client" = {
       extraConfig = ''
-        default_type application/json;
-        add_header Access-Control-Allow-Origin *;
-      '';
+    default_type application/json;
+    add_header Access-Control-Allow-Origin *;
+  '';
 
       return = "200 '{\"m.homeserver\": {\"base_url\": \"https://matrix.${config.monorepo.vars.orgHost}\"}, \"org.matrix.msc4143.rtc_foci\": [{\"type\": \"livekit\", \"livekit_service_url\": \"https://matrix.${config.monorepo.vars.orgHost}:${toString livekitListenPort}\"}]}'";
     };
 
     extraConfig = ''
-      merge_slashes off;
-    '';
+          merge_slashes off;
+        '';
   };
 
 
   services.nginx.virtualHosts."matrix.${config.monorepo.vars.orgHost}-livekit" = lib.mkIf config.services.livekit.enable {
     serverName = "matrix.${config.monorepo.vars.orgHost}";
     listen = [
-      {
-        addr = "0.0.0.0";
+      { 
+        addr = "0.0.0.0"; 
         port = livekitListenPort;
-        ssl = true;
+        ssl = true; 
       }
       {
         addr = "[::]";
@@ -154,16 +154,16 @@ in
     enableACME = false;
     forceSSL = false;
     useACMEHost = "matrix.${config.monorepo.vars.orgHost}";
-
+    
     locations."/" = {
-      proxyPass = "http://127.0.0.1:${toString config.services.lk-jwt-service.port}";
+      proxyPass = "http://127.0.0.1:${toString config.services.lk-jwt-service.port}"; 
       proxyWebsockets = true;
       extraConfig = ''
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-      '';
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    '';
     };
   };
 
@@ -174,39 +174,39 @@ in
       proxyPass = "http://127.0.0.1:${toString config.services.livekit.settings.port}";
       proxyWebsockets = true;
       extraConfig = ''
-        proxy_read_timeout 3600s;
-        proxy_send_timeout 3600s;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
 
-        # Standard headers for LiveKit
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+            # Standard headers for LiveKit
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
 
-        # --- CORS CONFIGURATION START ---
-        # 1. Allow all origins (including app.element.io)
-        add_header 'Access-Control-Allow-Origin' '*' always;
+            # --- CORS CONFIGURATION START ---
+            # 1. Allow all origins (including app.element.io)
+            add_header 'Access-Control-Allow-Origin' '*' always;
             
-        # 2. Allow specific methods (POST is required for /sfu/get)
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+            # 2. Allow specific methods (POST is required for /sfu/get)
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
             
-        # 3. Allow headers (Content-Type is crucial for JSON)
-        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+            # 3. Allow headers (Content-Type is crucial for JSON)
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
             
-        # 4. Handle the OPTIONS preflight request immediately
-        if ($request_method = 'OPTIONS') {
-           add_header 'Access-Control-Allow-Origin' '*' always;
-           add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
-           add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
-           add_header 'Access-Control-Max-Age' 1728000;
-           add_header 'Content-Type' 'text/plain; charset=utf-8';
-           add_header 'Content-Length' 0;
-           return 204;
-            }
-        # --- CORS CONFIGURATION END ---
-      '';
+            # 4. Handle the OPTIONS preflight request immediately
+            if ($request_method = 'OPTIONS') {
+               add_header 'Access-Control-Allow-Origin' '*' always;
+               add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+               add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+               add_header 'Access-Control-Max-Age' 1728000;
+               add_header 'Content-Type' 'text/plain; charset=utf-8';
+               add_header 'Content-Length' 0;
+               return 204;
+                }
+            # --- CORS CONFIGURATION END ---
+          '';
     };
   };
 }
