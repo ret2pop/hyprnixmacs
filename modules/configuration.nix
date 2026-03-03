@@ -41,12 +41,10 @@ in
     ./i2pd.nix
     ./conduit.nix
     ./bitcoin.nix
-    ./murmur.nix
     ./ngircd.nix
     ./znc.nix
     ./docker.nix
     ./impermanence.nix
-    ./coturn.nix
     ./maddy.nix
     ./ntfy-sh.nix
     ./fail2ban.nix
@@ -65,21 +63,26 @@ country=CA
     memoryPercent = 50;
   };
 
-  virtualisation.vmVariant = lib.mkIf config.monorepo.profiles.server.enable {
+  virtualisation.vmVariant = {
     sops.validateSopsFiles = false;
     disko.devices = lib.mkForce {};
-    virtualisation.forwardPorts = [
+
+    virtualisation.forwardPorts = lib.mkIf config.monorepo.profiles.server.enable [
       { from = "host"; host.port = 10443; guest.port = 443; }
       { from = "host"; host.port = 9080; guest.port = 80; }
     ];
+
     virtualisation.useNixStoreImage = false;
+
     virtualisation.sharedDirectories.sops-keys = {
-      source = "/home/preston/.config/sops/age"; # Path to your host key
+      source = "/home/preston/.config/sops/age";
       target = "/home/preston/.config/sops/age";
     };
+
     networking.extraHosts = lib.mkForce (lib.concatStringsSep "\n" vmHosts);
     networking.defaultGateway = lib.mkForce null;
-    networking.interfaces."${config.monorepo.profiles.server.interface}".useDHCP = lib.mkForce true;
+
+    networking.interfaces.eth0.useDHCP = lib.mkForce true;
 
     fileSystems."/" = lib.mkForce {
       device = "/dev/disk/by-label/nixos";
@@ -98,10 +101,10 @@ country=CA
 
   environment = {
     etc = {
-  	  securetty.text = ''
-  	    # /etc/securetty: list of terminals on which root is allowed to login.
-  	    # See securetty(5) and login(1).
-  	    '';
+      securetty.text = ''
+        # /etc/securetty: list of terminals on which root is allowed to login.
+        # See securetty(5) and login(1).
+      '';
     };
   };
 
@@ -123,11 +126,11 @@ country=CA
     coredump.enable = false;
     network.config.networkConfig.IPv6PrivacyExtensions = "kernel";
     tmpfiles.settings = {
-  	  "restrictetcnixos"."/etc/nixos/*".Z = {
-  	    mode = "0000";
-  	    user = "root";
-  	    group = "root";
-  	  };
+      "restrictetcnixos"."/etc/nixos/*".Z = {
+        mode = "0000";
+        user = "root";
+        group = "root";
+      };
     };
   };
 
@@ -507,7 +510,7 @@ country=CA
     )
   ];
 
-  users.groups = lib.genAttrs userGroups (name: lib.mkDefault {});
+  users.groups = lib.genAttrs userGroups (_: lib.mkDefault {});
 
   users.users = lib.genAttrs userGroups (name: {
     isSystemUser = lib.mkDefault true;

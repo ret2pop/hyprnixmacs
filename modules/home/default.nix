@@ -143,7 +143,7 @@
 					          ++
 					          (if config.monorepo.profiles.art.enable then (with pkgs; [
 						          inkscape
-						          # krita
+						          krita
 					          ]) else [])
 					          ++
 					          (if config.monorepo.profiles.music.enable then (with pkgs; [
@@ -156,7 +156,7 @@
 			                alsa-scarlett-gui
 				              ardour
 				              audacity
-					            # blender
+					            blender
                       foxdot
 			                fluidsynth
 			                qjackctl
@@ -165,9 +165,8 @@
 			                imagemagick
                       supercollider
 			                inkscape
-			                # kdePackages.kdenlive
-			                # kicad
-                      murmur
+			                kdePackages.kdenlive
+			                kicad
 					          ]) else []);
 
     monorepo.profiles = {
