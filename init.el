@@ -683,7 +683,7 @@
   ("C-<prior>" . centaur-tabs-backward)
   ("C-<next>" . centaur-tabs-forward))
 
-(use-package lean4-mode
+(unless noninteractive (use-package lean4-mode
   :commands lean4-mode
   :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
-       :rev "76895d8939111654a472cfc617cfd43fbf5f1eb6"))
+       :rev "76895d8939111654a472cfc617cfd43fbf5f1eb6")))
