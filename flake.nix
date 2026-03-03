@@ -147,6 +147,7 @@ echo "Merge to main detected. Building VM for ${hostname}..."
 nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
 ''}";
             pass_filenames = false;
+            always_run = true;
           };
         });
 
