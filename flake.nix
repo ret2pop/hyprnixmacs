@@ -136,13 +136,11 @@
             name = "${hostname}-vm-build";
             description = "Ensure ${hostname} can build";
             stages = [ "post-merge" ];
-            entry = "${pkgs.writeShellScript "${hostname}-check"''
+            entry = "${pkgs.writeShellScript "${hostname}-check" ''
 BRANCH=$(git branch --show-current)
-
 if [ "$BRANCH" != "main" ]; then
   exit 0
 fi
-
 echo "Merge to main detected. Building VM for ${hostname}..."
 nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
 ''}";
