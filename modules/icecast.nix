@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 {
   services.icecast = {
     enable = lib.mkDefault false;

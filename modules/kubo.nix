@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, lib, ... }:
 {
   services.kubo = {
     enable = lib.mkDefault config.monorepo.profiles.workstation.enable;

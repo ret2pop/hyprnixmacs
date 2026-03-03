@@ -42,7 +42,7 @@ in
       "${config.monorepo.vars.internetName}@${config.monorepo.vars.orgHost}"
       "discussion@${config.monorepo.vars.orgHost}"
     ];
-    ensureCredentials = lib.genAttrs config.services.maddy.ensureAccounts (name: {
+    ensureCredentials = lib.genAttrs config.services.maddy.ensureAccounts (_: {
       passwordFile = "/run/secrets/${password_path}";
     }) // {
       "${config.monorepo.vars.internetName}@${config.monorepo.vars.orgHost}" = {

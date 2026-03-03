@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, ... }:
 let
   spec = {
     disko.devices = {

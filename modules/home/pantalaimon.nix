@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 {
   services.pantalaimon = {
     enable = lib.mkDefault false;

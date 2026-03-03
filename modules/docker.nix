@@ -1,4 +1,4 @@
-{ lib, config, vars, ... }:
+{ ... }:
 {
   # virtualisation = {
   #   oci-containers = {

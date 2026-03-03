@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ ... }:
 {
   imports = [
     ../modules/home/default.nix

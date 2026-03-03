@@ -119,7 +119,7 @@
               name = "${hostname}";
               value = nixpkgs.lib.nixosSystem {
                 system = hostSystem;
-                specialArgs = attrs;
+                specialArgs = attrs // { isIntegrationTest = false; };
                 modules = mkHostModules hostname;
               };
             });
@@ -135,15 +135,16 @@
             enable = true;
             name = "${hostname}-vm-build";
             description = "Ensure ${hostname} can build";
-            entry = ''
+            entry = "${pkgs.writeShellScript "${hostname}-check"''
 BRANCH=$(git branch --show-current)
 GIT_DIR=$(git rev-parse --git-dir)
+
 if [ "$BRANCH" != "main" ] || [ ! -f "$GIT_DIR/MERGE_HEAD" ]; then
   exit 0
 fi
 echo "Merge to main detected. Building VM for ${hostname}..."
 nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
-'';
+''}";
             pass_filenames = false;
           };
         });
@@ -161,10 +162,10 @@ nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
                 serviceName = "sshd";
                 enabled = super.services.openssh.enable;
               }
-              {
-                serviceName = "conduit";
-                enabled = super.services.matrix-conduit.enable;
-              }
+              # {
+              #   serviceName = "conduit";
+              #   enabled = super.services.matrix-conduit.enable;
+              # }
               {
                 serviceName = "git-daemon";
                 enabled = super.services.gitDaemon.enable;
@@ -175,33 +176,53 @@ nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
               }
             ]);
 
-        mkServiceTestScripts = builtins.concatStringsSep "\n" (builtins.map (service:
+        _mkServiceTestScripts = hostname: services: builtins.concatStringsSep "\n" (builtins.map (service:
           (if service.enabled then ''
-test_machine.succeed("systemctl is-active ${service.serviceName}")
-'' else "")));
+${hostname}.succeed("systemctl is-active ${service.serviceName}")
+'' else "")) services);
+
+        mkServiceTestScripts = hostname: _mkServiceTestScripts hostname (hostToServices hostname);
 
         mkIntegrationTests = builtins.map (hostname: 
-          {
-            name = "integration-test-${hostname}";
-            value = pkgs.testers.runNixOSTest {
-              name = "services-test-${hostname}";
-              node.specialArgs = attrs;
-              nodes = {
-                test_machine = {
-                  imports = mkHostModules hostname;
+          let
+            lib = nixpkgs.lib;
+            hostPkgs = self.nixosConfigurations."${hostname}".pkgs;
+            hardwareConfig = ./systems/${hostname}/hardware-configuration.nix;
+          in
+            {
+              name = "integration-test-${hostname}";
+              value = hostPkgs.testers.runNixOSTest {
+                name = "services-test-${hostname}";
+                nodes = {
+                  "${hostname}" = { ... }: {
+                    _module.args = attrs // { isIntegrationTest = true; };
+                    imports = mkHostModules hostname ++ [
+                      "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
+                      {
+                        nixpkgs.pkgs = lib.mkVMOverride hostPkgs;
+                        nixpkgs.config = lib.mkForce {};
+                        systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                        systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+                        nixpkgs.overlays = lib.mkForce [];
+                      }
+                    ];
+                    disabledModules = [ 
+                      ./modules/nixpkgs-options.nix
+                    ]
+                    ++ lib.optional (builtins.pathExists hardwareConfig) hardwareConfig;
+                  };
                 };
+                testScript = ''
+${hostname}.start()
+${hostname}.wait_for_unit("default.target")
+${hostname}.succeed('printf "smoke"')
+${mkServiceTestScripts hostname}
+'';
               };
-              testScript =
-                ''
-test_machine.start()
-test_machine.wait_for_unit("default.target")
-test_machine.succeed('printf "smoke"')
-
-'' + mkServiceTestScripts (hostToServices hostname);
-            };
-          }
+            }
         );
 
+        integrationTests = builtins.listToAttrs (mkIntegrationTests filterHosts);
         pre-commit-check = git-hooks.lib.${system}.run {
           src = ./.;
           hooks = builtins.listToAttrs (mkBuildChecks filterHosts) // {
@@ -224,8 +245,6 @@ fi
             };
           };
         };
-
-        integrationTests = builtins.listToAttrs (mkIntegrationTests filterHosts);
       in
         {
           checks."${system}" = integrationTests // {

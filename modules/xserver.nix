@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ config, ... }:
 {
   services.xserver = {
     enable = (! config.monorepo.profiles.ttyonly.enable);

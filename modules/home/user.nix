@@ -1,4 +1,4 @@
-{ lib, config, super, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 {
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''

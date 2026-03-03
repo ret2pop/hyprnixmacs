@@ -1,4 +1,4 @@
-{ lib, config, home-manager, ... }:
+{ ... }:
 {
   imports = [
     ../common.nix

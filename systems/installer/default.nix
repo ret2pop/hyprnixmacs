@@ -1,4 +1,4 @@
-{ pkgs, config, lib, modulesPath, ... }:
+{ pkgs, lib, modulesPath, ... }:
 let
   commits = import ./commits.nix;
 in
@@ -15,7 +15,7 @@ in
       allowedTCPPorts = [ 22 ];
       allowedUDPPorts = [ ];
     };
-    wireless.enable = false;
+    wireless.enable = lib.mkForce false;
   };
   services.openssh = {
     enable = true;

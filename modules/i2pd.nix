@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 {
   services.i2pd = {
     enable = lib.mkDefault false;

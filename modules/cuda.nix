@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 {
   environment.systemPackages = (if config.monorepo.profiles.cuda.enable then with pkgs; [
 	cudatoolkit

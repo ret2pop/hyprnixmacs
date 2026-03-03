@@ -48,6 +48,7 @@ in
     ./maddy.nix
     ./ntfy-sh.nix
     ./fail2ban.nix
+    ./nixpkgs-options.nix
   ];
 
   environment.etc."wpa_supplicant.conf".text = ''
@@ -423,14 +424,6 @@ country=CA
     ssh.enableAskPassword = false;
   };
 
-  nixpkgs = {
-    hostPlatform = lib.mkDefault "x86_64-linux";
-    config = {
-      allowUnfree = true;
-      cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;
-    };
-  };
-
   security = {
     acme = {
       acceptTerms = true;
@@ -442,9 +435,6 @@ country=CA
       packages = with pkgs; [
         apparmor-profiles
       ];
-      # policies = {
-      #   firefox.path = "${pkgs.apparmor-profiles}/share/apparmor/extra-profiles/firefox";
-      # };
     };
 
     pam.loginLimits = [
@@ -576,11 +566,6 @@ country=CA
       packages = [];
     };
   };
-
-  nixpkgs.config.permittedInsecurePackages = [
-    "python3.13-ecdsa-0.19.1"
-    "olm-3.2.16"
-  ];
 
   nix = {
     settings = {
