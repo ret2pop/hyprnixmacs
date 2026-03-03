@@ -135,13 +135,14 @@
             enable = true;
             name = "${hostname}-vm-build";
             description = "Ensure ${hostname} can build";
+            stages = [ "post-merge" ];
             entry = "${pkgs.writeShellScript "${hostname}-check"''
 BRANCH=$(git branch --show-current)
-GIT_DIR=$(git rev-parse --git-dir)
 
-if [ "$BRANCH" != "main" ] || [ ! -f "$GIT_DIR/MERGE_HEAD" ]; then
+if [ "$BRANCH" != "main" ]; then
   exit 0
 fi
+
 echo "Merge to main detected. Building VM for ${hostname}..."
 nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
 ''}";
@@ -266,7 +267,6 @@ fi
           };
 
           devShell."${system}" = with pkgs; mkShell {
-            inherit (pre-commit-check) shellHook;
             buildInputs = [
               fira-code
               python3
@@ -274,6 +274,10 @@ fi
               statix
               deadnix
             ];
+            shellHook = ''
+            ${pre-commit-check.shellHook}
+            ${pkgs.pre-commit}/bin/pre-commit install --hook-type post-merge
+              '';
           };
 
           packages."${system}" = {
