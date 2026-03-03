@@ -274,10 +274,7 @@ fi
               statix
               deadnix
             ];
-            shellHook = ''
-            ${pre-commit-check.shellHook}
-            ${pkgs.pre-commit}/bin/pre-commit install --hook-type post-merge
-              '';
+            inherit (pre-commit-check) shellHook;
           };
 
           packages."${system}" = {
