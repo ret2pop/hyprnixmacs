@@ -1,6 +1,10 @@
-{ pkgs, lib, modulesPath, ... }:
+{ pkgs, lib, modulesPath, disko, monorepoSelf ? null, self, ... }:
 let
-  commits = import ./commits.nix;
+  commits = {
+    diskoCommitHash = disko.rev or "dirty";
+    monorepoCommitHash = if monorepoSelf != null then (monorepoSelf.rev or "dirty") else (self.rev or "dirty");
+    monorepoUrl = "https://github.com/ret2pop/monorepo";
+  };
 in
 {
   imports = [
@@ -55,7 +59,7 @@ cd "$HOME"
 ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
 
 if [ ! -d "$HOME/monorepo/" ]; then
-  git clone ${commits.monorepoUrl}
+  git clone ${commits.monorepoUrl} --recurse-submodules
   cd "$HOME/monorepo"
   git checkout "${commits.monorepoCommitHash}"
   cd "$HOME"
