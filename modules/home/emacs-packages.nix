@@ -10,7 +10,7 @@ epkgs: [
   epkgs.dashboard
   epkgs.doom-themes
   epkgs.doom-modeline
-  epkgs.irony-mode
+  epkgs.irony
   epkgs.elfeed
   epkgs.elfeed-org
   epkgs.elfeed-tube
