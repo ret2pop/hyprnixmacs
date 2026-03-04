@@ -318,7 +318,7 @@
  (use-package platformio-mode
 :hook (prog-mode . platformio-conditionally-enable))
 
-(use-package irony-mode
+(use-package irony
   :hook (
   (c++-mode . irony-mode)
   (c-mode . irony-mode)
