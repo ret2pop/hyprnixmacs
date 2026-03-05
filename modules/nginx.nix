@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ pkgs, config, lib, monorepoSelf, ... }:
 {
   services.nginx = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
@@ -11,7 +11,7 @@
       "${config.monorepo.vars.remoteHost}" = {
         serverName = "${config.monorepo.vars.remoteHost}";
         serverAliases = [ "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" ];
-        root = "/var/www/${config.monorepo.vars.internetName}-website/";
+        root = "${monorepoSelf.packages.${pkgs.system}.website}";
         addSSL = true;
         enableACME = true;
       };
