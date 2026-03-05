@@ -6,9 +6,12 @@ let
       device = config.monorepo.vars.device;
       content = {
         type = "gpt";
-        partitions = if (config.monorepo.vars.device == "/dev/vda") then
+        partitions = if ((builtins.match "/dev/vd[a-z]+" config.monorepo.vars.device) != null) then
           (import ./virtual-machine.nix)
-          else (import ./. + "${config.monorepo.vars.fileSystem}.nix");
+                     else (if ((builtins.match "/dev/mmcblk[0-9]+" config.monorepo.vars.device) != null) then
+                       (import ./rpi.nix)
+                           else 
+                             (import ./. + "${config.monorepo.vars.fileSystem}.nix"));
       };
     };
   };
