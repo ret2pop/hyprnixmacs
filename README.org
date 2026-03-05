@@ -1,0 +1,2 @@
+* HyprNixMacs
+This is my hyprnixmacs configuration, integrated into my monorepo.
