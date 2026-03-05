@@ -2,7 +2,6 @@
 {
   imports = [
     ../common.nix
-    ../../disko/drive-simple.nix
   ];
   config = {
     monorepo = {

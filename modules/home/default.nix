@@ -136,7 +136,6 @@
 					          ++
 					          (if config.monorepo.profiles.crypto.enable then (with pkgs; [
 						          bitcoin
-						          # electrum
 						          monero-cli
 						          monero-gui
 					          ]) else [])

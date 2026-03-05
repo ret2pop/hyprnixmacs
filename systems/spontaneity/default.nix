@@ -2,8 +2,6 @@
 {
   imports = [
     ../common.nix
-    ../../disko/drive-bios.nix
-
     # nixos-anywhere generates this file
     ./hardware-configuration.nix
   ];

@@ -1,7 +1,6 @@
 { ... }:
 {
   imports = [
-    ../../disko/btrfs-simple.nix
     ../common.nix
   ];
   config = {

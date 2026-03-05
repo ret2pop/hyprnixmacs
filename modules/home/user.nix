@@ -46,7 +46,7 @@
       graphviz jq
 
       # Apps
-      # octaveFull
+      octaveFull
       grim swww vim kotatogram-desktop tg qwen-code element-desktop signal-desktop signal-cli thunderbird jami
 
       # Sound/media

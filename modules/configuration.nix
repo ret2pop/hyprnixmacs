@@ -202,16 +202,13 @@ country=CA
       "usbcore.autosuspend=-1"
       "pcie_aspm=off"
       "pci=noaer"
-  	  # "debugfs=off"
   	  "page_alloc.shuffle=1"
   	  "slab_nomerge"
-  	  # "page_poison=1"
 
   	  # madaidan
   	  "pti=on"
   	  "randomize_kstack_offset=on"
   	  "vsyscall=none"
-  	  # "lockdown=confidentiality"
 
   	  # cpu
   	  "spectre_v2=on"
@@ -224,11 +221,7 @@ country=CA
   	  "extra_latent_entropy"
 
   	  # mineral
-  	  # "init_on_alloc=1"
-  	  # "random.trust_bootloader=off"
-  	  # "init_on_free=1"
   	  "quiet"
-  	  # "loglevel=0"
     ];
 
     blacklistedKernelModules = [
@@ -278,12 +271,6 @@ country=CA
       # net
       "net.ipv4.ip_forward" = 1;
       "net.ipv4.icmp_echo_ignore_broadcasts" = true;
-      # "net.ipv4.conf.all.accept_redirects" = false;
-      # "net.ipv4.conf.all.secure_redirects" = false;
-      # "net.ipv4.conf.default.accept_redirects" = false;
-      # "net.ipv4.conf.default.secure_redirects" = false;
-      # "net.ipv6.conf.all.accept_redirects" = false;
-      # "net.ipv6.conf.default.accept_redirects" = false;
     };
   };
 
