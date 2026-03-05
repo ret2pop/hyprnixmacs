@@ -386,7 +386,6 @@ country=CA
 
     jitterentropy-rngd.enable = true;
     resolved.settings.Resolve.DNSSEC = true;
-    # usbguard.enable = true;
     usbguard.enable = false;
     dbus.apparmor = "enabled";
 
