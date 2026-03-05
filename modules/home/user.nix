@@ -115,7 +115,7 @@ END {
       (writeShellScriptBin "remote-build"
         ''
 #!/bin/bash
-nixos-rebuild --sudo --ask-sudo-password --target-host "$1" switch --flake $HOME/monorepo/nix#spontaneity
+nixos-rebuild --sudo --ask-sudo-password --target-host "$1" switch --flake $HOME/monorepo#spontaneity
 ''
       )
       (writeShellScriptBin "install-vps"
