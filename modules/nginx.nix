@@ -1,4 +1,4 @@
-{ pkgs, config, lib, monorepoSelf, ... }:
+{ pkgs, config, lib, monorepoSelf ? null, ... }:
 {
   services.nginx = {
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
@@ -8,7 +8,7 @@
     recommendedTlsSettings = true;
     recommendedProxySettings = false;
     virtualHosts = {
-      "${config.monorepo.vars.remoteHost}" = {
+      "${config.monorepo.vars.remoteHost}" = lib.mkIf (monorepoSelf != null) {
         serverName = "${config.monorepo.vars.remoteHost}";
         serverAliases = [ "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" ];
         root = "${monorepoSelf.packages.${pkgs.system}.website}";
