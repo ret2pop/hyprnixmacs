@@ -138,7 +138,7 @@
             enable = true;
             name = "${hostname}-vm-build";
             description = "Ensure ${hostname} can build";
-            stages = [ "post-merge" ];
+            stages = [ "pre-merge-commit" ];
             entry = "${pkgs.writeShellScript "${hostname}-check" ''
 #!/usr/bin/env bash
 set -e
@@ -288,7 +288,10 @@ fi
               statix
               deadnix
             ];
-            inherit (pre-commit-check) shellHook;
+            shellHook = ''
+${pre-commit-check.shellHook}
+git config branch.main.mergeoptions "--no-ff"
+'';
           };
 
           packages."${system}" = {
