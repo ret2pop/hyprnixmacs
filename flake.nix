@@ -119,7 +119,10 @@
               name = "${hostname}";
               value = nixpkgs.lib.nixosSystem {
                 system = hostSystem;
-                specialArgs = attrs // { isIntegrationTest = false; };
+                specialArgs = attrs // {
+                  isIntegrationTest = false;
+                  monorepoSelf = null;
+                };
                 modules = mkHostModules hostname;
               };
             });
@@ -137,6 +140,7 @@
             description = "Ensure ${hostname} can build";
             stages = [ "post-merge" ];
             entry = "${pkgs.writeShellScript "${hostname}-check" ''
+#!/usr/bin/env bash
 set -e
 set -o pipefail
 trap "echo -e '\nHook interrupted by user. Aborting merge!'; exit 1" INT TERM
@@ -146,9 +150,14 @@ BRANCH=$(git branch --show-current)
 if [ "$BRANCH" != "main" ]; then
   exit 0
 fi
-
 echo "Merge to main detected. Building VM for ${hostname}..."
-nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
+if nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link; then
+    echo "Build succeeded. Proceeding with merge."
+    exit 0
+else
+    echo "Build failed! Aborting."
+    exit 1
+fi
 ''}";
             pass_filenames = false;
             always_run = true;
