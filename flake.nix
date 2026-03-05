@@ -137,10 +137,16 @@
             description = "Ensure ${hostname} can build";
             stages = [ "post-merge" ];
             entry = "${pkgs.writeShellScript "${hostname}-check" ''
+set -e
+set -o pipefail
+trap "echo -e '\nHook interrupted by user. Aborting merge!'; exit 1" INT TERM
+echo "Running Nix integration tests..."
+
 BRANCH=$(git branch --show-current)
 if [ "$BRANCH" != "main" ]; then
   exit 0
 fi
+
 echo "Merge to main detected. Building VM for ${hostname}..."
 nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link
 ''}";

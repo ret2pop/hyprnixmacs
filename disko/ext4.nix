@@ -3,12 +3,7 @@
     type = "EF00";
     size = "500M";
     priority = 1;
-    content = {
-      type = "filesystem";
-      format = "vfat";
-      mountpoint = "/boot";
-      mountOptions = [ "umask=0077" ];
-    };
+    content = import ./esp-boot.nix;
   };
   root = {
     size = "100%";
