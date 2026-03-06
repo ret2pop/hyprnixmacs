@@ -139,6 +139,8 @@
         :base-directory "~/monorepo"
         :base-extension "org"
         :publishing-directory "~/website_html"
+        :with-author t
+        :with-date t
         :recursive t
         :publishing-function org-html-publish-to-html
         :headline-levels 4
