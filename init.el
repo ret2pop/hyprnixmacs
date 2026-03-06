@@ -595,6 +595,9 @@
   (eww-search-prefix "https://google.com/search?q=" "Google prefix")
   :hook ((eww-mode . (lambda () (local-set-key (kbd "y Y") #'eww-copy-page-url)))))
 
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
 (use-package org-roam
   :after (org)
   :custom
