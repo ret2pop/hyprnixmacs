@@ -134,7 +134,6 @@
     (org-pretty-entities t "prettify org mode")
     (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
     (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
-    (org-html-head "\n<script> window.MathJax = { tex: { tags: 'ams', tagSide: 'left', tagIndent: '0em' }, chtml: { displayAlign: 'left', displayIndent: '0em' } }; </script>" "Add mathjax configuration")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
@@ -149,6 +148,7 @@
         :publishing-function org-html-publish-to-html
         :headline-levels 4
         :html-preamble t
+        :html-head-extra "<script> window.MathJax = { tex: { tags: 'ams', tagSide: 'left', tagIndent: '0em' }, chtml: { displayAlign: 'left', displayIndent: '0em' } }; </script>"
         :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
        ("website-static"
         :base-directory "~/monorepo"
