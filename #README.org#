@@ -1,0 +1,6 @@
+#+OPTIONS: :exports none
+#+BIND: org-export-publishing-directory nil
+#+archive:
+#+options: exports:none
+* HyprNixMacs
+This is my hyprnixmacs configuration, integrated into my monorepo.
