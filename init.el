@@ -162,6 +162,20 @@
     (require 'ox-publish)
     (require 'org-tempo)
     (require 'org-habit)
+    (defun org-latex-to-mathml-filter (text backend info)
+      "Convert raw LaTeX environments and fragments to MathML Core using texmath."
+      (if (org-export-derived-backend-p backend 'html)
+          (with-temp-buffer
+            (insert text)
+            (let ((exit-code (call-process-region (point-min) (point-max) "texmath" t t nil "-f" "tex" "-t" "mathml")))
+              (if (zerop exit-code)
+                  (buffer-string)
+                text)))
+        text))
+
+    (add-to-list 'org-export-filter-latex-fragment-functions #'org-latex-to-mathml-filter)
+    (add-to-list 'org-export-filter-latex-environment-functions #'org-latex-to-mathml-filter)
+
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((shell . t)
                                    (python . t)
