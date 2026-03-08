@@ -141,6 +141,7 @@
      '(("website-org"
         :base-directory "~/monorepo"
         :base-extension "org"
+        :exclude "nix/README\\.org"
         :publishing-directory "~/website_html"
         :with-author t
         :with-date t
