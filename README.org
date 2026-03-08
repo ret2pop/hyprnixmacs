@@ -1,2 +1,4 @@
+#+OPTIONS: :exports none
+#+BIND: org-export-publishing-directory nil
 * HyprNixMacs
 This is my hyprnixmacs configuration, integrated into my monorepo.
