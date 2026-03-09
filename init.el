@@ -135,7 +135,7 @@
     (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
     (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
     (org-html-with-latex 'html)
-    (org-latex-to-html-convert-command "texmath -f tex -t mathml <<'EOF'\n%s\nEOF")
+    (org-latex-to-html-convert-command "texmath -f tex -t mathml <<'EOF'\n%%s\nEOF")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
