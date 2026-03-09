@@ -138,7 +138,7 @@
     (org-html-mathjax-options nil)
     (org-html-mathjax-template "")
     (org-latex-to-html-convert-command 
-      "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n'")
+      "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
@@ -167,6 +167,21 @@
     (require 'ox-publish)
     (require 'org-tempo)
     (require 'org-habit)
+    (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
+      "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
+      (let ((processing-type (plist-get info :with-latex)))
+        (if (eq processing-type 'html)
+            (let* ((latex-frag (org-remove-indentation
+                                (org-element-property :value latex-environment)))
+                   ;; Send the block to your Pandoc pipeline
+                   (converted (org-format-latex-as-html latex-frag)))
+              ;; Wrap it in the standard equation divs
+              (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
+                      converted))
+          ;; If not set to 'html, fall back to standard behavior
+          (funcall orig-fun latex-environment contents info))))
+
+    (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
 
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((shell . t)
