@@ -137,7 +137,7 @@
     (org-html-with-latex 'html)
     (org-html-mathjax-options nil)
     (org-html-mathjax-template "")
-    (org-latex-to-html-convert-command "texmath -f tex -t mathml %i")
+    (org-latex-to-html-convert-command "pandoc -f latex -t mathml <<<%i")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
