@@ -137,7 +137,8 @@
     (org-html-with-latex 'html)
     (org-html-mathjax-options nil)
     (org-html-mathjax-template "")
-    (org-html-head-extra "<link rel=\"stylesheet\" type=\"text/css\" href=\"/syntax.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"/style.css\" />\n")
+    (org-html-container-element "main")
+    (org-html-head-extra "<link rel=\"stylesheet\" type=\"text/css\" href=\"/syntax.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"/style.css\" />\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n<meta name=\"theme-color\" content=\"#ffffff\">")
     (org-latex-to-html-convert-command 
       "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'")
     (org-html-viewport '((width "device-width") 
@@ -168,6 +169,7 @@
     (require 'ox-publish)
     (require 'org-tempo)
     (require 'org-habit)
+    (require 'ob-latex)
 
     (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
       "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
@@ -627,7 +629,7 @@
   (org-roam-directory (file-truename "~/monorepo/mindmap") "Set org-roam directory inside monorepo")
   (org-roam-capture-templates '(("d" "default" plain "%?"
 				 :target (file+head "${title}.org"
-						    "#+title: ${title}\n#+author: Preston Pan\n#+html_head: <link rel=\"stylesheet\" type=\"text/css\" href=\"../style.css\" />\n#+html_head: <script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n#+html_head: <script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>\n#+options: broken-links:t")
+						    "#+title: ${title}\n#+author: Preston Pan\n#+description:\n#+options: broken-links:t")
 				 :unnarrowed t)) "org-roam files start with this snippet by default")
   :config
   (org-roam-db-autosync-mode)
