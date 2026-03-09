@@ -134,7 +134,8 @@
     (org-pretty-entities t "prettify org mode")
     (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
     (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
-    (org-html-mathjax-options nil
+    (org-html-with-latex 'html)
+    (org-latex-to-html-convert-command "texmath -f tex -t mathml <<'EOF'\n%s\nEOF")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
@@ -163,19 +164,6 @@
     (require 'ox-publish)
     (require 'org-tempo)
     (require 'org-habit)
-    (defun org-latex-to-mathml-filter (text backend info)
-      "Convert raw LaTeX environments and fragments to MathML Core using texmath."
-      (if (org-export-derived-backend-p backend 'html)
-          (with-temp-buffer
-            (insert text)
-            (let ((exit-code (call-process-region (point-min) (point-max) "texmath" t t nil "-f" "tex" "-t" "mathml")))
-              (if (zerop exit-code)
-                  (buffer-string)
-                text)))
-        text))
-
-    (add-to-list 'org-export-filter-latex-fragment-functions #'org-latex-to-mathml-filter)
-    (add-to-list 'org-export-filter-latex-environment-functions #'org-latex-to-mathml-filter)
 
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((shell . t)
