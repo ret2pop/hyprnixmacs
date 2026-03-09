@@ -137,6 +137,7 @@
     (org-html-with-latex 'html)
     (org-html-mathjax-options nil)
     (org-html-mathjax-template "")
+    (org-html-head-extra "<link rel=\"stylesheet\" type=\"text/css\" href=\"/syntax.css\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"/style.css\" />\n")
     (org-latex-to-html-convert-command 
       "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'")
     (org-html-viewport '((width "device-width") 
@@ -167,18 +168,16 @@
     (require 'ox-publish)
     (require 'org-tempo)
     (require 'org-habit)
+
     (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
       "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
       (let ((processing-type (plist-get info :with-latex)))
         (if (eq processing-type 'html)
             (let* ((latex-frag (org-remove-indentation
                                 (org-element-property :value latex-environment)))
-                   ;; Send the block to your Pandoc pipeline
                    (converted (org-format-latex-as-html latex-frag)))
-              ;; Wrap it in the standard equation divs
               (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
                       converted))
-          ;; If not set to 'html, fall back to standard behavior
           (funcall orig-fun latex-environment contents info))))
 
     (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
@@ -288,7 +287,7 @@
     "Custom function to create journal header."
     (concat
      (pcase org-journal-file-type
-       (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything\n#+DESCRIPTION: My daily journal entry\n#+AUTHOR: Preston Pan\n#+HTML_HEAD: <link rel=\"stylesheet\" type=\"text/css\" href=\"../style.css\" />\n#+html_head: <script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n#+html_head: <script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>\n#+options: broken-links:t")
+       (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything\n#+DESCRIPTION: My daily journal entry\n#+AUTHOR: Preston Pan\n#+options: broken-links:t")
        (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
        (`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
        (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
