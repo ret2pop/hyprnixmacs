@@ -5,6 +5,7 @@
     user = "nginx";
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
+    recommendedBrotliSettings = true;
     recommendedTlsSettings = true;
     recommendedProxySettings = false;
     virtualHosts = {
@@ -14,6 +15,18 @@
         root = "${monorepoSelf.packages.${pkgs.system}.website}";
         addSSL = true;
         enableACME = true;
+        locations."/" = {
+          extraConfig = ''
+      add_header Cache-Control "no-cache, must-revalidate";
+      expires off;
+    '';
+        };
+        locations."~* \\.(?:woff2|ttf|otf|eot|woff|ico|css|js|gif|jpe?g|png|svg|mp3|mp4|iso|webmanifest)$" = {
+          extraConfig = ''
+      add_header Cache-Control "public, max-age=31536000, immutable";
+      access_log off;
+    '';
+        };
       };
 
       # the port comes from ssh tunnelling

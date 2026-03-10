@@ -114,6 +114,13 @@ in
       description = "Linux timezone";
     };
 
+    ntfySecret = lib.mkOption {
+      type = lib.types.str;
+      default = "ntfy";
+      example = "ntfy-env";
+      description = "Name of Ntfy secret for notification handling";
+    };
+
     monitors = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [

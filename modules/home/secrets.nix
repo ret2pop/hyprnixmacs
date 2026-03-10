@@ -26,6 +26,12 @@
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/dn42";
       };
+
+      ntfy = {
+        format = "yaml";
+        path = "${config.sops.defaultSymlinkPath}/${super.monorepo.vars.ntfySecret}";
+        sopsFile = ../secrets/common-secrets.yaml;
+      };
     } else {
     };
     defaultSymlinkPath = "/run/user/1000/secrets";

@@ -2,12 +2,13 @@
 let
   serverName = "ntfy.${config.monorepo.vars.remoteHost}";
   port = 2586;
-  ntfySecret = "ntfy";
+  ntfySecret = config.monorepo.vars.ntfySecret;
 in
 {
   sops.secrets."${ntfySecret}" = lib.mkIf config.services.ntfy-sh.enable {
     format = "yaml";
     owner = "ntfy-sh";
+    sopsFile = ../secrets/common-secrets.yaml;
   };
 
   services.ntfy-sh = {

@@ -47,6 +47,7 @@ epkgs: [
   epkgs.mu4e
   epkgs.minuet
   epkgs.nix-mode
+  epkgs.org-contrib
   epkgs.org-fragtog
   epkgs.org-journal
   epkgs.org-roam

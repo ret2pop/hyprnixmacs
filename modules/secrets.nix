@@ -14,6 +14,7 @@
         content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine mail.${config.monorepo.vars.orgHost} login ${x}@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
 machine mail.${config.monorepo.vars.orgHost} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
       };
+
       "matterbridge" = {
         owner = "matterbridge";
         content = ''
@@ -78,15 +79,19 @@ channel="-5290629325"
       znc = {
         format = "yaml";
       };
+
       znc_password_salt = {
         format = "yaml";
       };
+
       znc_password_hash = {
         format = "yaml";
       };
+
       matrix_bridge = {
         format = "yaml";
       };
+
       mail_password = {
         format = "yaml";
         owner = "maddy";
@@ -100,12 +105,15 @@ channel="-5290629325"
       mautrix_env = {
         format = "yaml";
       };
+
       telegram_token = {
         format = "yaml";
       };
+
       discord_token = {
         format = "yaml";
       };
+
       mpd_password = {
         format = "yaml";
         owner = "nginx";
