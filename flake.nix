@@ -305,7 +305,7 @@ else
   echo "Could not resolve sops path for $CURRENT_HOST or secret is missing. Set CLOUDFLARE_TOKEN manually."
 fi
 
-alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit"
+alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit --force"
 alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --force "
 alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r git branch -d'
 '';
