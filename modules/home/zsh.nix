@@ -1,4 +1,4 @@
-{ config, pkgs, systemHostName, ... }:
+{ pkgs, systemHostName, super, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -33,9 +33,9 @@
       build-installer = "nix build $HOME/monorepo/nix#nixosConfigurations.installer.config.system.build.isoImage";
       rb = "sudo nixos-rebuild switch --flake $HOME/monorepo/nix#${systemHostName}";
       nfu = "cd ~/monorepo/nix && git add . && git commit -m \"new flake lock\" &&  nix flake update";
-      usync =  "rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/monorepo/result/ root@${config.monorepo.vars.remoteHost}:/var/www/${config.monorepo.vars.internetName}-website/";
+      usync =  "rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/monorepo/result/ root@${super.monorepo.vars.remoteHost}:/var/www/${super.monorepo.vars.internetName}-website/";
       usite
-      = "cd ~/src/publish-org-roam-ui && bash local.sh && rm -rf ~/website_html/graph_view; cp -r ~/src/publish-org-roam-ui/out ~/website_html/graph_view && rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${config.monorepo.vars.remoteHost}:/var/www/${config.monorepo.vars.internetName}-website/";
+      = "cd ~/src/publish-org-roam-ui && bash local.sh && rm -rf ~/website_html/graph_view; cp -r ~/src/publish-org-roam-ui/out ~/website_html/graph_view && rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${super.monorepo.vars.remoteHost}:/var/www/${super.monorepo.vars.internetName}-website/";
       sai = "eval \"$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519 && ssh-add -l";
     };
     loginExtra = ''
