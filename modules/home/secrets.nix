@@ -30,11 +30,7 @@
       ntfy = {
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/${super.monorepo.vars.ntfySecret}";
-<<<<<<< Updated upstream
-        sopsFile = ../secrets/common-secrets.yaml;
-=======
         sopsFile = ../../secrets/common-secrets.yaml;
->>>>>>> Stashed changes
       };
     } else {
     };
