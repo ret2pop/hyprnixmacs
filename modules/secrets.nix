@@ -7,14 +7,6 @@
 
 
     templates = if config.monorepo.profiles.server.enable then {
-      "public-inbox-netrc" = {
-        owner = "public-inbox";
-        group = "public-inbox";
-        mode = "0400";
-        content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine mail.${config.monorepo.vars.orgHost} login ${x}@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
-machine mail.${config.monorepo.vars.orgHost} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
-      };
-
       "matterbridge" = {
         owner = "matterbridge";
         content = ''

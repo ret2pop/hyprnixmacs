@@ -5,10 +5,21 @@ let
   password_path = "mail_monorepo_password";
 in
 {
-  sops.secrets = lib.mkIf config.services.maddy.enable {
-    "${password_path}" = lib.mkIf config.services.maddy.enable {
-      format = "yaml";
-      owner = "maddy";
+  sops = lib.mkIf config.services.maddy.enable {
+    secrets = {
+      "${password_path}" = {
+        format = "yaml";
+        owner = "maddy";
+      };
+    };
+    templates = lib.mkIf config.services.public-inbox.enable {
+      "public-inbox-netrc" = {
+        owner = "public-inbox";
+        group = "public-inbox";
+        mode = "0400";
+        content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine ${emailServerName} login ${x}@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
+machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
+      };
     };
   };
 
@@ -63,18 +74,16 @@ in
   '';
     
     serviceConfig = {
-      # Allow the service to see the file it just created
       BindPaths = [ 
         "/var/lib/public-inbox" 
         "${config.users.users.git.home}"
       ];
       ReadOnlyPaths = [ "/var/lib/public-inbox/style.css" ];
-      # Ensure it can actually write to the directory during preStart
       ReadWritePaths = [ "/var/lib/public-inbox" ];
     };
   } else {};
 
-  systemd.services.public-inbox-watch = if config.monorepo.profiles.server.enable then {
+  systemd.services.public-inbox-watch = if config.services.public-inbox.enable then {
     after = [ "sops-nix.service" ];
     confinement.enable = lib.mkForce false;
     preStart = ''
@@ -104,7 +113,7 @@ in
   } else {};
 
   services.public-inbox = {
-    enable = lib.mkDefault config.monorepo.profiles.server.enable;
+    enable = lib.mkDefault config.services.maddy.enable;
     settings = {
       coderepo = lib.genAttrs config.monorepo.vars.projects (name: {
         dir = "${config.users.users.git.home}/${name}.git";

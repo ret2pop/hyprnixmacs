@@ -1,12 +1,12 @@
-{ lib, config, ... }:
+{ lib, config, super, ... }:
 {
   services.mpd = {
   enable = lib.mkDefault config.monorepo.profiles.music.enable;
-  dbFile = "/home/${config.monorepo.vars.userName}/.config/mpd/db";
-  dataDir = "/home/${config.monorepo.vars.userName}/.config/mpd/";
+  dbFile = "/home/${super.monorepo.vars.userName}/.config/mpd/db";
+  dataDir = "/home/${super.monorepo.vars.userName}/.config/mpd/";
   network.port = 6600;
-  musicDirectory = "/home/${config.monorepo.vars.userName}/music";
-  playlistDirectory = "/home/${config.monorepo.vars.userName}/.config/mpd/playlists";
+  musicDirectory = "/home/${super.monorepo.vars.userName}/music";
+  playlistDirectory = "/home/${super.monorepo.vars.userName}/.config/mpd/playlists";
   network.listenAddress = "0.0.0.0";
   extraConfig = ''
       audio_output {

@@ -152,7 +152,7 @@ if [ "$BRANCH" != "main" ]; then
 fi
 echo "Merge to main detected. Building VM for ${hostname}..."
 if nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link; then
-    echo "Build succeeded. Proceeding with merge."
+    echo "Build succeeded."
     exit 0
 else
     echo "Build failed! Aborting."
@@ -177,10 +177,6 @@ fi
                 serviceName = "sshd";
                 enabled = super.services.openssh.enable;
               }
-              # {
-              #   serviceName = "conduit";
-              #   enabled = super.services.matrix-conduit.enable;
-              # }
               {
                 serviceName = "git-daemon";
                 enabled = super.services.gitDaemon.enable;
@@ -283,14 +279,35 @@ fi
           devShell."${system}" = with pkgs; mkShell {
             buildInputs = [
               fira-code
-              python3
-              poetry
               statix
               deadnix
+              (python3.withPackages (ps: with ps; [
+                octodns
+                octodns-providers.cloudflare
+                octodns-providers.bind
+              ]))
             ];
             shellHook = ''
 ${pre-commit-check.shellHook}
 git config branch.main.mergeoptions "--no-ff"
+
+CURRENT_HOST="$(hostname)"
+
+TARGET_USER_RAW=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users --apply "u: builtins.head (builtins.attrNames u)" --raw 2>/dev/null)
+
+TARGET_USER=$(echo "$TARGET_USER_RAW" | xargs)
+SOPS_BASE=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users."$TARGET_USER".sops.defaultSymlinkPath --raw 2>/dev/null)
+
+if [ -n "$SOPS_BASE" ] && [ -f "$SOPS_BASE/cloudflare-dns" ]; then
+  export CLOUDFLARE_TOKEN="$(cat "$SOPS_BASE/cloudflare-dns" | tr -d '\n')"
+  echo "Authenticated via sops-nix for host: $CURRENT_HOST"
+else
+  echo "Could not resolve sops path for $CURRENT_HOST or secret is missing. Set CLOUDFLARE_TOKEN manually."
+fi
+
+alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit --force"
+alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --force "
+alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r git branch -d'
 '';
           };
 

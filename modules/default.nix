@@ -1,9 +1,10 @@
 { lib, config, pkgs, ... }:
+let
+  dirContents = builtins.readDir ./.;
+  files = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix") dirContents;
+in
 {
-  imports = [
-    ./configuration.nix
-    ./vars.nix
-  ];
+  imports = lib.mapAttrsToList (name: _: ./. + "/${name}") files;
 
   options = {
     monorepo = {

@@ -1,8 +1,6 @@
 {
-  ESP = {
+  ESP = (import ./esp-boot.nix) // {
     size = "512M";
-    type = "EF00";
-    content = import ./esp-boot.nix;
   };
   luks = {
     size = "100%";

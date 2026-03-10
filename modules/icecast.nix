@@ -17,5 +17,4 @@
 </mount>
 '';
   };
-  admin.password = "changeme";
 }

@@ -17,16 +17,21 @@
         enableACME = true;
         locations."/" = {
           extraConfig = ''
-      add_header Cache-Control "no-cache, must-revalidate";
-      expires off;
+add_header Cache-Control "no-cache, must-revalidate";
+expires off;
     '';
         };
+
         locations."~* \\.(?:woff2|ttf|otf|eot|woff|ico|css|js|gif|jpe?g|png|svg|mp3|mp4|iso|webmanifest)$" = {
           extraConfig = ''
-      add_header Cache-Control "public, max-age=31536000, immutable";
-      access_log off;
+add_header Cache-Control "public, max-age=31536000, immutable";
+access_log off;
     '';
         };
+        extraConfig = ''
+include ${monorepoSelf.packages.${pkgs.system}.website}/csp_headers.conf;
+rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
+'';
       };
 
       # the port comes from ssh tunnelling
@@ -54,6 +59,20 @@ proxy_read_timeout 36000s;
         addSSL = true;
         enableACME = true;
       };
+
+      "graph.${config.monorepo.vars.remoteHost}" = lib.mkIf (monorepoSelf != null) {
+        serverName = "graph.${config.monorepo.vars.remoteHost}";
+        root = "${monorepoSelf.packages.${pkgs.system}.website}";
+        addSSL = true;
+        enableACME = true;
+        locations."/" = {
+          extraConfig = "rewrite ^/$ /graph_view/index.html break;";
+        };
+
+        extraConfig = ''
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none';";
+  '';
+      };
     };
   };
 
@@ -63,5 +82,7 @@ proxy_read_timeout 36000s;
     "${config.monorepo.vars.remoteHost}" = {};
     "${config.monorepo.vars.orgHost}" = {};
     "${config.monorepo.vars.internetName}.${config.monorepo.vars.orgHost}" = {};
+    "music.${config.monorepo.vars.remoteHost}" = {};
+    "graph.${config.monorepo.vars.remoteHost}" = {};
   };
 }

@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, super, ... }:
 {
   programs.waybar = {
     enable = lib.mkDefault config.monorepo.profiles.hyprland.enable;
@@ -254,7 +254,7 @@
         position = "top";
         height = 50;
 
-        output = config.monorepo.vars.monitors;
+        output = super.monorepo.vars.monitors;
 
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "hyprland/window" ];
