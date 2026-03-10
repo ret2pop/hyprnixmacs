@@ -1,30 +1,30 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, super, ... }:
 {
   home = {
     activation.startup-files = lib.hm.dag.entryAfter [ "installPackages" ] ''
-    if [ ! -d "/home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/" ]; then
-      mkdir -p /home/${config.monorepo.vars.userName}/email/${config.monorepo.vars.internetName}/
+    if [ ! -d "/home/${super.monorepo.vars.userName}/email/${super.monorepo.vars.internetName}/" ]; then
+      mkdir -p /home/${super.monorepo.vars.userName}/email/${super.monorepo.vars.internetName}/
     fi
 
-    if [ ! -d "/home/${config.monorepo.vars.userName}/music" ]; then
-      mkdir -p /home/${config.monorepo.vars.userName}/music
+    if [ ! -d "/home/${super.monorepo.vars.userName}/music" ]; then
+      mkdir -p /home/${super.monorepo.vars.userName}/music
     fi
 
-    if [ ! -d /home/${config.monorepo.vars.userName}/org ]; then
-      mkdir -p /home/${config.monorepo.vars.userName}/org
+    if [ ! -d /home/${super.monorepo.vars.userName}/org ]; then
+      mkdir -p /home/${super.monorepo.vars.userName}/org
     fi
 
-    if [ ! -d /home/${config.monorepo.vars.userName}/src ]; then
-      mkdir -p /home/${config.monorepo.vars.userName}/src
+    if [ ! -d /home/${super.monorepo.vars.userName}/src ]; then
+      mkdir -p /home/${super.monorepo.vars.userName}/src
     fi
 
-    touch /home/${config.monorepo.vars.userName}/org/agenda.org
-    touch /home/${config.monorepo.vars.userName}/org/notes.org
+    touch /home/${super.monorepo.vars.userName}/org/agenda.org
+    touch /home/${super.monorepo.vars.userName}/org/notes.org
     '';
 
     enableNixpkgsReleaseCheck = false;
-    username = config.monorepo.vars.userName;
-    homeDirectory = "/home/${config.monorepo.vars.userName}";
+    username = super.monorepo.vars.userName;
+    homeDirectory = "/home/${super.monorepo.vars.userName}";
     stateVersion = "24.11";
 
     packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
