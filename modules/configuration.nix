@@ -22,35 +22,6 @@ let
   vmHosts = map (dom: "127.0.0.1 ${dom}") allDomains;
 in
 {
-  imports = [
-    ./cgit.nix
-    ./public_inbox.nix
-    ./matterbridge.nix
-    ./mautrix.nix
-    ./xserver.nix
-    ./ssh.nix
-    ./pipewire.nix
-    ./tor.nix
-    ./kubo.nix
-    ./nvidia.nix
-    ./cuda.nix
-    ./nginx.nix
-    ./secrets.nix
-    ./git-daemon.nix
-    ./ollama.nix
-    ./i2pd.nix
-    ./conduit.nix
-    ./bitcoin.nix
-    ./ngircd.nix
-    ./znc.nix
-    ./docker.nix
-    ./impermanence.nix
-    ./maddy.nix
-    ./ntfy-sh.nix
-    ./fail2ban.nix
-    ./nixpkgs-options.nix
-  ];
-
   environment.etc."wpa_supplicant.conf".text = ''
 country=CA
 '';

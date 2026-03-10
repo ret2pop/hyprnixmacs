@@ -87,6 +87,7 @@
   		      (prettify-symbols-mode))))
     :config
     (require 'tex-site)
+    (require 'subr-x)
     (server-start)
 
     ;; start wiith sane defaults
@@ -143,11 +144,9 @@
                       (content "main" "content")
                       (postamble "footer" "postamble")))
     (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                                 "<style>\n"
-                                 (with-temp-buffer (insert-file-contents "~/monorepo/style.css") (buffer-string))
-                                 "\n"
-                                 (with-temp-buffer (insert-file-contents "~/monorepo/syntax.css") (buffer-string))
-                                 "\n</style>"))
+                                 "<style>"
+                                 (with-temp-buffer (insert-file-contents-literally "~/monorepo/combined.css") (buffer-substring-no-properties (point-min) (point-max)))
+                                 "</style>"))
     (org-latex-to-html-convert-command 
       "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'")
     (org-html-viewport '((width "device-width") 
@@ -168,7 +167,7 @@
         :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
        ("website-static"
         :base-directory "~/monorepo"
-        :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp"
+        :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
         :publishing-directory "~/website_html/"
         :recursive t
         :publishing-function org-publish-attachment)
@@ -264,7 +263,6 @@
     (define-key evil-motion-state-map (kbd "RET") nil)
     (define-key evil-motion-state-map (kbd "TAB") nil))
   (evil-collection-init))
-
 
 (use-package evil-commentary
   :after (evil)
@@ -535,15 +533,6 @@
     "s i p" '(insert-urandom-password :wk "insert random password to buffer (for sops)")
 
     "h r r" '(lambda () (interactive) (org-babel-load-file (expand-file-name "~/monorepo/config/emacs.org")))))
-
-;; (use-package ellama
-;;   :custom
-;;   (ellama-sessions-directory "~/org/ellama/" "Set org directory for LLM sessions")
-;;   :init
-;;   (require 'llm-ollama)
-;;   (setopt ellama-provider (make-llm-ollama
-;; 	     :host "localhost"
-;; 	     :chat-model "qwen2.5:14b")))
 
 (use-package minuet
     :bind

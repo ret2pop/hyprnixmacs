@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 let
   vars = import ../flakevars.nix;
 in
@@ -119,6 +119,13 @@ in
       default = "ntfy";
       example = "ntfy-env";
       description = "Name of Ntfy secret for notification handling";
+    };
+
+    ntfyUrl = lib.mkOption {
+      type = lib.types.str;
+      default = "ntfy.${config.monorepo.vars.remoteHost}";
+      example = "ntfy.nullring.xyz";
+      description = "Name of ntfy server";
     };
 
     monitors = lib.mkOption {

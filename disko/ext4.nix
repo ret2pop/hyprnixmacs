@@ -1,9 +1,7 @@
 {
-  ESP = {
-    type = "EF00";
+  ESP = (import ./esp-boot.nix) // {
     size = "500M";
     priority = 1;
-    content = import ./esp-boot.nix;
   };
   root = {
     size = "100%";

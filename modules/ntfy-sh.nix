@@ -1,6 +1,6 @@
 { pkgs, lib, config, ... }:
 let
-  serverName = "ntfy.${config.monorepo.vars.remoteHost}";
+  serverName = "${config.monorepo.vars.ntfyUrl}";
   port = 2586;
   ntfySecret = config.monorepo.vars.ntfySecret;
 in

@@ -1,29 +1,12 @@
 { lib, config, pkgs, sops-nix, super, ... }:
+let
+  dirContents = builtins.readDir ./.;
+  files = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix") dirContents;
+in
 {
   imports = [
     sops-nix.homeManagerModules.sops
-    ../vars.nix
-    ./fcitx.nix
-    ./emacs.nix
-    ./firefox.nix
-    ./git.nix
-    ./hyprland.nix
-    ./mpv.nix
-    ./yt-dlp.nix
-    ./wofi.nix
-    ./kitty.nix
-    ./waybar.nix
-    ./zsh.nix
-    ./mbsync.nix
-    ./msmtp.nix
-    ./gammastep.nix
-    ./mpd.nix
-    ./mako.nix
-    ./user.nix
-    ./gtk.nix
-    ./secrets.nix
-    ./pantalaimon.nix
-  ];
+  ] ++ lib.mapAttrsToList (name: _: ./. + "/${name}") files;
 
   options = {
     monorepo.profiles = {
