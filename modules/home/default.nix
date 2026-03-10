@@ -1,7 +1,7 @@
 { lib, config, pkgs, sops-nix, super, ... }:
 let
   dirContents = builtins.readDir ./.;
-  files = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix") dirContents;
+  files = lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix" && name != "emacs-packages.nix") dirContents;
 in
 {
   imports = [

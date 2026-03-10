@@ -283,7 +283,8 @@ fi
               deadnix
               (python3.withPackages (ps: with ps; [
                 octodns
-                octodns-cloudflare
+                octodns-providers.cloudflare
+                octodns-providers.bind
               ]))
             ];
             shellHook = ''
@@ -291,7 +292,11 @@ ${pre-commit-check.shellHook}
 git config branch.main.mergeoptions "--no-ff"
 
 CURRENT_HOST="$(hostname)"
-SOPS_BASE=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users."${vars.userName}".sops.defaultSymlinkPath --raw 2>/dev/null)
+
+TARGET_USER_RAW=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users --apply "u: builtins.head (builtins.attrNames u)" --raw 2>/dev/null)
+
+TARGET_USER=$(echo "$TARGET_USER_RAW" | xargs)
+SOPS_BASE=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users."$TARGET_USER".sops.defaultSymlinkPath --raw 2>/dev/null)
 
 if [ -n "$SOPS_BASE" ] && [ -f "$SOPS_BASE/cloudflare-dns" ]; then
   export CLOUDFLARE_TOKEN="$(cat "$SOPS_BASE/cloudflare-dns" | tr -d '\n')"
@@ -301,7 +306,7 @@ else
 fi
 
 alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit"
-alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} "
+alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --force "
 alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r git branch -d'
 '';
           };
