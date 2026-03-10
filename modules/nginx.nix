@@ -70,7 +70,7 @@ proxy_read_timeout 36000s;
         };
 
         extraConfig = ''
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none';";
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none';";
   '';
       };
     };
