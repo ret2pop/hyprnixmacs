@@ -8,7 +8,7 @@ in
   sops.secrets."${ntfySecret}" = lib.mkIf config.services.ntfy-sh.enable {
     format = "yaml";
     owner = "ntfy-sh";
-    sopsFile = ../secrets/common-secrets.yaml;
+    sopsFile = ../secrets/common_secrets.yaml;
   };
 
   services.ntfy-sh = {

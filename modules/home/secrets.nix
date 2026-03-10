@@ -30,7 +30,7 @@
       ntfy = {
         format = "yaml";
         path = "${config.sops.defaultSymlinkPath}/${super.monorepo.vars.ntfySecret}";
-        sopsFile = ../../secrets/common-secrets.yaml;
+        sopsFile = ../../secrets/common_secrets.yaml;
       };
     } else {
     };
