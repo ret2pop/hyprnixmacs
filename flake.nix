@@ -258,6 +258,10 @@ fi
         };
       in
         {
+          lib = {
+            inherit mkHostModules;
+          };
+
           checks."${system}" = integrationTests // {
             inherit pre-commit-check;
           };
