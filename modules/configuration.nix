@@ -35,6 +35,7 @@ country=CA
     memoryPercent = 50;
   };
 
+  # Shim for testing
   virtualisation.vmVariant = {
     sops.validateSopsFiles = false;
     disko.devices = lib.mkForce {};
@@ -63,6 +64,8 @@ country=CA
     systemd.services.sops-nix = {
       unitConfig.RequiresMountsFor = "/home/preston/.config/sops/age";
     };
+
+    security.acme.defaults.server = lib.mkForce "https://127.0.0.1:14000/dir";
   };
 
   documentation = {
