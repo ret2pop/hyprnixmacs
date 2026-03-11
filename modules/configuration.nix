@@ -377,7 +377,6 @@ country=CA
   programs = {
     nix-ld.enable = true;
     zsh.enable = true;
-    light.enable = true;
     ssh.enableAskPassword = false;
   };
 
