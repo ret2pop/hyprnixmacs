@@ -29,7 +29,7 @@ access_log off;
     '';
         };
         extraConfig = ''
-include ${monorepoSelf.packages.${pkgs.system}.website}/csp_headers.conf;
+include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
 rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
 '';
       };
