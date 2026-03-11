@@ -90,7 +90,7 @@
     (require 'subr-x)
     (server-start)
 
-    ;; start wiith sane defaults
+    ;; start with sane defaults
     (pixel-scroll-precision-mode 1)
     (display-battery-mode 1)
     (display-time-mode 1)
@@ -135,20 +135,20 @@
     (org-pretty-entities t "prettify org mode")
     (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
     (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
-    (org-html-with-latex 'html)
-    (org-html-mathjax-options nil)
-    (org-html-mathjax-template "")
-    (org-html-head-include-default-style nil) ; Clear Org's default CSS
-    (org-html-head-include-scripts nil)       ; Clear Org's default JS
+    (org-html-with-latex 'html "let my html handler handle latex")
+    (org-html-mathjax-options nil "disable mathjax, use MathML")
+    (org-html-mathjax-template "" "disable mathjax, use MathML")
+    (org-html-head-include-default-style nil "use my own css for everything")
+    (org-html-head-include-scripts nil "use my own js for everything")
     (org-html-divs '((preamble "header" "preamble")
                       (content "main" "content")
-                      (postamble "footer" "postamble")))
+                      (postamble "footer" "postamble")) "semantic html exports")
     (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
                                  "<style>"
                                  (with-temp-buffer (insert-file-contents-literally "~/monorepo/combined.css") (buffer-substring-no-properties (point-min) (point-max)))
-                                 "</style>"))
+                                 "</style>") "add all these different headers for performance and compliance")
     (org-latex-to-html-convert-command 
-      "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'")
+      "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
     (org-html-viewport '((width "device-width") 
                          (initial-scale "1.0") 
                          (minimum-scale "1.0")) "Prevent zooming out past default size")
