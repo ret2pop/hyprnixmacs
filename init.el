@@ -107,26 +107,6 @@
 (defvar my-pre-generated-syntax-css "" 
   "Static cache of minified syntax CSS.")
 
-(defun my-get-minified-syntax-css ()
-  "Generate htmlize CSS and minify it via the system 'minify' tool."
-  (let ((org-html-htmlize-output-type 'css))
-    (with-temp-buffer
-      (insert (org-html-htmlize-generate-css))
-      (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-      (buffer-string))))
-
-
-(when (and noninteractive (require 'htmlize nil t))
-  (message "Pre-generating minified syntax CSS...")
-  (require 'ox-html)
-  (setq my-pre-generated-syntax-css
-        (let ((org-html-htmlize-output-type 'css))
-          (with-temp-buffer
-            (insert (org-html-htmlize-generate-css))
-            ;; This calls the 'minify' binary in your Nix path
-            (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-            (buffer-string)))))
-
 (use-package org
   :hook
   ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
@@ -334,17 +314,27 @@
   (doom-modeline-mode 1))
 
 (use-package doom-themes
-  :ensure t
+  :demand t
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   (doom-themes-treemacs-theme "doom-rouge")
   :config
-  (load-theme 'doom-rouge t)
-
   (doom-themes-visual-bell-config)
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
+
+(when (and noninteractive (require 'htmlize nil t))
+  (message "Pre-generating minified syntax CSS...")
+  (require 'ox-html)
+  (setq my-pre-generated-syntax-css
+        (let ((org-html-htmlize-output-type 'css))
+          (with-temp-buffer
+            (insert (org-html-htmlize-generate-css))
+            ;; This calls the 'minify' binary in your Nix path
+            (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+            (buffer-string)))))
+
 ;; (load-theme 'catppuccin :no-confirm)
 
 (use-package writegood-mode
