@@ -110,6 +110,7 @@
 (when (and noninteractive (require 'htmlize nil t))
   (message "Pre-generating minified syntax CSS...")
   (require 'ox-html)
+  (load-theme 'catppuccin t)
   (setq my-pre-generated-syntax-css
         (let ((org-html-htmlize-output-type 'css))
           (with-temp-buffer
