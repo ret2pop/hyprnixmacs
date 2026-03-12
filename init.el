@@ -112,18 +112,19 @@
   (require 'ox-html)
   (setq custom-safe-themes t)
   (condition-case err
-      (error (progn
-               (require 'catppuccin-theme)
-               (load-theme 'catppuccin t)
-               (setq my-pre-generated-syntax-css
-                     (let ((org-html-htmlize-output-type 'css))
-                       (with-temp-buffer
-                         ;; Strip the <style> and </style> tags before inserting and minifying
-                         (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
-                         (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-                         (buffer-string)))))
-             (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
-                    'external-debugging-output))))
+      (progn
+        (require 'catppuccin-theme)
+        (load-theme 'catppuccin t)
+        (setq my-pre-generated-syntax-css
+              (let ((org-html-htmlize-output-type 'css))
+                (with-temp-buffer
+                  ;; Strip the <style> and </style> tags before inserting and minifying
+                  (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
+                  (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+                  (buffer-string)))))
+    (error 
+     (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
+            'external-debugging-output))))
 
 (use-package org
   :hook
