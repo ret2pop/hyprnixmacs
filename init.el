@@ -104,13 +104,6 @@
     (set-frame-parameter nil 'alpha-background 70)
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
-(defun my-get-minified-syntax-css ()
-  "Generate htmlize CSS and minify it via the system 'minify' tool."
-  (let ((org-html-htmlize-output-type 'css))
-    (with-temp-buffer
-      (insert (org-html-htmlize-generate-css))
-      (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-      (buffer-string))))
 (use-package org
   :hook
   ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
@@ -186,6 +179,15 @@
   (require 'org-tempo)
   (require 'org-habit)
   (require 'ob-latex)
+  (require 'htmlize)
+
+  (defun my-get-minified-syntax-css ()
+    "Generate htmlize CSS and minify it via the system 'minify' tool."
+    (let ((org-html-htmlize-output-type 'css))
+      (with-temp-buffer
+        (insert (org-html-htmlize-generate-css))
+        (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+        (buffer-string))))
 
   (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
     "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
