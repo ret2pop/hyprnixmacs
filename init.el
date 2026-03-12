@@ -111,15 +111,18 @@
   (message "Pre-generating minified syntax CSS...")
   (require 'ox-html)
   (setq custom-safe-themes t)
-  (ignore-errors
-  (load-theme 'catppuccin t)
-  (setq my-pre-generated-syntax-css
-        (let ((org-html-htmlize-output-type 'css))
-          (with-temp-buffer
-            (insert (org-html-htmlize-generate-css))
-            ;; This calls the 'minify' binary in your Nix path
-            (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-            (buffer-string))))))
+(condition-case err
+    (progn
+      (load-theme 'catppuccin t)
+      (setq my-pre-generated-syntax-css
+            (let ((org-html-htmlize-output-type 'css))
+              (with-temp-buffer
+                (insert (org-html-htmlize-generate-css))
+                (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+                (buffer-string)))))
+  (error 
+   (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
+          'external-debugging-output))))
 
 (use-package org
   :hook
