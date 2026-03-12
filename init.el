@@ -88,7 +88,7 @@
     :config
     (require 'tex-site)
     (require 'subr-x)
-    (server-start)
+    (unless noninteractive (server-start))
 
     ;; start with sane defaults
     (pixel-scroll-precision-mode 1)
@@ -646,18 +646,18 @@
   ;; Otherwise links are broken when publishing
   (org-roam-update-org-id-locations))
 
-(use-package org-roam-ui
+(unless noninteractive (use-package org-roam-ui
   :after org-roam
   :hook (after-init . org-roam-ui-mode)
   :custom
   (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
   (org-roam-ui-follow t "Have cool visual while editing org-roam")
   (org-roam-ui-update-on-save t "This option is obvious")
-  (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads"))
+  (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")))
 
-(use-package pinentry
+(unless noninteractive (use-package pinentry
   :custom (epa-pinentry-mode `loopback "Set this option to match gpg-agent.conf")
-  :config (pinentry-start))
+  :config (pinentry-start)))
 
 (use-package smtpmail
   :custom
@@ -696,7 +696,7 @@
   (message-mail-user-agent 'mu4e-user-agent)
   (mu4e-use-fancy-chars t "Random option to make mu4e look nicer"))
 
-(use-package emms
+(unless noninteractive (use-package emms
   :custom
   (emms-source-file-default-directory (expand-file-name "~/music/") "Use directory specified in Nix")
   (emms-player-mpd-music-directory (expand-file-name "~/music/") "Use directory specified in Nix")
@@ -711,7 +711,7 @@
   (emms-all)
   (add-to-list 'emms-info-functions 'emms-info-mpd)
   (add-to-list 'emms-player-list 'emms-player-mpd)
-  :config (emms-player-mpd-connect))
+  :config (emms-player-mpd-connect)))
 
 (use-package centaur-tabs
   :custom
