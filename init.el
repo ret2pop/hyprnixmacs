@@ -104,6 +104,28 @@
     (set-frame-parameter nil 'alpha-background 70)
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
+;; (defvar my-pre-generated-syntax-css "" 
+;;   "Static cache of minified syntax CSS.")
+
+;; (when (and noninteractive (require 'htmlize nil t))
+;;   (message "Pre-generating minified syntax CSS...")
+;;   (require 'ox-html)
+;;   (setq custom-safe-themes t)
+;;   (condition-case err
+;;       (progn
+;;         (require 'catppuccin-theme)
+;;         (load-theme 'catppuccin t)
+;;         (setq my-pre-generated-syntax-css
+;;               (let ((org-html-htmlize-output-type 'css))
+;;                 (with-temp-buffer
+;;                   ;; Strip the <style> and </style> tags before inserting and minifying
+;;                   (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
+;;                   (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+;;                   (buffer-string)))))
+;;     (error 
+;;      (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
+;;             'external-debugging-output))))
+
 (defvar my-pre-generated-syntax-css "" 
   "Static cache of minified syntax CSS.")
 
@@ -111,6 +133,7 @@
   (message "Pre-generating minified syntax CSS...")
   (require 'ox-html)
   (setq custom-safe-themes t)
+  
   (condition-case err
       (progn
         (require 'catppuccin-theme)
@@ -118,9 +141,18 @@
         (setq my-pre-generated-syntax-css
               (let ((org-html-htmlize-output-type 'css))
                 (with-temp-buffer
-                  ;; Strip the <style> and </style> tags before inserting and minifying
-                  (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
-                  (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+                  ;; 1. Generate CSS directly into the temp buffer
+                  (insert (org-html-htmlize-generate-css))
+                  
+                  ;; 2. Safely strip the <style> tags inside the buffer
+                  (goto-char (point-min))
+                  (while (re-search-forward "<style[^>]*>\\|</style>" nil t)
+                    (replace-match ""))
+                  
+                  ;; 3. Minify and REPLACE the buffer (t t arguments are crucial here)
+                  (shell-command-on-region (point-min) (point-max) "minify --type=css" t t)
+                  
+                  ;; 4. Return the clean, minified string
                   (buffer-string)))))
     (error 
      (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
