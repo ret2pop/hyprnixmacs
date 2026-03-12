@@ -113,6 +113,7 @@
   (setq custom-safe-themes t)
 (condition-case err
     (progn
+      (require 'catppuccin-theme)
       (load-theme 'catppuccin t)
       (setq my-pre-generated-syntax-css
             (let ((org-html-htmlize-output-type 'css))
