@@ -111,6 +111,7 @@
   (message "Pre-generating minified syntax CSS...")
   (require 'ox-html)
   (setq custom-safe-themes t)
+  (ignore-errors
   (load-theme 'catppuccin t)
   (setq my-pre-generated-syntax-css
         (let ((org-html-htmlize-output-type 'css))
@@ -118,7 +119,7 @@
             (insert (org-html-htmlize-generate-css))
             ;; This calls the 'minify' binary in your Nix path
             (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-            (buffer-string)))))
+            (buffer-string))))))
 
 (use-package org
   :hook
