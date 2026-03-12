@@ -15,9 +15,13 @@
         root = "${monorepoSelf.packages.${pkgs.system}.website}";
         addSSL = true;
         enableACME = true;
+        quic = true;
+
         locations."/" = {
           extraConfig = ''
 add_header Cache-Control "no-cache, must-revalidate";
+add_header Alt-Svc 'h3=":443"; ma=86400';
+include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
 expires off;
     '';
         };
@@ -25,11 +29,12 @@ expires off;
         locations."~* \\.(?:woff2|ttf|otf|eot|woff|ico|css|js|gif|jpe?g|png|svg|mp3|mp4|iso|webmanifest)$" = {
           extraConfig = ''
 add_header Cache-Control "public, max-age=31536000, immutable";
+add_header Alt-Svc 'h3=":443"; ma=86400';
+include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
 access_log off;
     '';
         };
         extraConfig = ''
-include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
 rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
 '';
       };
@@ -65,8 +70,12 @@ proxy_read_timeout 36000s;
         root = "${monorepoSelf.packages.${pkgs.system}.website}";
         addSSL = true;
         enableACME = true;
+        quic = true;
         locations."/" = {
-          extraConfig = "rewrite ^/$ /graph_view/index.html break;";
+          extraConfig = ''
+add_header Alt-Svc 'h3=":443"; ma=86400';
+rewrite ^/$ /graph_view/index.html break;
+'';
         };
 
         extraConfig = ''
@@ -77,6 +86,7 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
   };
 
   networking.firewall.allowedTCPPorts = lib.mkIf config.services.nginx.enable [ 80 443 ];
+  networking.firewall.allowedUDPPorts = lib.mkIf config.services.nginx.enable [ 443 ];
 
   networking.domains.subDomains = lib.mkIf config.services.nginx.enable {
     "${config.monorepo.vars.remoteHost}" = {};

@@ -19,6 +19,7 @@ epkgs: [
   epkgs.ement
   epkgs.emmet-mode
   epkgs.emms
+  epkgs.engrave-faces
   epkgs.enwc
   epkgs.evil
   epkgs.evil-collection
