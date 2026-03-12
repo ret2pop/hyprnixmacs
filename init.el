@@ -104,99 +104,108 @@
     (set-frame-parameter nil 'alpha-background 70)
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
+(defun my-get-minified-syntax-css ()
+  "Generate htmlize CSS and minify it via the system 'minify' tool."
+  (require 'htmlize)
+  (let ((org-html-htmlize-output-type 'css))
+    (with-temp-buffer
+      (insert (org-html-htmlize-generate-css))
+      (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
+      (buffer-string))))
 (use-package org
-    :hook
-    ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
-    :custom
-    (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
-    (org-export-with-broken-links t "publish website even with broken links")
-    (org-src-fontify-natively t "Colors!")
-    (org-latex-preview-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-    (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-    (TeX-PDF-mode t)
-    (org-latex-compiler "xelatex" "Use latex as default")
-    (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default")
-    (TeX-engine 'xetex "set xelatex as default engine")
-    (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
-    (preview-image-type 'png "Use PNGs")
-;;    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
-    (org-return-follows-link t "be able to follow links without mouse")
-    (org-habit-preceding-days 7 "See org habit entries")
-    (org-habit-following-days 35 "See org habit entries")
-    (org-habit-show-habits t "See org habit entries")
-    (org-habit-show-habits-only-for-today nil "See org habit entries")
-    (org-habit-show-all-today t "Show org habit graph")
-    (org-startup-indented t "Indent the headings")
-    (org-image-actual-width '(300) "Cap width") 
-    (org-startup-with-latex-preview t "see latex previews on opening file")
-    (org-startup-with-inline-images t "See images on opening file")
-    (org-hide-emphasis-markers t "prettify org mode")
-    (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
-    (org-pretty-entities t "prettify org mode")
-    (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
-    (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
-    (org-html-with-latex 'html "let my html handler handle latex")
-    (org-html-mathjax-options nil "disable mathjax, use MathML")
-    (org-html-mathjax-template "" "disable mathjax, use MathML")
-    (org-html-head-include-default-style nil "use my own css for everything")
-    (org-html-head-include-scripts nil "use my own js for everything")
-    (org-html-divs '((preamble "header" "preamble")
-                      (content "main" "content")
-                      (postamble "footer" "postamble")) "semantic html exports")
-    (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                                 "<style>"
-                                 (with-temp-buffer (insert-file-contents-literally "~/monorepo/combined.css") (buffer-substring-no-properties (point-min) (point-max)))
-                                 "</style>") "add all these different headers for performance and compliance")
-    (org-latex-to-html-convert-command 
-      "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
-    (org-html-viewport '((width "device-width") 
-                         (initial-scale "1.0") 
-                         (minimum-scale "1.0")) "Prevent zooming out past default size")
-    (org-publish-project-alist
-     '(("website-org"
-        :base-directory "~/monorepo"
-        :base-extension "org"
-        :exclude "nix/README\\.org"
-        :publishing-directory "~/website_html"
-        :with-author t
-        :with-date t
-        :recursive t
-        :publishing-function org-html-publish-to-html
-        :headline-levels 4
-        :html-preamble t
-        :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
-       ("website-static"
-        :base-directory "~/monorepo"
-        :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
-        :publishing-directory "~/website_html/"
-        :recursive t
-        :publishing-function org-publish-attachment)
-       ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website")
-    (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
-    :config
-    (require 'ox-publish)
-    (require 'org-tempo)
-    (require 'org-habit)
-    (require 'ob-latex)
+  :hook
+  ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
+  :custom
+  (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
+  (org-export-with-broken-links t "publish website even with broken links")
+  (org-src-fontify-natively t "Colors!")
+  (org-latex-preview-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (TeX-PDF-mode t)
+  (org-latex-compiler "xelatex" "Use latex as default")
+  (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default")
+  (TeX-engine 'xetex "set xelatex as default engine")
+  (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
+  (preview-image-type 'png "Use PNGs")
+  ;;    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
+  (org-return-follows-link t "be able to follow links without mouse")
+  (org-habit-preceding-days 7 "See org habit entries")
+  (org-habit-following-days 35 "See org habit entries")
+  (org-habit-show-habits t "See org habit entries")
+  (org-habit-show-habits-only-for-today nil "See org habit entries")
+  (org-habit-show-all-today t "Show org habit graph")
+  (org-startup-indented t "Indent the headings")
+  (org-image-actual-width '(300) "Cap width") 
+  (org-startup-with-latex-preview t "see latex previews on opening file")
+  (org-startup-with-inline-images t "See images on opening file")
+  (org-hide-emphasis-markers t "prettify org mode")
+  (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
+  (org-pretty-entities t "prettify org mode")
+  (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
+  (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
+  (org-html-with-latex 'html "let my html handler handle latex")
+  (org-html-mathjax-options nil "disable mathjax, use MathML")
+  (org-html-mathjax-template "" "disable mathjax, use MathML")
+  (org-html-head-include-default-style nil "use my own css for everything")
+  (org-html-head-include-scripts nil "use my own js for everything")
+  (org-html-divs '((preamble "header" "preamble")
+                   (content "main" "content")
+                   (postamble "footer" "postamble")) "semantic html exports")
+  (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
+                               "<style>"
+                               (with-temp-buffer (insert-file-contents-literally "~/monorepo/style.css") (buffer-substring-no-properties (point-min) (point-max)))
+                               (my-get-minified-syntax-css)
+                               "</style>") "add all these different headers for performance and compliance")
+  (org-latex-to-html-convert-command 
+   "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+  (org-html-viewport '((width "device-width") 
+                       (initial-scale "1.0") 
+                       (minimum-scale "1.0")) "Prevent zooming out past default size")
+  (org-publish-project-alist
+   '(("website-org"
+      :base-directory "~/monorepo"
+      :base-extension "org"
+      :exclude "nix/README\\.org"
+      :publishing-directory "~/website_html"
+      :with-author t
+      :with-date t
+      :recursive t
+      :publishing-function org-html-publish-to-html
+      :headline-levels 4
+      :html-preamble t
+      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
+     ("website-static"
+      :base-directory "~/monorepo"
+      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
+      :publishing-directory "~/website_html/"
+      :recursive t
+      :publishing-function org-publish-attachment)
+     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website")
+  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
+  :config
+  (require 'ox-publish)
+  (require 'org-tempo)
+  (require 'org-habit)
+  (require 'ob-latex)
 
-    (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
-      "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
-      (let ((processing-type (plist-get info :with-latex)))
-        (if (eq processing-type 'html)
-            (let* ((latex-frag (org-remove-indentation
-                                (org-element-property :value latex-environment)))
-                   (converted (org-format-latex-as-html latex-frag)))
-              (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
-                      converted))
-          (funcall orig-fun latex-environment contents info))))
+  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
+    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
+    (let ((processing-type (plist-get info :with-latex)))
+      (if (eq processing-type 'html)
+          (let* ((latex-frag (org-remove-indentation
+                              (org-element-property :value latex-environment)))
+                 (converted (org-format-latex-as-html latex-frag)))
+            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
+                    converted))
+        (funcall orig-fun latex-environment contents info))))
 
-    (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
+  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
 
-    (org-babel-do-load-languages 'org-babel-load-languages
-                                 '((shell . t)
-                                   (python . t)
-                                   (nix . t)
-                                   (latex . t))))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell . t)
+                                 (python . t)
+                                 (nix . t)
+                                 (latex . t))))
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
@@ -327,14 +336,7 @@
   :after (org)
   :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
-;; (use-package eglot
- ;;   :hook
- ;;   (prog-mode . eglot-ensure)
- ;;   (nix-mode . eglot-ensure)
- ;;   :config
- ;;   (add-to-list 'eglot-server-programs '(nix-mode . ("nil"))))
-
- (use-package lsp
+(use-package lsp
    :hook
    (prog-mode . lsp))
 
