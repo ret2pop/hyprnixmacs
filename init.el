@@ -106,7 +106,6 @@
 
 (defun my-get-minified-syntax-css ()
   "Generate htmlize CSS and minify it via the system 'minify' tool."
-  (require 'htmlize)
   (let ((org-html-htmlize-output-type 'css))
     (with-temp-buffer
       (insert (org-html-htmlize-generate-css))
