@@ -324,6 +324,7 @@
   :config
   (doom-modeline-mode 1))
 
+(unless noninteractive
 (use-package doom-themes
   :custom
   (doom-themes-enable-bold t)
@@ -333,9 +334,7 @@
   (load-theme 'doom-rouge t)
   (doom-themes-visual-bell-config)
   (doom-themes-treemacs-config)
-  (doom-themes-org-config))
-
-
+  (doom-themes-org-config)))
 ;; (load-theme 'catppuccin :no-confirm)
 
 (use-package writegood-mode
