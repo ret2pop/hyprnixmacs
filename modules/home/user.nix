@@ -158,13 +158,13 @@ nixos-rebuild build-vm --flake $HOME/monorepo/nix#spontaneity && QEMU_OPTS="-ser
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     defaultApplications = {
       "x-scheme-handler/mailto" = "emacsclient-mail.desktop";
-        "text/html" = "librewolf.desktop";
-        "text/xml" = "librewolf.desktop";
-        "application/xhtml+xml" = "librewolf.desktop";
-        "x-scheme-handler/http" = "librewolf.desktop";
-        "x-scheme-handler/https" = "librewolf.desktop";
-        "x-scheme-handler/about" = "librewolf.desktop";
-        "x-scheme-handler/unknown" = "librewolf.desktop";
+      "text/html" = "librewolf.desktop";
+      "text/xml" = "librewolf.desktop";
+      "application/xhtml+xml" = "librewolf.desktop";
+      "x-scheme-handler/http" = "librewolf.desktop";
+      "x-scheme-handler/https" = "librewolf.desktop";
+      "x-scheme-handler/about" = "librewolf.desktop";
+      "x-scheme-handler/unknown" = "librewolf.desktop";
     };
   };
 

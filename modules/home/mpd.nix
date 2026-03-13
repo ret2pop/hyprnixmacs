@@ -15,12 +15,12 @@
       }
 
       audio_output {
-        type		"httpd"
-        name		"Ret2pop's Music Stream"
-        encoder		"opus"
-        port		"8000"
-        bitrate		"128000"
-        format		"48000:16:1"
+        type          "httpd"
+        name          "Ret2pop's Music Stream"
+        encoder               "opus"
+        port          "8000"
+        bitrate               "128000"
+        format                "48000:16:1"
         always_on       "yes"
         tags            "yes"
       }

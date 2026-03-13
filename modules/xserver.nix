@@ -7,7 +7,7 @@
     };
 
     desktopManager = {
-	    runXdgAutostartIfNone = true;
+      runXdgAutostartIfNone = true;
     };
 
     videoDrivers = (if config.monorepo.profiles.cuda.enable then [ "nvidia" ] else []);

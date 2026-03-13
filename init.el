@@ -4,6 +4,7 @@
 (indent-tabs-mode nil "no real tabs, only spaces")
 (tab-width 2 "tab show as 2 spaces")
 (standard-indent 2 "base indentation")
+(custom-safe-themes t "I already manage my themes with nix")
 
 ;; Startup errors
 (warning-minimum-level :emergency "Supress emacs warnings")
@@ -104,30 +105,12 @@
     (set-frame-parameter nil 'alpha-background 70)
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
-(defvar my-pre-generated-syntax-css ""
+(defvar pre-generated-syntax-css ""
   "Static cache of minified syntax CSS.")
 
-(when (and noninteractive (require 'htmlize nil t))
-  (message "Pre-generating minified syntax CSS...")
-  (require 'ox-html)
-  (setq custom-safe-themes t)
-  
-  (condition-case err
-      (progn
-        (require 'catppuccin-theme)
-        (load-theme 'catppuccin t)
-        (setq my-pre-generated-syntax-css
-              (let ((org-html-htmlize-output-type 'css))
-                (with-temp-buffer
-                  (insert (org-html-htmlize-generate-css))
-                  (goto-char (point-min))
-                  (while (re-search-forward "<style[^>]*>\\|</style>" nil t)
-                    (replace-match ""))
-                  (shell-command-on-region (point-min) (point-max) "minify --type=css" t t)
-                  (buffer-string)))))
-    (error
-     (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
-            'external-debugging-output))))
+(use-package s)
+(use-package f)
+(use-package dash)
 
 (use-package org
   :hook
@@ -144,6 +127,7 @@
   (org-latex-compiler "xelatex" "Use latex as default")
   (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default")
   (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+  (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
 
   (TeX-engine 'xetex "set xelatex as default engine")
   (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
@@ -161,6 +145,7 @@
   (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
 
   ;; org-html
+  (org-html-htmlize-output-type 'css "allow styling from CSS file")
   (org-html-with-latex 'html "let my html handler handle latex")
   (org-html-mathjax-options nil "disable mathjax, use MathML")
   (org-html-mathjax-template "" "disable mathjax, use MathML")
@@ -175,29 +160,18 @@
                        (minimum-scale "1.0")) "Prevent zooming out past default size")
   (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
                                "<style>"
-                               my-pre-generated-syntax-css
+                               pre-generated-syntax-css
                                (with-temp-buffer (insert-file-contents-literally "~/monorepo/style.css") (buffer-substring-no-properties (point-min) (point-max)))
                                "</style>") "add all these different headers for performance and compliance")
   :config
-  (require 'ob-latex)
-
-  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
-    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
-    (let ((processing-type (plist-get info :with-latex)))
-      (if (eq processing-type 'html)
-          (let* ((latex-frag (org-remove-indentation
-                              (org-element-property :value latex-environment)))
-                 (converted (org-format-latex-as-html latex-frag)))
-            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
-                    converted))
-        (funcall orig-fun latex-environment contents info))))
-  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
-
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((shell . t)
                                  (python . t)
                                  (nix . t)
                                  (latex . t))))
+
+(use-package org-tempo
+  :after org)
 
 (use-package org-habit
   :after org
@@ -232,8 +206,46 @@
       :publishing-function org-publish-attachment)
      ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website"))
 
-(use-package org-tempo
-  :after org)
+(defmacro try (expr)
+  `(condition-case err
+       ,expr
+     (error
+      (princ (format "BLOCK FAILED: %s\n" (error-message-string err))))))
+
+(use-package ox-html
+  :after (org f s dash)
+  :config
+  (defun minify-css (css)
+    "A functional wrapper around the external 'minify' binary."
+    (with-temp-buffer
+      (insert css)
+      (call-process-region (point-min) (point-max) "minify" t t nil "--type=css")
+      (buffer-string)))
+
+  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
+    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
+    (let ((processing-type (plist-get info :with-latex)))
+      (if (eq processing-type 'html)
+          (let* ((latex-frag (org-remove-indentation (org-element-property :value latex-environment)))
+                 (converted (org-format-latex-as-mathml latex-frag)))
+            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>" converted))
+        (funcall orig-fun latex-environment contents info))))
+
+  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
+
+  (when noninteractive
+    (use-package htmlize
+      :config
+      (try
+       (use-package catppuccin-theme
+         :config
+         (load-theme 'catppuccin-theme t)
+         (setq pre-generated-syntax-css
+               (->> (org-html-htmlize-generate-css)
+                    (s-replace-regexp "<style[^>]*>" "")
+                    (s-replace "</style>" "")
+                    (s-trim)
+                    (minify-css))))))))
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
@@ -354,7 +366,6 @@
   (doom-themes-visual-bell-config)
   (doom-themes-treemacs-config)
   (doom-themes-org-config)))
-;; (load-theme 'catppuccin :no-confirm)
 
 (use-package writegood-mode
   :hook (text-mode . writegood-mode))

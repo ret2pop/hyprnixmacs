@@ -4,19 +4,19 @@
     enable = lib.mkDefault config.monorepo.profiles.server.enable;
     config = ''
 [Global]
-	Name = ${config.monorepo.vars.orgHost}
-	Info = NullRing IRC Instance
+  Name = ${config.monorepo.vars.orgHost}
+  Info = NullRing IRC Instance
   Listen = ::,0.0.0.0
   MotdFile = /etc/motd.txt
-	Network = NullRing
-	Ports = 6667
+  Network = NullRing
+  Ports = 6667
 [Options]
-	PAM = no
+  PAM = no
 [SSL]
-	CertFile = /var/lib/acme/${config.monorepo.vars.orgHost}/fullchain.pem
-	CipherList = HIGH:!aNULL:@STRENGTH:!SSLv3
-	KeyFile = /var/lib/acme/${config.monorepo.vars.orgHost}/key.pem
-	Ports = 6697
+  CertFile = /var/lib/acme/${config.monorepo.vars.orgHost}/fullchain.pem
+  CipherList = HIGH:!aNULL:@STRENGTH:!SSLv3
+  KeyFile = /var/lib/acme/${config.monorepo.vars.orgHost}/key.pem
+  Ports = 6697
 '';
   };
 

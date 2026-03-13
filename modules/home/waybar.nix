@@ -40,32 +40,32 @@
       }
 
       #workspaces button:hover {
-      	background-color: #cdd6f4;
-      	color: black;
-      	border-radius: 16px;
+              background-color: #cdd6f4;
+              color: black;
+              border-radius: 16px;
       }
 
       #custom-date, #clock, #battery, #pulseaudio, #network, #custom-randwall, #custom-launcher {
-      	background: transparent;
-      	padding: 5px 5px 5px 5px;
-      	margin: 5px 5px 5px 5px;
+              background: transparent;
+              padding: 5px 5px 5px 5px;
+              margin: 5px 5px 5px 5px;
         border-radius: 8px;
         border: solid 0px #f4d9e1;
       }
 
       #custom-date {
-      	color: #D3869B;
+              color: #D3869B;
       }
 
       #custom-power {
-      	color: #24283b;
-      	background-color: #db4b4b;
-      	border-radius: 5px;
-      	margin-right: 10px;
-      	margin-top: 5px;
-      	margin-bottom: 5px;
-      	margin-left: 0px;
-      	padding: 5px 10px;
+              color: #24283b;
+              background-color: #db4b4b;
+              border-radius: 5px;
+              margin-right: 10px;
+              margin-top: 5px;
+              margin-bottom: 5px;
+              margin-left: 0px;
+              padding: 5px 10px;
       }
 
       #tray {
@@ -158,10 +158,10 @@
       }
 
       #custom-playerctl {
-      	background: #45475a;
-      	padding-left: 15px;
+              background: #45475a;
+              padding-left: 15px;
         padding-right: 14px;
-      	border-radius: 16px;
+              border-radius: 16px;
         /*border-left: solid 1px #282738;*/
         /*border-right: solid 1px #282738;*/
         margin-top: 5px;

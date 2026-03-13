@@ -17,7 +17,6 @@ let
     (lib.attrNames config.networking.domains.baseDomains) ++ 
     (lib.attrNames config.networking.domains.subDomains);
 
-  # 2. Generate BOTH possible outcomes in advance
   prodHosts = map (dom: "${config.monorepo.profiles.server.ipv4} ${dom}") allDomains;
   vmHosts = map (dom: "127.0.0.1 ${dom}") allDomains;
 in
@@ -129,29 +128,29 @@ country=CA
     extraModulePackages = [ ];
 
     initrd = {
-  	  availableKernelModules = [
-  	    "xhci_pci"
-  	    "ahci"
-  	    "usb_storage"
-  	    "sd_mod"
-  	    "nvme"
-  	    "sd_mod"
-  	    "ehci_pci"
-  	    "rtsx_pci_sdmmc"
-  	    "usbhid"
-  	  ];
+      availableKernelModules = [
+        "xhci_pci"
+        "ahci"
+        "usb_storage"
+        "sd_mod"
+        "nvme"
+        "sd_mod"
+        "ehci_pci"
+        "rtsx_pci_sdmmc"
+        "usbhid"
+      ];
 
-  	  kernelModules = [ ];
+      kernelModules = [ ];
     };
 
     lanzaboote = {
-  	  enable = config.monorepo.profiles.secureBoot.enable;
-  	  pkiBundle = "/var/lib/sbctl";
+      enable = config.monorepo.profiles.secureBoot.enable;
+      pkiBundle = "/var/lib/sbctl";
     };
 
     loader = {
-  	  systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
-  	  efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
+      systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
+      efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
     };
 
     kernelModules = [
@@ -176,53 +175,53 @@ country=CA
       "usbcore.autosuspend=-1"
       "pcie_aspm=off"
       "pci=noaer"
-  	  "page_alloc.shuffle=1"
-  	  "slab_nomerge"
+      "page_alloc.shuffle=1"
+      "slab_nomerge"
 
-  	  # madaidan
-  	  "pti=on"
-  	  "randomize_kstack_offset=on"
-  	  "vsyscall=none"
+      # madaidan
+      "pti=on"
+      "randomize_kstack_offset=on"
+      "vsyscall=none"
 
-  	  # cpu
-  	  "spectre_v2=on"
-  	  "spec_store_bypass_disable=on"
-  	  "tsx=off"
-  	  "l1tf=full,force"
-  	  "kvm.nx_huge_pages=force"
+      # cpu
+      "spectre_v2=on"
+      "spec_store_bypass_disable=on"
+      "tsx=off"
+      "l1tf=full,force"
+      "kvm.nx_huge_pages=force"
 
-  	  # hardened
-  	  "extra_latent_entropy"
+      # hardened
+      "extra_latent_entropy"
 
-  	  # mineral
-  	  "quiet"
+      # mineral
+      "quiet"
     ];
 
     blacklistedKernelModules = [
-  	  "netrom"
-  	  "rose"
+      "netrom"
+      "rose"
 
-  	  "adfs"
-  	  "affs"
-  	  "bfs"
-  	  "befs"
-  	  "cramfs"
-  	  "efs"
-  	  "erofs"
-  	  "exofs"
-  	  "freevxfs"
-  	  "f2fs"
-  	  "hfs"
-  	  "hpfs"
-  	  "jfs"
-  	  "minix"
-  	  "nilfs2"
-  	  "ntfs"
-  	  "omfs"
-  	  "qnx4"
-  	  "qnx6"
-  	  "sysv"
-  	  "ufs"
+      "adfs"
+      "affs"
+      "bfs"
+      "befs"
+      "cramfs"
+      "efs"
+      "erofs"
+      "exofs"
+      "freevxfs"
+      "f2fs"
+      "hfs"
+      "hpfs"
+      "jfs"
+      "minix"
+      "nilfs2"
+      "ntfs"
+      "omfs"
+      "qnx4"
+      "qnx6"
+      "sysv"
+      "ufs"
     ];
 
     kernel.sysctl = if config.monorepo.profiles.server.enable then {
@@ -293,7 +292,7 @@ country=CA
     nameservers = [ "8.8.8.8" "1.1.1.1"];
     dhcpcd.enable = (! config.monorepo.profiles.server.enable);
     networkmanager = {
-  	  enable = lib.mkForce (! config.monorepo.profiles.server.enable); # rpis need network
+      enable = lib.mkForce (! config.monorepo.profiles.server.enable); # rpis need network
       wifi = {
         powersave = false;
       };
@@ -333,8 +332,8 @@ country=CA
       };
     };
     firewall = {
-  	  allowedTCPPorts = [ 22 11434 ];
-  	  allowedUDPPorts = [ ];
+      allowedTCPPorts = [ 22 11434 ];
+      allowedUDPPorts = [ ];
     };
   };
 

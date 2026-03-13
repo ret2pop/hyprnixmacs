@@ -9,13 +9,13 @@
                               ] else []);
 
     nvidia = {
-	    modesetting.enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
-	    powerManagement = {
-		    enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
-		    finegrained = false;
-	    };
-	    open = config.monorepo.profiles.cuda.enable;
-	    package = config.boot.kernelPackages.nvidiaPackages.stable;
+      modesetting.enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
+      powerManagement = {
+        enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
+        finegrained = false;
+      };
+      open = config.monorepo.profiles.cuda.enable;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
       nvidiaSettings = false;
     };
   };
