@@ -7,6 +7,7 @@ epkgs: [
   epkgs.company-solidity
   epkgs.counsel
   epkgs.centaur-tabs
+  epkgs.dash
   epkgs.dashboard
   epkgs.doom-themes
   epkgs.doom-modeline
@@ -61,6 +62,7 @@ epkgs: [
   epkgs.platformio-mode
   epkgs.projectile
   epkgs.rustic
+  epkgs.s
   epkgs.scad-mode
   epkgs.simple-httpd
   epkgs.solidity-flycheck
