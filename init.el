@@ -28,63 +28,63 @@
     (fill-column 150)
     (line-spacing 2 "Default line spacing")
     (c-doc-comment-style '((c-mode . doxygen)
-  			 (c++-mode . doxygen)))
+                       (c++-mode . doxygen)))
 
     :hook ((text-mode . visual-line-mode)
-  	 (prog-mode . display-line-numbers-mode)
-  	 (prog-mode . display-fill-column-indicator-mode)
-  	 (org-mode . auto-fill-mode)
-  	 (org-mode . display-fill-column-indicator-mode)
-  	 (org-mode . display-line-numbers-mode)
-  	 (org-mode . (lambda ()
-  		       (setq prettify-symbols-alist
-  			     '(("#+begin_src" . ?)
-  			       ("#+BEGIN_SRC" . ?)
-  			       ("#+end_src" . ?)
-  			       ("#+END_SRC" . ?)
-  			       ("#+begin_example" . ?)
-  			       ("#+BEGIN_EXAMPLE" . ?)
-  			       ("#+end_example" . ?)
-  			       ("#+END_EXAMPLE" . ?)
-  			       ("#+header:" . ?)
-  			       ("#+HEADER:" . ?)
-  			       ("#+name:" . ?﮸)
-  			       ("#+NAME:" . ?﮸)
-  			       ("#+results:" . ?)
-  			       ("#+RESULTS:" . ?)
-  			       ("#+call:" . ?)
-  			       ("#+CALL:" . ?)
-  			       (":PROPERTIES:" . ?)
-  			       (":properties:" . ?)
-  			       ("lambda" . ?λ)
-  			       ("->"     . ?→)
-  			       ("map"    . ?↦)
-  			       ("/="     . ?≠)
-  			       ("!="     . ?≠)
-  			       ("=="     . ?≡)
-  			       ("<="     . ?≤)
-  			       (">="     . ?≥)
-  			       ("&&"     . ?∧)
-  			       ("||"     . ?∨)
-  			       ("sqrt"   . ?√)
-  			       ("..."    . ?…)))
-  		       (prettify-symbols-mode)))
-  	 (prog-mode .
-  		    (lambda ()
-  		      (setq prettify-symbols-alist
-  			    '(("lambda" . ?λ)
-  			      ("->"     . ?→)
-  			      ("map"    . ?↦)
-  			      ("/="     . ?≠)
-  			      ("!="     . ?≠)
-  			      ("=="     . ?≡)
-  			      ("<="     . ?≤)
-  			      (">="     . ?≥)
-  			      ("&&"     . ?∧)
-  			      ("||"     . ?∨)
-  			      ("sqrt"   . ?√)
-  			      ("..."    . ?…)))
-  		      (prettify-symbols-mode))))
+       (prog-mode . display-line-numbers-mode)
+       (prog-mode . display-fill-column-indicator-mode)
+       (org-mode . auto-fill-mode)
+       (org-mode . display-fill-column-indicator-mode)
+       (org-mode . display-line-numbers-mode)
+       (org-mode . (lambda ()
+                     (setq prettify-symbols-alist
+                           '(("#+begin_src" . ?)
+                             ("#+BEGIN_SRC" . ?)
+                             ("#+end_src" . ?)
+                             ("#+END_SRC" . ?)
+                             ("#+begin_example" . ?)
+                             ("#+BEGIN_EXAMPLE" . ?)
+                             ("#+end_example" . ?)
+                             ("#+END_EXAMPLE" . ?)
+                             ("#+header:" . ?)
+                             ("#+HEADER:" . ?)
+                             ("#+name:" . ?﮸)
+                             ("#+NAME:" . ?﮸)
+                             ("#+results:" . ?)
+                             ("#+RESULTS:" . ?)
+                             ("#+call:" . ?)
+                             ("#+CALL:" . ?)
+                             (":PROPERTIES:" . ?)
+                             (":properties:" . ?)
+                             ("lambda" . ?λ)
+                             ("->"     . ?→)
+                             ("map"    . ?↦)
+                             ("/="     . ?≠)
+                             ("!="     . ?≠)
+                             ("=="     . ?≡)
+                             ("<="     . ?≤)
+                             (">="     . ?≥)
+                             ("&&"     . ?∧)
+                             ("||"     . ?∨)
+                             ("sqrt"   . ?√)
+                             ("..."    . ?…)))
+                     (prettify-symbols-mode)))
+       (prog-mode .
+                  (lambda ()
+                    (setq prettify-symbols-alist
+                          '(("lambda" . ?λ)
+                            ("->"     . ?→)
+                            ("map"    . ?↦)
+                            ("/="     . ?≠)
+                            ("!="     . ?≠)
+                            ("=="     . ?≡)
+                            ("<="     . ?≤)
+                            (">="     . ?≥)
+                            ("&&"     . ?∧)
+                            ("||"     . ?∨)
+                            ("sqrt"   . ?√)
+                            ("..."    . ?…)))
+                    (prettify-symbols-mode))))
     :config
     (require 'tex-site)
     (require 'subr-x)
@@ -104,29 +104,7 @@
     (set-frame-parameter nil 'alpha-background 70)
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
-;; (defvar my-pre-generated-syntax-css "" 
-;;   "Static cache of minified syntax CSS.")
-
-;; (when (and noninteractive (require 'htmlize nil t))
-;;   (message "Pre-generating minified syntax CSS...")
-;;   (require 'ox-html)
-;;   (setq custom-safe-themes t)
-;;   (condition-case err
-;;       (progn
-;;         (require 'catppuccin-theme)
-;;         (load-theme 'catppuccin t)
-;;         (setq my-pre-generated-syntax-css
-;;               (let ((org-html-htmlize-output-type 'css))
-;;                 (with-temp-buffer
-;;                   ;; Strip the <style> and </style> tags before inserting and minifying
-;;                   (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
-;;                   (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-;;                   (buffer-string)))))
-;;     (error 
-;;      (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
-;;             'external-debugging-output))))
-
-(defvar my-pre-generated-syntax-css "" 
+(defvar my-pre-generated-syntax-css ""
   "Static cache of minified syntax CSS.")
 
 (when (and noninteractive (require 'htmlize nil t))
@@ -141,20 +119,13 @@
         (setq my-pre-generated-syntax-css
               (let ((org-html-htmlize-output-type 'css))
                 (with-temp-buffer
-                  ;; 1. Generate CSS directly into the temp buffer
                   (insert (org-html-htmlize-generate-css))
-                  
-                  ;; 2. Safely strip the <style> tags inside the buffer
                   (goto-char (point-min))
                   (while (re-search-forward "<style[^>]*>\\|</style>" nil t)
                     (replace-match ""))
-                  
-                  ;; 3. Minify and REPLACE the buffer (t t arguments are crucial here)
                   (shell-command-on-region (point-min) (point-max) "minify --type=css" t t)
-                  
-                  ;; 4. Return the clean, minified string
                   (buffer-string)))))
-    (error 
+    (error
      (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
             'external-debugging-output))))
 
@@ -162,12 +133,13 @@
   :hook
   ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
   :custom
+  (TeX-PDF-mode t)
   (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
   (org-export-with-broken-links t "publish website even with broken links")
   (org-src-fontify-natively t "Colors!")
-  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-  (TeX-PDF-mode t)
 
+  ;; org-latex
+  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
   (org-latex-preview-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
   (org-latex-compiler "xelatex" "Use latex as default")
   (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default")
@@ -176,13 +148,8 @@
   (TeX-engine 'xetex "set xelatex as default engine")
   (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
   (preview-image-type 'png "Use PNGs")
-  ;;    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
+  ;; (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
   (org-return-follows-link t "be able to follow links without mouse")
-  (org-habit-preceding-days 7 "See org habit entries")
-  (org-habit-following-days 35 "See org habit entries")
-  (org-habit-show-habits t "See org habit entries")
-  (org-habit-show-habits-only-for-today nil "See org habit entries")
-  (org-habit-show-all-today t "Show org habit graph")
   (org-startup-indented t "Indent the headings")
   (org-image-actual-width '(300) "Cap width") 
   (org-startup-with-latex-preview t "see latex previews on opening file")
@@ -193,22 +160,57 @@
   (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
   (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
 
+  ;; org-html
   (org-html-with-latex 'html "let my html handler handle latex")
   (org-html-mathjax-options nil "disable mathjax, use MathML")
   (org-html-mathjax-template "" "disable mathjax, use MathML")
   (org-html-head-include-default-style nil "use my own css for everything")
   (org-html-head-include-scripts nil "use my own js for everything")
+  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
   (org-html-divs '((preamble "header" "preamble")
                    (content "main" "content")
                    (postamble "footer" "postamble")) "semantic html exports")
-  (org-html-viewport '((width "device-width") 
-                       (initial-scale "1.0") 
+  (org-html-viewport '((width "device-width")
+                       (initial-scale "1.0")
                        (minimum-scale "1.0")) "Prevent zooming out past default size")
   (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
                                "<style>"
                                my-pre-generated-syntax-css
                                (with-temp-buffer (insert-file-contents-literally "~/monorepo/style.css") (buffer-substring-no-properties (point-min) (point-max)))
                                "</style>") "add all these different headers for performance and compliance")
+  :config
+  (require 'ob-latex)
+
+  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
+    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
+    (let ((processing-type (plist-get info :with-latex)))
+      (if (eq processing-type 'html)
+          (let* ((latex-frag (org-remove-indentation
+                              (org-element-property :value latex-environment)))
+                 (converted (org-format-latex-as-html latex-frag)))
+            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
+                    converted))
+        (funcall orig-fun latex-environment contents info))))
+  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
+
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell . t)
+                                 (python . t)
+                                 (nix . t)
+                                 (latex . t))))
+
+(use-package org-habit
+  :after org
+  :custom
+  (org-habit-preceding-days 7 "See org habit entries")
+  (org-habit-following-days 35 "See org habit entries")
+  (org-habit-show-habits t "See org habit entries")
+  (org-habit-show-habits-only-for-today nil "See org habit entries")
+  (org-habit-show-all-today t "Show org habit graph"))
+
+(use-package ox-publish
+  :after org
+  :custom
   (org-publish-project-alist
    '(("website-org"
       :base-directory "~/monorepo"
@@ -228,33 +230,10 @@
       :publishing-directory "~/website_html/"
       :recursive t
       :publishing-function org-publish-attachment)
-     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website")
-  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
-  :config
-  (require 'ox-publish)
-  (require 'org-tempo)
-  (require 'org-habit)
-  (require 'ob-latex)
-  (require 'htmlize)
+     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website"))
 
-  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
-    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
-    (let ((processing-type (plist-get info :with-latex)))
-      (if (eq processing-type 'html)
-          (let* ((latex-frag (org-remove-indentation
-                              (org-element-property :value latex-environment)))
-                 (converted (org-format-latex-as-html latex-frag)))
-            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
-                    converted))
-        (funcall orig-fun latex-environment contents info))))
-
-  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
-
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((shell . t)
-                                 (python . t)
-                                 (nix . t)
-                                 (latex . t))))
+(use-package org-tempo
+  :after org)
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
@@ -287,8 +266,8 @@
   :hook (org-mode . (lambda () (yas-minor-mode) (yas-activate-extra-mode 'latex-mode))))
 
 (use-package company
-  :config
-  '(add-to-list 'company-backends '(company-ispell company-capf company-yasnippet company-files))
+  :custom
+  (company-backends '(company-ispell company-capf company-yasnippet company-files) "Set company backends")
   :hook ((after-init . global-company-mode)))
 
 (use-package ispell
@@ -405,11 +384,10 @@
 :hook (prog-mode . platformio-conditionally-enable))
 
 (use-package irony
-  :hook (
-  (c++-mode . irony-mode)
-  (c-mode . irony-mode)
-  (objc-mode . irony-mode)
-  (irony-mode . irony-cdb-autosetup-compile-options)))
+  :hook ((c++-mode . irony-mode)
+         (c-mode . irony-mode)
+         (objc-mode . irony-mode)
+         (irony-mode . irony-cdb-autosetup-compile-options)))
 
 (use-package irony-eldoc
   :hook ((irony-mode . irony-eldoc)))
@@ -435,15 +413,14 @@
   (dashboard-set-init-info t)
   (dashboard-week-agenda t "Agenda in dashboard")
   (dashboard-items '((recents   . 5)
-			(bookmarks . 5)
-			(projects  . 5)
-			(agenda    . 5)
-			(registers . 5)) "Look at some items")
+      (bookmarks . 5)
+      (projects  . 5)
+      (agenda    . 5)
+      (registers . 5)) "Look at some items")
   :config
   (dashboard-setup-startup-hook))
 
 (use-package counsel)
-
 (use-package ivy
   :custom
   (ivy-use-virtual-buffers t "Make searching more efficient")
@@ -476,42 +453,30 @@
   (erc-nick system-username "sets erc username to the one set in nix config")
   (erc-user-full-name system-fullname "sets erc fullname to the one set in nix config"))
 
+(defmacro declare-irc-server (name server port)
+  `(defun ,name ()
+     (interactive)
+     (erc-tls :server ,server
+              :port ,port)))
+
+(defmacro create-irc-servers (&rest server-list)
+  `(progn
+     ,@(mapcar (lambda (n) `(declare-irc-server ,@n)) server-list)))
+
 (use-package general
-  :init
-  (defun znc ()
-    (interactive)
-    (erc-tls :server "ret2pop.net"
-             :port "5000"))
-
-  (defun prestonpan ()
-    (interactive)
-    (erc-tls :server "nullring.xyz"
-	     :port   "6697"))
-
-  (defun liberachat ()
-    (interactive)
-    (erc-tls :server "irc.libera.chat"
-	     :port   "6697"))
-
-  (defun efnet ()
-    (interactive)
-    (erc-tls :server "irc.prison.net"
-	     :port   "6697"))
-
-  (defun matrix-org ()
-    (interactive)
-    (ement-connect))
-
-  (defun gimp-org ()
-    (interactive)
-    (erc-tls :server "irc.gimp.org"
-	     :port "6697"))
-
   :config
+  (create-irc-servers
+   (znc "ret2pop.net" "5000")
+   (prestonpan "nullring.xyz" "6697")
+   (libera-chat "irc.libera.chat" "6697")
+   (efnet "irc.prison.net" "6697")
+   (matrix-org "matrix.org" "8448")
+   (gimp-org "irc.gimp.org" "6697"))
+
   (general-create-definer leader-key :prefix "SPC")
+
   (leader-key 'normal
     "o c" '(org-capture :wk "Capture")
-
     ;; Org Mode
     "n" '(:ignore t :wk "Org mode plugins")
     "n j j" '(org-journal-new-entry :wk "Make new journal entry")
@@ -585,30 +550,29 @@
     "h r r" '(lambda () (interactive) (org-babel-load-file (expand-file-name "~/monorepo/config/emacs.org")))))
 
 (use-package minuet
-    :bind
-    (("M-y" . #'minuet-complete-with-minibuffer)
-     ("C-c m" . #'minuet-show-suggestion)
-     :map minuet-active-mode-map
-     ("C-c r" . #'minuet-dismiss-suggestion)
-     ("TAB" . #'minuet-accept-suggestion))
-
-    :init
-    (add-hook 'prog-mode-hook #'minuet-auto-suggestion-mode)
-
-    :custom
-    (minuet-request-timeout 40 "Max timeout in seconds")
-    (minuet-provider 'openai-fim-compatible "FIM compatible OpenAI-like API (Ollama)")
-    (minuet-n-completions 1 "I am using ghost text so I only need one possible completion")
-    (minuet-context-window 1024 "how much context do I want?")
-
-    :config
-    (plist-put minuet-openai-fim-compatible-options :end-point "http://localhost:11434/v1/completions")
-
-    (plist-put minuet-openai-fim-compatible-options :name "Ollama")
-    (plist-put minuet-openai-fim-compatible-options :api-key "TERM")
-    (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:14b")
-
-    (minuet-set-optional-options minuet-openai-fim-compatible-options :max_tokens 50))
+  :bind
+  (("M-y" . #'minuet-complete-with-minibuffer)
+   ("C-c m" . #'minuet-show-suggestion)
+   :map minuet-active-mode-map
+   ("C-c r" . #'minuet-dismiss-suggestion)
+   ("TAB" . #'minuet-accept-suggestion))
+  :hook ((prog-mode-hook . minuet-auto-suggestion-mode))
+  :custom
+  (minuet-request-timeout 40 "Max timeout in seconds")
+  (minuet-provider 'openai-fim-compatible "FIM compatible OpenAI-like API (Ollama)")
+  (minuet-n-completions 1 "I am using ghost text so I only need one possible completion")
+  (minuet-context-window 1024 "how much context do I want?")
+  (minuet-openai-fim-compatible-options
+   '(
+     :end-point "http://localhost:11434/v1/completions"
+     :name "Ollama"
+     :api-key "TERM"
+     :template (:prompt minuet--default-fim-prompt-function
+                        :suffix minuet--default-fim-suffix-function)
+     :transform ()
+     :get-text-fn minuet--openai-fim-get-text-fn
+     :optional (:max-tokens 50)
+     :model "qwen2.5-coder:14b")))
 
 (use-package elfeed
   :custom
@@ -628,14 +592,14 @@
 (use-package elfeed-tube
   :after elfeed
   :demand t
-  :config
-  (elfeed-tube-setup)
   :bind (:map elfeed-show-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)
-         :map elfeed-search-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)))
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save)
+              :map elfeed-search-mode-map
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save))
+  :config
+  (elfeed-tube-setup))
 
 (use-package elfeed-tube-mpv
   :bind (:map elfeed-show-mode-map
@@ -643,7 +607,7 @@
               ("C-c C-c" . elfeed-tube-mpv)
               ("C-c C-w" . elfeed-tube-mpv-where)
          :map elfeed-search-mode-map
-	        ("M" . elfeed-tube-mpv)))
+          ("M" . elfeed-tube-mpv)))
 
 (use-package treemacs)
 (use-package treemacs-evil
@@ -656,12 +620,11 @@
 (use-package eww
   :custom
   (search-engines
-	'((("google" "g") "https://google.com/search?q=%s")
+  '((("google" "g") "https://google.com/search?q=%s")
           (("duckduckgo" "d" "ddg") "https://duckduckgo.com/?q=%s")
           (("rfc" "r") "https://www.rfc-editor.org/rfc/rfc%s.txt")
           (("rfc-kw" "rk") "https://www.rfc-editor.org/search/rfc_search_detail.php?title=%s"))
-	"use this set of search engines")
-
+  "use this set of search engines")
   (search-engine-default "google" "Use google as default")
   (eww-search-prefix "https://google.com/search?q=" "Google prefix")
   :hook ((eww-mode . (lambda () (local-set-key (kbd "y Y") #'eww-copy-page-url)))))
@@ -676,9 +639,9 @@
   (org-roam-graph-viewer "librewolf" "Use librewolf to view org-roam graph")
   (org-roam-directory (file-truename "~/monorepo/mindmap") "Set org-roam directory inside monorepo")
   (org-roam-capture-templates '(("d" "default" plain "%?"
-				 :target (file+head "${title}.org"
-						    "#+title: ${title}\n#+author: Preston Pan\n#+description:\n#+options: broken-links:t")
-				 :unnarrowed t)) "org-roam files start with this snippet by default")
+         :target (file+head "${title}.org"
+                "#+title: ${title}\n#+author: Preston Pan\n#+description:\n#+options: broken-links:t")
+         :unnarrowed t)) "org-roam files start with this snippet by default")
   :config
   (org-roam-db-autosync-mode)
   ;; Otherwise links are broken when publishing
