@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Mako][Mako:1]]
 { lib, config, sounds, ... }:
 {
   services.mako = {
@@ -13,3 +14,4 @@
     };
   };
 }
+# Mako:1 ends here

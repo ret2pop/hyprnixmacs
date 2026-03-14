@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Default Home Profile][Default Home Profile:1]]
 { lib, config, pkgs, sops-nix, super, ... }:
 let
   dirContents = builtins.readDir ./.;
@@ -180,3 +181,4 @@ in
     };
   };
 }
+# Default Home Profile:1 ends here

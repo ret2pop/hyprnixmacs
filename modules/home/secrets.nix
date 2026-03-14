@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Secrets][Secrets:1]]
 { config, super, ... }:
 {
   sops = {
@@ -38,3 +39,4 @@
     defaultSecretsMountPoint = "/run/user/1000/secrets.d";
   };
 }
+# Secrets:1 ends here

@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Wofi][Wofi:1]]
 { lib, config, ... }:
 {
   programs.wofi = {
@@ -186,3 +187,4 @@
     '';
   };
 }
+# Wofi:1 ends here

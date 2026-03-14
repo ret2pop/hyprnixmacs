@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Vars][Vars:1]]
 { config, lib, ... }:
 let
   vars = import ../flakevars.nix;
@@ -143,3 +144,4 @@ in
     };
   };
 }
+# Vars:1 ends here

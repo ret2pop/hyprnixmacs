@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Btrfs][Btrfs:1]]
 {
   ESP = (import ./esp-boot.nix) // {
     size = "512M";
@@ -48,3 +49,4 @@
     };
   };
 }
+# Btrfs:1 ends here

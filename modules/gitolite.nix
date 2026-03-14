@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Gitolite][Gitolite:1]]
 { lib, config, ... }:
 {
   services.gitolite = {
@@ -6,3 +7,4 @@
     adminPubkey = config.monorepo.vars.sshKey;
   };
 }
+# Gitolite:1 ends here

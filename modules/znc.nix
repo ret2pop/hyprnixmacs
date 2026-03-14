@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*ZNC][ZNC:1]]
 { lib, config, ... }:
 {
   services.znc = {
@@ -6,12 +7,12 @@
     confOptions = {
       useSSL = true;
       passBlock = ''
-<Pass password>
-  Method = sha256
-  Hash = d4abdd69aa24de69693885c5bd83a4a0e9ee989e1a69a905041b0dad9abc06ea
-  Salt = sDY,?H5AxC-!gH3a.:)D
-</Pass>
-'';
+  <Pass password>
+    Method = sha256
+    Hash = d4abdd69aa24de69693885c5bd83a4a0e9ee989e1a69a905041b0dad9abc06ea
+    Salt = sDY,?H5AxC-!gH3a.:)D
+  </Pass>
+  '';
       modules = [
         "partyline"
         "webadmin"
@@ -35,3 +36,4 @@
     };
   };
 }
+# ZNC:1 ends here

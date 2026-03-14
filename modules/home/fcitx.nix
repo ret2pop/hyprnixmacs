@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Fcitx][Fcitx:1]]
 { config, pkgs, lib, ... }:
 {
   i18n.inputMethod = {
@@ -12,3 +13,4 @@
     ]) else [];
   };
 }
+# Fcitx:1 ends here

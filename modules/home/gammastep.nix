@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Gammastep][Gammastep:1]]
 { lib, config, ... }:
 {
   services.gammastep = {
@@ -18,3 +19,4 @@
     };
   };
 }
+# Gammastep:1 ends here

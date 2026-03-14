@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*MPV][MPV:1]]
 { lib, config, ... }:
 {
   programs.mpv = {
@@ -10,3 +11,4 @@
     };
   };
 }
+# MPV:1 ends here

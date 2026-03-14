@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Firefox][Firefox:1]]
 { lib, config, pkgs, ... }:
 {
   programs.librewolf = {
@@ -23,3 +24,4 @@
     };
   };
 }
+# Firefox:1 ends here

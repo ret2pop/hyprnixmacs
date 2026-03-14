@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*rpi-zero][rpi-zero:1]]
 { ... }:
 {
   imports = [
@@ -19,3 +20,4 @@
     };
   };
 }
+# rpi-zero:1 ends here

@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Nvidia][Nvidia:1]]
 { config, lib, pkgs, ... }:
 {
   hardware = {
@@ -20,3 +21,4 @@
     };
   };
 }
+# Nvidia:1 ends here

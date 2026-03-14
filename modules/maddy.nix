@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Maddy][Maddy:1]]
 { lib, config, options, ... }:
 let
   emailServerName = "mail.${config.monorepo.vars.orgHost}";
@@ -18,7 +19,7 @@ in
         group = "public-inbox";
         mode = "0400";
         content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine ${emailServerName} login ${x}@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
-machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
+  machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
       };
     };
   };
@@ -67,11 +68,11 @@ machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} pass
   ];
   systemd.services.public-inbox-httpd = if config.monorepo.profiles.server.enable then {
     preStart = ''
-    # Copy or link the file. 
-    # Using 'cp' is often safer for sandboxed services than linking to the store. Lol.
-    cp -f ${../data/public-inbox.css} /var/lib/public-inbox/style.css
-    chmod 644 /var/lib/public-inbox/style.css
-  '';
+      # Copy or link the file. 
+      # Using 'cp' is often safer for sandboxed services than linking to the store. Lol.
+      cp -f ${../data/public-inbox.css} /var/lib/public-inbox/style.css
+      chmod 644 /var/lib/public-inbox/style.css
+    '';
     
     serviceConfig = {
       BindPaths = [ 
@@ -87,10 +88,10 @@ machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} pass
     after = [ "sops-nix.service" ];
     confinement.enable = lib.mkForce false;
     preStart = ''
-      mkdir -p /var/lib/public-inbox/.tmp
-      chmod 0700 /var/lib/public-inbox/.tmp
-      ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
-    '';
+        mkdir -p /var/lib/public-inbox/.tmp
+        chmod 0700 /var/lib/public-inbox/.tmp
+        ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
+      '';
     environment = {
       PUBLIC_INBOX_FORCE_IPV4 = "1";
       NETRC = config.sops.templates."public-inbox-netrc".path;
@@ -182,11 +183,11 @@ machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} pass
     locations."/" = {
       proxyPass = "http://localhost:${toString config.services.public-inbox.http.port}";
       extraConfig = ''
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
     };
   };
 
@@ -198,3 +199,4 @@ machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} pass
   };
 
 }
+# Maddy:1 ends here

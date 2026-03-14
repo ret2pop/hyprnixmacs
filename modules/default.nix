@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Default Profile][Default Profile:1]]
 { lib, config, pkgs, ... }:
 let
   dirContents = builtins.readDir ./.;
@@ -57,14 +58,14 @@ in
       {
         assertion = !(config.monorepo.profiles.workstation.enable && config.monorepo.profiles.server.enable);
         message = ''
-You can't enable both workstation and server profile together. Please select only one.
-'';
+  You can't enable both workstation and server profile together. Please select only one.
+  '';
       }
       {
         assertion = !(config.monorepo.profiles.desktop.enable && config.monorepo.profiles.server.enable);
         message = ''
-You can't enable both desktop and server profile together. Please select only one.
-'';
+  You can't enable both desktop and server profile together. Please select only one.
+  '';
       }
     ];
     monorepo = {
@@ -81,3 +82,4 @@ You can't enable both desktop and server profile together. Please select only on
     };
   };
 }
+# Default Profile:1 ends here

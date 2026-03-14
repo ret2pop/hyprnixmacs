@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*yt-dlp][yt-dlp:1]]
 { lib, config, ... }:
 {
   programs.yt-dlp = {
@@ -11,3 +12,4 @@
     };
   };
 }
+# yt-dlp:1 ends here

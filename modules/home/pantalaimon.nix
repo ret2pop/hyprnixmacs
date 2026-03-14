@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*pantalaimon][pantalaimon:1]]
 { lib, ... }:
 {
   services.pantalaimon = {
@@ -17,3 +18,4 @@
 
   };
 }
+# pantalaimon:1 ends here

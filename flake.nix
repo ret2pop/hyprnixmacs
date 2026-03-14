@@ -1,3 +1,4 @@
+# [[file:../config/nix.org::*Flake.nix][Flake.nix:1]]
 {
   description = "Emacs centric configurations for a complete networked system";
 
@@ -44,7 +45,7 @@
   };
 
   outputs = {
-      self,
+    self,
       nixpkgs,
       home-manager,
       nur,
@@ -140,25 +141,25 @@
             description = "Ensure ${hostname} can build";
             stages = [ "pre-merge-commit" ];
             entry = "${pkgs.writeShellScript "${hostname}-check" ''
-#!/usr/bin/env bash
-set -e
-set -o pipefail
-trap "echo -e '\nHook interrupted by user. Aborting merge!'; exit 1" INT TERM
-echo "Running Nix integration tests..."
+  #!/usr/bin/env bash
+  set -e
+  set -o pipefail
+  trap "echo -e '\nHook interrupted by user. Aborting merge!'; exit 1" INT TERM
+  echo "Running Nix integration tests..."
 
-BRANCH=$(git branch --show-current)
-if [ "$BRANCH" != "main" ]; then
-  exit 0
-fi
-echo "Merge to main detected. Building VM for ${hostname}..."
-if nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link; then
-    echo "Build succeeded."
+  BRANCH=$(git branch --show-current)
+  if [ "$BRANCH" != "main" ]; then
     exit 0
-else
-    echo "Build failed! Aborting."
-    exit 1
-fi
-''}";
+  fi
+  echo "Merge to main detected. Building VM for ${hostname}..."
+  if nix build .#nixosConfigurations.${hostname}.config.system.build.vm --no-link; then
+      echo "Build succeeded."
+      exit 0
+  else
+      echo "Build failed! Aborting."
+      exit 1
+  fi
+  ''}";
             pass_filenames = false;
             always_run = true;
           };
@@ -189,8 +190,8 @@ fi
 
         _mkServiceTestScripts = hostname: services: builtins.concatStringsSep "\n" (builtins.map (service:
           (if service.enabled then ''
-${hostname}.succeed("systemctl is-active ${service.serviceName}")
-'' else "")) services);
+  ${hostname}.succeed("systemctl is-active ${service.serviceName}")
+  '' else "")) services);
 
         mkServiceTestScripts = hostname: _mkServiceTestScripts hostname (hostToServices hostname);
 
@@ -224,11 +225,11 @@ ${hostname}.succeed("systemctl is-active ${service.serviceName}")
                   };
                 };
                 testScript = ''
-${hostname}.start()
-${hostname}.wait_for_unit("default.target")
-${hostname}.succeed('printf "smoke"')
-${mkServiceTestScripts hostname}
-'';
+  ${hostname}.start()
+  ${hostname}.wait_for_unit("default.target")
+  ${hostname}.succeed('printf "smoke"')
+  ${mkServiceTestScripts hostname}
+  '';
               };
             }
         );
@@ -245,14 +246,14 @@ ${mkServiceTestScripts hostname}
               description = "Blocks commits to main unless they are merge commits";
               pass_filenames = false;
               entry = "${pkgs.writeShellScript "block-main-commits" ''
-BRANCH=$(git branch --show-current)
-GIT_DIR=$(git rev-parse --git-dir)
-if [ "$BRANCH" = "main" ] && [ ! -f "$GIT_DIR/MERGE_HEAD" ]; then
-  echo "Direct commits to 'main' are blocked."
-  echo "Please commit to a feature branch and merge it into main."
-  exit 1
-fi
-              ''}";
+  BRANCH=$(git branch --show-current)
+  GIT_DIR=$(git rev-parse --git-dir)
+  if [ "$BRANCH" = "main" ] && [ ! -f "$GIT_DIR/MERGE_HEAD" ]; then
+    echo "Direct commits to 'main' are blocked."
+    echo "Please commit to a feature branch and merge it into main."
+    exit 1
+  fi
+                ''}";
             };
           };
         };
@@ -292,27 +293,27 @@ fi
               ]))
             ];
             shellHook = ''
-${pre-commit-check.shellHook}
-git config branch.main.mergeoptions "--no-ff"
+  ${pre-commit-check.shellHook}
+  git config branch.main.mergeoptions "--no-ff"
 
-CURRENT_HOST="$(hostname)"
+  CURRENT_HOST="$(hostname)"
 
-TARGET_USER_RAW=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users --apply "u: builtins.head (builtins.attrNames u)" --raw 2>/dev/null)
+  TARGET_USER_RAW=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users --apply "u: builtins.head (builtins.attrNames u)" --raw 2>/dev/null)
 
-TARGET_USER=$(echo "$TARGET_USER_RAW" | xargs)
-SOPS_BASE=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users."$TARGET_USER".sops.defaultSymlinkPath --raw 2>/dev/null)
+  TARGET_USER=$(echo "$TARGET_USER_RAW" | xargs)
+  SOPS_BASE=$(nix eval .#nixosConfigurations."$CURRENT_HOST".config.home-manager.users."$TARGET_USER".sops.defaultSymlinkPath --raw 2>/dev/null)
 
-if [ -n "$SOPS_BASE" ] && [ -f "$SOPS_BASE/cloudflare-dns" ]; then
-  export CLOUDFLARE_TOKEN="$(cat "$SOPS_BASE/cloudflare-dns" | tr -d '\n')"
-  echo "Authenticated via sops-nix for host: $CURRENT_HOST"
-else
-  echo "Could not resolve sops path for $CURRENT_HOST or secret is missing. Set CLOUDFLARE_TOKEN manually."
-fi
+  if [ -n "$SOPS_BASE" ] && [ -f "$SOPS_BASE/cloudflare-dns" ]; then
+    export CLOUDFLARE_TOKEN="$(cat "$SOPS_BASE/cloudflare-dns" | tr -d '\n')"
+    echo "Authenticated via sops-nix for host: $CURRENT_HOST"
+  else
+    echo "Could not resolve sops path for $CURRENT_HOST or secret is missing. Set CLOUDFLARE_TOKEN manually."
+  fi
 
-alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit --force"
-alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --force "
-alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r git branch -d'
-'';
+  alias update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --doit --force"
+  alias fake-update-dns="octodns-sync --config-file ${self.packages."${system}".octodns} --force "
+  alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r git branch -d'
+  '';
           };
 
           packages."${system}" = {
@@ -339,3 +340,4 @@ alias gprune='git branch --merged | grep -v -E "^\*|main|master|dev" | xargs -r 
           };
         };
 }
+# Flake.nix:1 ends here

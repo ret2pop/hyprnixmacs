@@ -3,4 +3,4 @@
 #+options: exports:none
 #+filetags: :noexport:
 * HyprNixMacs
-This is my hyprnixmacs configuration, integrated into my monorepo.
+This is my hyprnixmacs configuration, integrated into my monorepo. Documentation coming soon.

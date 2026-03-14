@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*i2pd][i2pd:1]]
 { lib, ... }:
 {
   services.i2pd = {
@@ -9,3 +10,4 @@
     };
   };
 }
+# i2pd:1 ends here

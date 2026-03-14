@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*CGit Interface][CGit Interface:1]]
 { lib, config, ... }:
 let
   serverName = "git.${config.monorepo.vars.orgHost}";
@@ -32,3 +33,4 @@ in
     enableACME = true;
   };
 }
+# CGit Interface:1 ends here

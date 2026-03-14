@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Kitty][Kitty:1]]
 { lib, config, ... }:
 {
   programs.kitty = {
@@ -51,3 +52,4 @@
     };
   };
 }
+# Kitty:1 ends here

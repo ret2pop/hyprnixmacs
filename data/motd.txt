@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*MOTD][MOTD:1]]
 Welcome to the NullRing experience!
 The main channel is #nullring; we're glad to have you!
 
@@ -6,3 +7,4 @@ Rules:
 2. No illegal content.
 And if you're here to have constructive, philisophical and theoretical
 conversations, this is the place for you!
+# MOTD:1 ends here

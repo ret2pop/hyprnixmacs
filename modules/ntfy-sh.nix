@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Ntfy][Ntfy:1]]
 { pkgs, lib, config, ... }:
 let
   serverName = "${config.monorepo.vars.ntfyUrl}";
@@ -30,34 +31,34 @@ in
       EnvironmentFile = "/run/secrets/${ntfySecret}";
     };
     postStart = lib.mkForce ''
-      # 1. Wait for the server to initialize the database
-      echo "Waiting for ntfy auth database to appear..."
-      TIMEOUT=30
-      while [ ! -f /var/lib/ntfy-sh/user.db ]; do
-        sleep 1
-        TIMEOUT=$((TIMEOUT-1))
-        if [ $TIMEOUT -le 0 ]; then
-          echo "Timed out waiting for database creation!"
-          exit 1
+        # 1. Wait for the server to initialize the database
+        echo "Waiting for ntfy auth database to appear..."
+        TIMEOUT=30
+        while [ ! -f /var/lib/ntfy-sh/user.db ]; do
+          sleep 1
+          TIMEOUT=$((TIMEOUT-1))
+          if [ $TIMEOUT -le 0 ]; then
+            echo "Timed out waiting for database creation!"
+            exit 1
+          fi
+        done
+        
+        echo "Database found. Configuring admin user..."
+
+        # 2. Define the username
+        ADMIN_USER="ret2pop"
+
+        # 3. Check if user exists, create if missing
+        # We pipe the password twice because 'ntfy user add' asks for confirmation
+        if ! ${pkgs.ntfy-sh}/bin/ntfy user list | grep -q "$ADMIN_USER"; then
+          echo "Creating admin user $ADMIN_USER..."
+          printf "$ADMIN_PASSWORD\n$ADMIN_PASSWORD" | \
+            ${pkgs.ntfy-sh}/bin/ntfy user add --role=admin "$ADMIN_USER"
+          echo "User created."
+        else
+          echo "Admin user already exists."
         fi
-      done
-      
-      echo "Database found. Configuring admin user..."
-
-      # 2. Define the username
-      ADMIN_USER="ret2pop"
-
-      # 3. Check if user exists, create if missing
-      # We pipe the password twice because 'ntfy user add' asks for confirmation
-      if ! ${pkgs.ntfy-sh}/bin/ntfy user list | grep -q "$ADMIN_USER"; then
-        echo "Creating admin user $ADMIN_USER..."
-        printf "$ADMIN_PASSWORD\n$ADMIN_PASSWORD" | \
-          ${pkgs.ntfy-sh}/bin/ntfy user add --role=admin "$ADMIN_USER"
-        echo "User created."
-      else
-        echo "Admin user already exists."
-      fi
-    '';
+      '';
   };
 
   networking.domains.subDomains."${serverName}" = lib.mkIf config.services.ntfy-sh.enable {};
@@ -69,12 +70,13 @@ in
       proxyPass = "http://127.0.0.1:${toString port}";
       proxyWebsockets = true;
       extraConfig = ''
-proxy_buffering off;
-proxy_set_header Host $host;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $scheme;
-'';
+  proxy_buffering off;
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+  '';
     };
   };
 }
+# Ntfy:1 ends here

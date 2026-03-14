@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Pipewire][Pipewire:1]]
 { lib, config, ... }:
 {
   services.pipewire = {
@@ -40,3 +41,4 @@
     };
   };
 }
+# Pipewire:1 ends here

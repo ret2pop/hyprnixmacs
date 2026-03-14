@@ -1,3 +1,4 @@
+# [[file:../config/nix.org::*Configurables][Configurables:1]]
 let
   # I'm ret2pop! What's your name?
   internetName = "ret2pop";
@@ -20,3 +21,4 @@ in
     "installer"
   ];
 }
+# Configurables:1 ends here

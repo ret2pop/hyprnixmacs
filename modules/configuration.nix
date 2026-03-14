@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
 { config, pkgs, lib, ... }:
 let
   userGroups = [
@@ -22,8 +23,8 @@ let
 in
 {
   environment.etc."wpa_supplicant.conf".text = ''
-country=CA
-'';
+  country=CA
+  '';
   systemd.tmpfiles.rules = [
     "d /srv/git 0755 git git -"
   ];
@@ -76,9 +77,9 @@ country=CA
   environment = {
     etc = {
       securetty.text = ''
-        # /etc/securetty: list of terminals on which root is allowed to login.
-        # See securetty(5) and login(1).
-      '';
+          # /etc/securetty: list of terminals on which root is allowed to login.
+          # See securetty(5) and login(1).
+        '';
     };
   };
 
@@ -116,15 +117,15 @@ country=CA
     };
 
     extraModprobeConfig = ''
-  options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
-  options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
-  options rtw88_pci disable_msi=y disable_aspm=y
-  options rtw_core disable_lps_deep=y
-  options rtw_pci disable_msi=y disable_aspm=y
-  options rtw89_core disable_ps_mode=y
-  options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
-  options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
-'';
+    options snd-usb-audio vid=0x1235 pid=0x8200 device_setup=1
+    options rtw88_core disable_lps_deep=y power_save=0 disable_aspm_l1ss=y
+    options rtw88_pci disable_msi=y disable_aspm=y
+    options rtw_core disable_lps_deep=y
+    options rtw_pci disable_msi=y disable_aspm=y
+    options rtw89_core disable_ps_mode=y
+    options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
+    options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
+  '';
     extraModulePackages = [ ];
 
     initrd = {
@@ -431,12 +432,12 @@ country=CA
   };
 
   environment.etc."gitconfig".text = ''
-  [init]
-  defaultBranch = main
-  '';
+    [init]
+    defaultBranch = main
+    '';
   environment.extraInit = ''
-  umask 0022
-  '';
+    umask 0022
+    '';
   environment.systemPackages = with pkgs; [
     restic
     sbctl
@@ -449,12 +450,12 @@ country=CA
     exiftool
     (writeShellScriptBin "new-repo"
       ''
-  #!/bin/bash
-  cd ${config.users.users.git.home}
-  git init --bare "$1"
-  vim "$1/description"
-  chown -R git:git "$1"
-  ''
+    #!/bin/bash
+    cd ${config.users.users.git.home}
+    git init --bare "$1"
+    vim "$1/description"
+    chown -R git:git "$1"
+    ''
     )
   ];
 
@@ -547,3 +548,4 @@ country=CA
   i18n.defaultLocale = "en_CA.UTF-8";
   system.stateVersion = "24.11";
 }
+# Main Configuration:1 ends here
