@@ -289,6 +289,8 @@
                           (->> (create-htmlize-css)
                                (s-replace-regexp "<style[^>]*>" "")
                                (s-replace "</style>" "")
+                               (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
+                               (s-replace "/*]]>*/-->" "")
                                (s-trim)
                                (minify-css))
                           (f-read-text "~/monorepo/style.css" 'utf-8)
@@ -534,8 +536,7 @@
                      (projects  . 5)
                      (agenda    . 5)
                      (registers . 5)) "Look at some items")
-  :config
-  (dashboard-setup-startup-hook))
+  :config (unless noninteractive (dashboard-setup-startup-hook)))
 ;; Dashboard:1 ends here
 
 ;; [[file:../config/emacs.org::*Ivy][Ivy:1]]
