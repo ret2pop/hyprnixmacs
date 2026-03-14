@@ -42,6 +42,12 @@
                       (string (elt chars (mod (string-to-char (char-to-string c)) (length chars)))))
                     bytes ""))))))
 
+(defun create-htmlize-css ()
+  (progn
+    (org-html-htmlize-generate-css)
+    (with-current-buffer "*htmlize*"
+      (buffer-string))))
+
 (use-package tex-site)
 (use-package subr-x)
 (use-package dash)
@@ -157,7 +163,7 @@
     (add-to-list 'default-frame-alist '(alpha-background . 70)))
 
 (use-package org
-  :after (f s dash)
+  :after (f s dash nix-mode)
   :hook
   ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
   :custom
@@ -175,7 +181,14 @@
   (TeX-engine 'xetex "set xelatex as default engine")
   (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
   (preview-image-type 'png "Use PNGs")
-  (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
+  (org-format-latex-options
+   '(:foreground default
+                 :background default
+                 :scale 1.5
+                 :html-foreground "Black"
+                 :html-background "Transparent"
+                 :html-scale 1.5
+                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
   (org-return-follows-link t "be able to follow links without mouse")
   (org-startup-indented t "Indent the headings")
   (org-image-actual-width '(300) "Cap width") 
@@ -247,14 +260,14 @@
       :publishing-function org-html-publish-to-html
       :headline-levels 4
       :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                         "<style>"
-                         (->> (org-html-htmlize-generate-css)
-                              (s-replace-regexp "<style[^>]*>" "")
-                              (s-replace "</style>" "")
-                              (s-trim)
-                              (minify-css))
-                         (f-read-text "~/monorepo/style.css" 'utf-8)
-                         "</style>")
+                          "<style>"
+                          (->> (create-htmlize-css)
+                               (s-replace-regexp "<style[^>]*>" "")
+                               (s-replace "</style>" "")
+                               (s-trim)
+                               (minify-css))
+                          (f-read-text "~/monorepo/style.css" 'utf-8)
+                          "</style>")
       :html-preamble t
       :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>"))
       )
@@ -302,10 +315,10 @@
 
 (use-package evil
   :custom (evil-want-keybinding nil "Don't load a whole bunch of default keybindings")
-  :map
-  (evil-normal-state-map
-   ("/" . swiper)
-   ("?" . (lambda () (interactive) (swiper "--reverse"))))
+  :bind
+  (:map evil-normal-state-map
+        ("/" . swiper)
+        ("?" . (lambda () (interactive) (swiper "--reverse"))))
   :config
   ;; order matters
   (evil-mode 1)
@@ -314,12 +327,10 @@
 
 (use-package evil-collection
   :after (evil)
-  :bind
-  :map
-  (evil-motion-state-map
-   ("SPC" . nil)
-   ("RET" . nil)
-   ("TAB" . nil))
+  :bind (:map evil-motion-state-map
+              ("SPC" . nil)
+              ("RET" . nil)
+              ("TAB" . nil))
   :config
   (evil-collection-init))
 
@@ -368,7 +379,7 @@
       (doom-themes-org-config))))
 
 (use-package catppuccin-theme
-  :config (unless noninteractive
+  :config (when noninteractive
             (try (load-theme 'catppuccin-theme t))))
 
 (use-package writegood-mode
@@ -602,7 +613,8 @@
          :map elfeed-search-mode-map
           ("M" . elfeed-tube-mpv)))
 
-(use-package treemacs)
+(use-package treemacs
+  :after doom-themes)
 
 (use-package treemacs-evil
   :after (treemacs evil))
