@@ -244,7 +244,7 @@
   (org-habit-show-all-today t "Show org habit graph"))
 
 (use-package htmlize
-  :after (doom-themes catppuccin-theme))
+  :after (catppuccin-theme))
 
 (use-package ox-latex
   :after (org)
