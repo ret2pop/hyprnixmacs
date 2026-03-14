@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Nixpkgs][Nixpkgs:1]]
 { lib, config, isIntegrationTest, ... }:
 {
   nixpkgs = lib.mkIf (! isIntegrationTest) {
@@ -12,3 +13,4 @@
     ];
   };
 }
+# Nixpkgs:1 ends here

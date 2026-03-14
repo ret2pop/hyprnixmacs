@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Git][Git:1]]
 { pkgs, lib, config, super, ... }:
 {
   programs.git = {
@@ -38,3 +39,4 @@
     };
   };
 }
+# Git:1 ends here

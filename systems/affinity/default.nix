@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Affinity][Affinity:1]]
 { ... }:
 {
   imports = [
@@ -14,3 +15,4 @@
     };
   };
 }
+# Affinity:1 ends here

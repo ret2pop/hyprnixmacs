@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Fail2Ban][Fail2Ban:1]]
 { lib, config, ... }:
 {
   services.fail2ban = {
@@ -9,3 +10,4 @@
     banaction-allports = "iptables-allports";
   };
 }
+# Fail2Ban:1 ends here

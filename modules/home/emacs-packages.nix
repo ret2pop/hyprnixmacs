@@ -1,15 +1,19 @@
+# [[file:../../../config/nix.org::*Emacs Packages][Emacs Packages:1]]
 epkgs: [
-  epkgs.agda2-mode
   epkgs.all-the-icons
+  epkgs.agda2-mode
   epkgs.auctex
   epkgs.catppuccin-theme
   epkgs.company
+  epkgs.company-box
   epkgs.company-solidity
   epkgs.counsel
   epkgs.centaur-tabs
+  epkgs.dash
   epkgs.dashboard
   epkgs.doom-themes
   epkgs.doom-modeline
+  epkgs.indent-bars
   epkgs.irony
   epkgs.elfeed
   epkgs.elfeed-org
@@ -28,6 +32,7 @@ epkgs: [
   epkgs.f
   epkgs.flycheck
   epkgs.general
+  epkgs.git-gutter
   epkgs.gptel
   epkgs.gruvbox-theme
   epkgs.haskell-mode
@@ -35,8 +40,7 @@ epkgs: [
   epkgs.idris-mode
   epkgs.irony-eldoc
   epkgs.ivy
-  epkgs.ivy-pass
-  epkgs.kiwix
+  epkgs.ivy-posframe
   epkgs.latex-preview-pane
   epkgs.lsp-ivy
   epkgs.lsp-mode
@@ -46,14 +50,15 @@ epkgs: [
   epkgs.magit
   epkgs.magit-delta
   epkgs.mu4e
+  epkgs.mixed-pitch
   epkgs.minuet
   epkgs.nix-mode
   epkgs.org-contrib
   epkgs.org-fragtog
   epkgs.org-journal
+  epkgs.org-modern
   epkgs.org-roam
   epkgs.org-roam-ui
-  epkgs.org-superstar
   epkgs.page-break-lines
   epkgs.password-store
   epkgs.pdf-tools
@@ -61,19 +66,21 @@ epkgs: [
   epkgs.platformio-mode
   epkgs.projectile
   epkgs.rustic
+  epkgs.s
+  epkgs.solaire-mode
   epkgs.scad-mode
   epkgs.simple-httpd
   epkgs.solidity-flycheck
   epkgs.solidity-mode
   epkgs.sudo-edit
-  epkgs.telega
   epkgs.treemacs
   epkgs.treemacs-evil
   epkgs.treemacs-magit
   epkgs.treemacs-projectile
+  epkgs.treemacs-all-the-icons
+  epkgs.all-the-icons-ivy-rich
   epkgs.treesit-auto
   epkgs.typescript-mode
-  epkgs.unicode-fonts
   epkgs.use-package
   epkgs.vterm
   epkgs.wgrep
@@ -86,3 +93,4 @@ epkgs: [
   epkgs.yasnippet
   epkgs.yasnippet-snippets
 ]
+# Emacs Packages:1 ends here

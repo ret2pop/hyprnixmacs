@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Matterbridge][Matterbridge:1]]
 { lib, config, ... }:
 {
   services.matterbridge = {
@@ -5,3 +6,4 @@
     configPath = "${config.sops.templates.matterbridge.path}";
   };
 }
+# Matterbridge:1 ends here

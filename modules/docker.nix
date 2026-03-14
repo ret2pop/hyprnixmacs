@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Containers][Containers:1]]
 { lib, ... }:
 {
   virtualisation = {
@@ -13,3 +14,4 @@
     };
   };
 }
+# Containers:1 ends here

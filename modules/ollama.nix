@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Ollama][Ollama:1]]
 { config, lib, pkgs, ... }:
 {
   # services.open-webui.enable = lib.mkDefault (!config.monorepo.profiles.server.enable);
@@ -17,3 +18,4 @@
     openFirewall = true;
   };
 }
+# Ollama:1 ends here

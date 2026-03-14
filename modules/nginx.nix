@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Nginx][Nginx:1]]
 { pkgs, config, lib, monorepoSelf ? null, ... }:
 {
   services.nginx = {
@@ -19,24 +20,24 @@
 
         locations."/" = {
           extraConfig = ''
-add_header Cache-Control "no-cache, must-revalidate";
-add_header Alt-Svc 'h3=":443"; ma=86400';
-include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
-expires off;
-    '';
+  add_header Cache-Control "no-cache, must-revalidate";
+  add_header Alt-Svc 'h3=":443"; ma=86400';
+  include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
+  expires off;
+      '';
         };
 
         locations."~* \\.(?:woff2|ttf|otf|eot|woff|ico|css|js|gif|jpe?g|png|svg|mp3|mp4|iso|webmanifest)$" = {
           extraConfig = ''
-add_header Cache-Control "public, max-age=31536000, immutable";
-add_header Alt-Svc 'h3=":443"; ma=86400';
-include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
-access_log off;
-    '';
+  add_header Cache-Control "public, max-age=31536000, immutable";
+  add_header Alt-Svc 'h3=":443"; ma=86400';
+  include ${monorepoSelf.packages.${pkgs.system}.website}/csp_header.conf;
+  access_log off;
+      '';
         };
         extraConfig = ''
-rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
-'';
+  rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
+  '';
       };
 
       # the port comes from ssh tunnelling
@@ -47,14 +48,14 @@ rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 
         locations."/" = {
           proxyPass = "http://localhost:8000";
           extraConfig = ''
-proxy_buffering off;
-proxy_http_version 1.1;
-proxy_set_header Connection "";
-proxy_set_header Host $host;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_read_timeout 36000s;
-'';
+  proxy_buffering off;
+  proxy_http_version 1.1;
+  proxy_set_header Connection "";
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_read_timeout 36000s;
+  '';
         };
       };
 
@@ -73,14 +74,14 @@ proxy_read_timeout 36000s;
         quic = true;
         locations."/" = {
           extraConfig = ''
-add_header Alt-Svc 'h3=":443"; ma=86400';
-rewrite ^/$ /graph_view/index.html break;
-'';
+  add_header Alt-Svc 'h3=":443"; ma=86400';
+  rewrite ^/$ /graph_view/index.html break;
+  '';
         };
 
         extraConfig = ''
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none';";
-  '';
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none';";
+    '';
       };
     };
   };
@@ -96,3 +97,4 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
     "graph.${config.monorepo.vars.remoteHost}" = {};
   };
 }
+# Nginx:1 ends here

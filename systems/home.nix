@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Home][Home:1]]
 { config, sops-nix, ... }:
 {
   home-manager = {
@@ -13,3 +14,4 @@
     users."${config.monorepo.vars.userName}" = (import (./. + "/${config.networking.hostName}/home.nix"));
   };
 }
+# Home:1 ends here

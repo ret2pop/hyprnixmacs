@@ -1,271 +1,38 @@
-(use-package emacs
-:custom
-;; global defaults
-(indent-tabs-mode nil "no real tabs, only spaces")
-(tab-width 2 "tab show as 2 spaces")
-(standard-indent 2 "base indentation")
+;; [[file:../config/emacs.org::*Initialization][Initialization:1]]
+;; -*- lexical-binding: t; -*-
+;; Initialization:1 ends here
 
-;; Startup errors
-(warning-minimum-level :emergency "Supress emacs warnings")
-(confirm-kill-processes nil "Don't ask to quit")
-(debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
-(browse-url-generic-program "librewolf")
-(browse-url-secondary-browser-function 'browse-url-generic)
-(browse-url-browser-function 'browse-url-generic)
+;; [[file:../config/emacs.org::*State][State:1]]
+;; pure, well okay it prints but whatever
+(defmacro try (expr)
+  `(condition-case err
+       ,expr
+     (error
+      (princ (format "BLOCK FAILED: %s\n" (error-message-string err))))))
 
-;; Mouse wheel
-(mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
-(mouse-wheel-progressive-speed nil "Make scrolling non laggy")
-(mouse-wheel-follow-mouse 't "Scroll correct window")
-(scroll-conservatively 101 "Sort of smooth scrolling")
-(scroll-step 1 "Scroll one line at a time")
-(debug-on-error nil "Don't make the annoying popups")
-(display-time-24hr-format t "Use 24 hour format to read the time")
-    (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
-    (use-short-answers t "Use y instead of yes")
-    (make-backup-files nil "Don't make backups")
-    (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
-    (fill-column 150)
-    (line-spacing 2 "Default line spacing")
-    (c-doc-comment-style '((c-mode . doxygen)
-  			 (c++-mode . doxygen)))
+;; pure
+(defmacro declare-irc-server (name server port)
+  `(defun ,name ()
+     (interactive)
+     (erc-tls :server ,server
+              :port ,port)))
 
-    :hook ((text-mode . visual-line-mode)
-  	 (prog-mode . display-line-numbers-mode)
-  	 (prog-mode . display-fill-column-indicator-mode)
-  	 (org-mode . auto-fill-mode)
-  	 (org-mode . display-fill-column-indicator-mode)
-  	 (org-mode . display-line-numbers-mode)
-  	 (org-mode . (lambda ()
-  		       (setq prettify-symbols-alist
-  			     '(("#+begin_src" . ?)
-  			       ("#+BEGIN_SRC" . ?)
-  			       ("#+end_src" . ?)
-  			       ("#+END_SRC" . ?)
-  			       ("#+begin_example" . ?)
-  			       ("#+BEGIN_EXAMPLE" . ?)
-  			       ("#+end_example" . ?)
-  			       ("#+END_EXAMPLE" . ?)
-  			       ("#+header:" . ?)
-  			       ("#+HEADER:" . ?)
-  			       ("#+name:" . ?﮸)
-  			       ("#+NAME:" . ?﮸)
-  			       ("#+results:" . ?)
-  			       ("#+RESULTS:" . ?)
-  			       ("#+call:" . ?)
-  			       ("#+CALL:" . ?)
-  			       (":PROPERTIES:" . ?)
-  			       (":properties:" . ?)
-  			       ("lambda" . ?λ)
-  			       ("->"     . ?→)
-  			       ("map"    . ?↦)
-  			       ("/="     . ?≠)
-  			       ("!="     . ?≠)
-  			       ("=="     . ?≡)
-  			       ("<="     . ?≤)
-  			       (">="     . ?≥)
-  			       ("&&"     . ?∧)
-  			       ("||"     . ?∨)
-  			       ("sqrt"   . ?√)
-  			       ("..."    . ?…)))
-  		       (prettify-symbols-mode)))
-  	 (prog-mode .
-  		    (lambda ()
-  		      (setq prettify-symbols-alist
-  			    '(("lambda" . ?λ)
-  			      ("->"     . ?→)
-  			      ("map"    . ?↦)
-  			      ("/="     . ?≠)
-  			      ("!="     . ?≠)
-  			      ("=="     . ?≡)
-  			      ("<="     . ?≤)
-  			      (">="     . ?≥)
-  			      ("&&"     . ?∧)
-  			      ("||"     . ?∨)
-  			      ("sqrt"   . ?√)
-  			      ("..."    . ?…)))
-  		      (prettify-symbols-mode))))
-    :config
-    (require 'tex-site)
-    (require 'subr-x)
-    (unless noninteractive (server-start))
+;; pure, well imperative when evaluated but they're all just bindings that don't depend on each other
+(defmacro create-irc-servers (&rest server-list)
+  `(progn
+     ,@(mapcar (lambda (n) `(declare-irc-server ,@n)) server-list)))
 
-    ;; start with sane defaults
-    (pixel-scroll-precision-mode 1)
-    (display-battery-mode 1)
-    (display-time-mode 1)
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
+;; pure
+(defun org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
+  "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
+  (let ((processing-type (plist-get info :with-latex)))
+    (if (eq processing-type 'html)
+        (let* ((latex-frag (org-remove-indentation (org-element-property :value latex-environment)))
+               (converted (org-format-latex-as-html latex-frag)))
+          (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>" converted))
+      (funcall orig-fun latex-environment contents info))))
 
-    ;; load theme, fonts, and transparency. Prettify symbols.
-    (global-prettify-symbols-mode 1)
-    (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
-    (set-frame-parameter nil 'alpha-background 70)
-    (add-to-list 'default-frame-alist '(alpha-background . 70)))
-
-;; (defvar my-pre-generated-syntax-css "" 
-;;   "Static cache of minified syntax CSS.")
-
-;; (when (and noninteractive (require 'htmlize nil t))
-;;   (message "Pre-generating minified syntax CSS...")
-;;   (require 'ox-html)
-;;   (setq custom-safe-themes t)
-;;   (condition-case err
-;;       (progn
-;;         (require 'catppuccin-theme)
-;;         (load-theme 'catppuccin t)
-;;         (setq my-pre-generated-syntax-css
-;;               (let ((org-html-htmlize-output-type 'css))
-;;                 (with-temp-buffer
-;;                   ;; Strip the <style> and </style> tags before inserting and minifying
-;;                   (insert (replace-regexp-in-string "<style[^>]*>\\|</style>" "" (org-html-htmlize-generate-css)))
-;;                   (shell-command-on-region (point-min) (point-max) "minify --type=css" nil t)
-;;                   (buffer-string)))))
-;;     (error 
-;;      (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
-;;             'external-debugging-output))))
-
-(defvar my-pre-generated-syntax-css "" 
-  "Static cache of minified syntax CSS.")
-
-(when (and noninteractive (require 'htmlize nil t))
-  (message "Pre-generating minified syntax CSS...")
-  (require 'ox-html)
-  (setq custom-safe-themes t)
-  
-  (condition-case err
-      (progn
-        (require 'catppuccin-theme)
-        (load-theme 'catppuccin t)
-        (setq my-pre-generated-syntax-css
-              (let ((org-html-htmlize-output-type 'css))
-                (with-temp-buffer
-                  ;; 1. Generate CSS directly into the temp buffer
-                  (insert (org-html-htmlize-generate-css))
-                  
-                  ;; 2. Safely strip the <style> tags inside the buffer
-                  (goto-char (point-min))
-                  (while (re-search-forward "<style[^>]*>\\|</style>" nil t)
-                    (replace-match ""))
-                  
-                  ;; 3. Minify and REPLACE the buffer (t t arguments are crucial here)
-                  (shell-command-on-region (point-min) (point-max) "minify --type=css" t t)
-                  
-                  ;; 4. Return the clean, minified string
-                  (buffer-string)))))
-    (error 
-     (princ (format "CATPPUCCIN BLOCK FAILED: %s\n" (error-message-string err))
-            'external-debugging-output))))
-
-(use-package org
-  :hook
-  ((org-mode-hook . (lambda () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))))
-  :custom
-  (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
-  (org-export-with-broken-links t "publish website even with broken links")
-  (org-src-fontify-natively t "Colors!")
-  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-  (TeX-PDF-mode t)
-
-  (org-latex-preview-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-  (org-latex-compiler "xelatex" "Use latex as default")
-  (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default")
-  (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
-
-  (TeX-engine 'xetex "set xelatex as default engine")
-  (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
-  (preview-image-type 'png "Use PNGs")
-  ;;    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5) "space latex better")
-  (org-return-follows-link t "be able to follow links without mouse")
-  (org-habit-preceding-days 7 "See org habit entries")
-  (org-habit-following-days 35 "See org habit entries")
-  (org-habit-show-habits t "See org habit entries")
-  (org-habit-show-habits-only-for-today nil "See org habit entries")
-  (org-habit-show-all-today t "Show org habit graph")
-  (org-startup-indented t "Indent the headings")
-  (org-image-actual-width '(300) "Cap width") 
-  (org-startup-with-latex-preview t "see latex previews on opening file")
-  (org-startup-with-inline-images t "See images on opening file")
-  (org-hide-emphasis-markers t "prettify org mode")
-  (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
-  (org-pretty-entities t "prettify org mode")
-  (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
-  (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
-
-  (org-html-with-latex 'html "let my html handler handle latex")
-  (org-html-mathjax-options nil "disable mathjax, use MathML")
-  (org-html-mathjax-template "" "disable mathjax, use MathML")
-  (org-html-head-include-default-style nil "use my own css for everything")
-  (org-html-head-include-scripts nil "use my own js for everything")
-  (org-html-divs '((preamble "header" "preamble")
-                   (content "main" "content")
-                   (postamble "footer" "postamble")) "semantic html exports")
-  (org-html-viewport '((width "device-width") 
-                       (initial-scale "1.0") 
-                       (minimum-scale "1.0")) "Prevent zooming out past default size")
-  (org-html-head-extra (concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                               "<style>"
-                               my-pre-generated-syntax-css
-                               (with-temp-buffer (insert-file-contents-literally "~/monorepo/style.css") (buffer-substring-no-properties (point-min) (point-max)))
-                               "</style>") "add all these different headers for performance and compliance")
-  (org-publish-project-alist
-   '(("website-org"
-      :base-directory "~/monorepo"
-      :base-extension "org"
-      :exclude "nix/README\\.org"
-      :publishing-directory "~/website_html"
-      :with-author t
-      :with-date t
-      :recursive t
-      :publishing-function org-html-publish-to-html
-      :headline-levels 4
-      :html-preamble t
-      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
-     ("website-static"
-      :base-directory "~/monorepo"
-      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
-      :publishing-directory "~/website_html/"
-      :recursive t
-      :publishing-function org-publish-attachment)
-     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website")
-  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
-  :config
-  (require 'ox-publish)
-  (require 'org-tempo)
-  (require 'org-habit)
-  (require 'ob-latex)
-  (require 'htmlize)
-
-  (defun my-org-html-latex-environment-pandoc-fix (orig-fun latex-environment contents info)
-    "Force `ox-html' to use the convert command for LaTeX environments when set to 'html."
-    (let ((processing-type (plist-get info :with-latex)))
-      (if (eq processing-type 'html)
-          (let* ((latex-frag (org-remove-indentation
-                              (org-element-property :value latex-environment)))
-                 (converted (org-format-latex-as-html latex-frag)))
-            (format "<div class=\"equation-container\">\n<span class=\"equation\">\n%s\n</span>\n</div>"
-                    converted))
-        (funcall orig-fun latex-environment contents info))))
-
-  (advice-add 'org-html-latex-environment :around #'my-org-html-latex-environment-pandoc-fix)
-
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((shell . t)
-                                 (python . t)
-                                 (nix . t)
-                                 (latex . t))))
-
-(use-package unicode-fonts
-  :init (unicode-fonts-setup))
-
-(use-package electric-pair
-  :hook ((prog-mode . electric-pair-mode)
-         (org-mode . (lambda () (setq-local electric-pair-inhibit-predicate (lambda (c) (if (eq c ?<) t (electric-pair-default-inhibit c))))))))
-
-(use-package wgrep
-  :after grep)
-
+;; imperative
 (defun insert-urandom-password (&optional length)
   (interactive "P")
   (let ((length (or length 32))
@@ -278,70 +45,383 @@
                       (string (elt chars (mod (string-to-char (char-to-string c)) (length chars)))))
                     bytes ""))))))
 
-(use-package org-fragtog :hook (org-mode . org-fragtog-mode))
+;; imperative
+(defun create-htmlize-css ()
+  (org-html-htmlize-generate-css)
+  (with-current-buffer "*html*"
+    (buffer-string)))
 
-(use-package yasnippet
-  :config
-  (add-to-list 'yas-snippet-dirs "~/monorepo/yasnippet/")
-  (yas-global-mode 1)
-  :hook (org-mode . (lambda () (yas-minor-mode) (yas-activate-extra-mode 'latex-mode))))
+;; imperative
+(defun minify-css (css)
+  "A functional wrapper around the external 'minify' binary."
+  (with-temp-buffer
+    (insert css)
+    (call-process-region (point-min) (point-max) "minify" t t nil "--type=css")
+    (buffer-string)))
 
-(use-package company
-  :config
-  '(add-to-list 'company-backends '(company-ispell company-capf company-yasnippet company-files))
-  :hook ((after-init . global-company-mode)))
+;; imperative
+(defun emacs-config ()
+  (unless noninteractive (server-start))
 
-(use-package ispell
-  :custom
-  (ispell-program-name "aspell" "use aspell")
-  (ispell-silently-savep t "Save changes to dict without confirmation")
-  (ispell-dictionary "en" "Use english dictionary")
-  (ispell-alternate-dictionary "~/.local/share/dict" "dict location"))
+  ;; start with sane defaults
+  (pixel-scroll-precision-mode 1)
+  (display-battery-mode 1)
+  (display-time-mode 1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
 
-(use-package flyspell
-  :hook (text-mode . flyspell-mode))
+  ;; load theme, fonts, and transparency. Prettify symbols.
+  (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
+  (set-face-attribute 'variable-pitch nil :font "Lora" :height 1.1)
 
-(use-package evil
-  :custom
-  (evil-want-keybinding nil "Don't load a whole bunch of default keybindings")
-  :config
+  (when (display-graphic-p)
+    (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC"))
+    (set-fontset-font t 'kana (font-spec :family "Noto Sans CJK JP"))
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
+    (set-fontset-font t 'symbol (font-spec :family "Symbols Nerd Font Mono") nil 'append))
+  (set-frame-parameter nil 'alpha-background 70))
+
+;; imperative
+(defun evil-config ()
   (evil-mode 1)
   (evil-set-undo-system 'undo-redo)
-  (evil-set-initial-state 'pdf-view-mode 'normal)
-  ;; bind / and ? safely after evil is loaded
-  (define-key evil-normal-state-map (kbd "/") 'swiper)
-  (define-key evil-normal-state-map (kbd "?")
-    (lambda () (interactive) (swiper "--reverse"))))
+  (evil-set-initial-state 'pdf-view-mode 'normal))
+
+;; imperative
+(defun doom-themes-config ()
+  (load-theme 'doom-rouge t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
+
+;; imperative
+(defun org-roam-config ()
+  (org-roam-db-autosync-mode)
+  (org-roam-update-org-id-locations))
+
+;; same as above
+(defun org-electric-pair ()
+  (setq-local electric-pair-inhibit-predicate
+              (lambda (c) (if (eq c ?<) t (electric-pair-default-inhibit c)))))
+
+;; same as above
+(defun org-yasnippet-latex () (yas-activate-extra-mode 'latex-mode))
+
+;; same as above
+(defun remove-annoying-pairing () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))
+;; State:1 ends here
+
+;; [[file:../config/emacs.org::*Random Packages][Random Packages:1]]
+(use-package tex-site)
+(use-package subr-x)
+(use-package dash)
+(use-package s)
+(use-package f)
+;; Random Packages:1 ends here
+
+;; [[file:../config/emacs.org::*Emacs][Emacs:1]]
+(use-package emacs
+  :custom
+  ;; global defaults
+  (indent-tabs-mode nil "no real tabs, only spaces")
+  (tab-width 2 "tab show as 2 spaces")
+  (standard-indent 2 "base indentation")
+  (custom-safe-themes t "I already manage my themes with nix")
+  (custom-file null-device "Don't save custom configs")
+
+  ;; Startup errors
+  (warning-minimum-level :emergency "Supress emacs warnings")
+  (confirm-kill-processes nil "Don't ask to quit")
+  (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
+  (browse-url-generic-program "librewolf" "set browser to librewolf")
+  (browse-url-secondary-browser-function 'browse-url-generic "set browser")
+  (browse-url-browser-function 'browse-url-generic "set browser")
+  (default-frame-alist '((alpha-background . 70)
+                         (vertical-scroll-bars)
+                         (internal-border-width . 24)
+                         (left-fringe . 8)
+                         (right-fringe . 8)))
+
+  ;; Mouse wheel
+  (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
+  (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
+  (mouse-wheel-follow-mouse 't "Scroll correct window")
+  (scroll-conservatively 101 "Sort of smooth scrolling")
+  (scroll-step 1 "Scroll one line at a time")
+  (debug-on-error nil "Don't make the annoying popups")
+  (display-time-24hr-format t "Use 24 hour format to read the time")
+  (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
+  (use-short-answers t "Use y instead of yes")
+  (make-backup-files nil "Don't make backups")
+  (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
+  (fill-column 150)
+  (line-spacing 2 "Default line spacing")
+  (c-doc-comment-style '((c-mode . doxygen)
+                         (c++-mode . doxygen)))
+
+
+  :hook ((text-mode . visual-line-mode)
+         (prog-mode . display-line-numbers-mode)
+         (prog-mode . display-fill-column-indicator-mode)
+         (org-mode . auto-fill-mode)
+         (org-mode . display-fill-column-indicator-mode)
+         (org-mode . display-line-numbers-mode))
+  :config (emacs-config))
+;; Emacs:1 ends here
+
+;; [[file:../config/emacs.org::*Org Mode][Org Mode:1]]
+(use-package org
+  :after (f s dash nix-mode)
+  :hook
+  ((org-mode-hook . remove-annoying-pairing))
+  :custom
+  ;; Fix terrible indentation issues
+  (org-edit-src-content-indentation 0)
+  (org-src-tab-acts-natively t)
+  (org-src-preserve-indentation t)
+
+  (TeX-PDF-mode t)
+  (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
+  (org-export-with-broken-links t "publish website even with broken links")
+  (org-src-fontify-natively t "Colors!")
+
+  ;; org-latex
+  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+  (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+
+  (TeX-engine 'xetex "set xelatex as default engine")
+  (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
+  (preview-image-type 'png "Use PNGs")
+  (org-format-latex-options
+   '(:foreground default
+                 :background default
+                 :scale 2
+                 :html-foreground "Black"
+                 :html-background "Transparent"
+                 :html-scale 1.5
+                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
+  (org-return-follows-link t "be able to follow links without mouse")
+  (org-startup-indented t "Indent the headings")
+  (org-image-actual-width '(300) "Cap width") 
+  (org-startup-with-latex-preview t "see latex previews on opening file")
+  (org-startup-with-inline-images t "See images on opening file")
+  (org-hide-emphasis-markers t "prettify org mode")
+  (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
+  (org-pretty-entities t "prettify org mode")
+  (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
+  (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
+
+  ;; ricing
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  (org-agenda-tags-column 0)
+  (org-ellipsis "…")
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell . t)
+                                 (python . t)
+                                 (nix . t)
+                                 (latex . t))))
+
+(use-package org-tempo
+  :after org)
+
+(use-package org-habit
+  :after org
+  :custom
+  (org-habit-preceding-days 7 "See org habit entries")
+  (org-habit-following-days 35 "See org habit entries")
+  (org-habit-show-habits t "See org habit entries")
+  (org-habit-show-habits-only-for-today nil "See org habit entries")
+  (org-habit-show-all-today t "Show org habit graph"))
+
+(use-package htmlize
+  :after (doom-themes catppuccin-theme))
+
+(use-package ox-latex
+  :after (org)
+  :custom
+  (org-latex-compiler "xelatex" "Use latex as default")
+  (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
+
+(use-package ox-html
+  :after (org htmlize)
+  :custom
+  (org-html-htmlize-output-type 'css "allow styling from CSS file")
+  (org-html-with-latex 'html "let my html handler handle latex")
+  (org-html-mathjax-options nil "disable mathjax, use MathML")
+  (org-html-mathjax-template "" "disable mathjax, use MathML")
+  (org-html-head-include-default-style nil "use my own css for everything")
+  (org-html-head-include-scripts nil "use my own js for everything")
+  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
+  (org-html-divs '((preamble "header" "preamble")
+                   (content "main" "content")
+                   (postamble "footer" "postamble")) "semantic html exports")
+  (org-html-viewport '((width "device-width")
+                       (initial-scale "1.0")
+                       (minimum-scale "1.0")) "Prevent zooming out past default size")
+  :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
+
+(use-package ox-publish
+  :after (org f s dash ox-html)
+  :custom
+  (org-publish-project-alist
+   `(("website-org"
+      :base-directory "~/monorepo"
+      :base-extension "org"
+      :exclude "nix/README\\.org"
+      :publishing-directory "~/website_html"
+      :with-author t
+      :with-date t
+      :recursive t
+      :publishing-function org-html-publish-to-html
+      :headline-levels 4
+      :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
+                          "<style>"
+                          (->> (create-htmlize-css)
+                               (s-replace-regexp "<style[^>]*>" "")
+                               (s-replace "</style>" "")
+                               (s-trim)
+                               (minify-css))
+                          (f-read-text "~/monorepo/style.css" 'utf-8)
+                          "</style>")
+      :html-preamble t
+      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
+     ("website-static"
+      :base-directory "~/monorepo"
+      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
+      :publishing-directory "~/website_html/"
+      :recursive t
+      :publishing-function org-publish-attachment)
+     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website"))
+;; Org Mode:1 ends here
+
+;; [[file:../config/emacs.org::*All The Icons][All The Icons:1]]
+(use-package all-the-icons
+  :if (display-graphic-p))
+;; All The Icons:1 ends here
+
+;; [[file:../config/emacs.org::*Variable Pitch Font][Variable Pitch Font:1]]
+(use-package mixed-pitch
+  :hook ((text-mode . mixed-pitch-mode)
+         (org-mode . mixed-pitch-mode))
+  :custom (mixed-pitch-set-height t)
+  :config
+  (dolist (face '(org-latex-and-related
+                  org-priority
+                  org-block
+                  org-table
+                  org-formula))
+    (add-to-list 'mixed-pitch-fixed-pitch-faces face)))
+;; Variable Pitch Font:1 ends here
+
+;; [[file:../config/emacs.org::*Writeroom][Writeroom:1]]
+(use-package writeroom-mode
+  :custom (writeroom-width 150))
+;; Writeroom:1 ends here
+
+;; [[file:../config/emacs.org::*Indent Bars][Indent Bars:1]]
+(use-package indent-bars
+  :after (nix-mode)
+  :hook ((python-mode yaml-mode nix-mode) . indent-bars-mode))
+;; Indent Bars:1 ends here
+
+;; [[file:../config/emacs.org::*Autopair][Autopair:1]]
+(use-package electric-pair
+  :hook ((prog-mode . electric-pair-mode)
+         (org-mode . org-electric-pair)))
+;; Autopair:1 ends here
+
+;; [[file:../config/emacs.org::*Search and Replace][Search and Replace:1]]
+(use-package wgrep
+  :after grep)
+;; Search and Replace:1 ends here
+
+;; [[file:../config/emacs.org::*Fragtog][Fragtog:1]]
+(use-package org-fragtog :hook (org-mode . org-fragtog-mode))
+;; Fragtog:1 ends here
+
+;; [[file:../config/emacs.org::*Snippets][Snippets:1]]
+(use-package yasnippet
+  :demand t
+  :hook (org-mode . org-yasnippet-latex)
+  :custom (yas-snippet-dirs '("~/monorepo/yasnippet/" "~/.emacs.d/snippets"))
+  :config (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :after yasnippet)
+;; Snippets:1 ends here
+
+;; [[file:../config/emacs.org::*Completion][Completion:1]]
+(use-package company
+  :custom (company-backends '(company-ispell company-capf company-yasnippet company-files) "Set company backends")
+  :hook ((after-init . global-company-mode)))
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+;; Completion:1 ends here
+
+;; [[file:../config/emacs.org::*Spelling][Spelling:1]]
+(unless noninteractive (use-package ispell
+                         :custom
+                         (ispell-program-name "aspell" "use aspell")
+                         (ispell-local-dictionary-alist
+                          '(("en" "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "en") nil utf-8)))
+                         (ispell-dictionary "en" "Use english dictionary")
+                         (ispell-extra-args my-ispell-args "Force aspell to use normal mode instead of nroff")
+                         (ispell-silently-savep t "Save changes to dict without confirmation")
+                         (ispell-alternate-dictionary my-ispell-dictionary "dict location")))
+
+(unless noninteractive (use-package flyspell
+                         :hook (text-mode . flyspell-mode)))
+;; Spelling:1 ends here
+
+;; [[file:../config/emacs.org::*Packages][Packages:1]]
+(use-package evil
+  :demand t
+  :custom (evil-want-keybinding nil "Don't load a whole bunch of default keybindings")
+  :bind
+  (:map evil-normal-state-map
+        ("/" . swiper)
+        ("?" . (lambda () (interactive) (swiper "--reverse"))))
+  :config (evil-config))
 
 (use-package evil-collection
+  :demand t
   :after (evil)
-  :config
-  (with-eval-after-load 'evil-maps
-    (define-key evil-motion-state-map (kbd "SPC") nil)
-    (define-key evil-motion-state-map (kbd "RET") nil)
-    (define-key evil-motion-state-map (kbd "TAB") nil))
-  (evil-collection-init))
+  :bind (:map evil-motion-state-map
+              ("SPC" . nil)
+              ("RET" . nil)
+              ("TAB" . nil))
+  :config (evil-collection-init))
 
 (use-package evil-commentary
   :after (evil)
-  :config
-  (evil-commentary-mode))
+  :config (evil-commentary-mode))
 
 (use-package evil-org
   :after (evil org)
-  :hook (org-mode . (lambda () evil-org-mode))
-  :config
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
+  :hook (org-mode . evil-org-mode))
+
+(use-package evil-org-agenda
+  :after (evil-org)
+  :config (evil-org-agenda-set-keys))
 
 (use-package which-key
-  :config
-  (which-key-mode))
+  :config (which-key-mode))
 
 (use-package page-break-lines
-  :init
-  (page-break-lines-mode))
+  :config (page-break-lines-mode))
+;; Packages:1 ends here
 
+;; [[file:../config/emacs.org::*Journal][Journal:1]]
 (use-package org-journal
   :after (org)
   :custom
@@ -349,83 +429,98 @@
   (org-journal-date-format "%A, %d %B %Y" "Date format")
   (org-journal-file-format "%Y%m%d.org" "Automatic file creation format based on date")
   (org-journal-enable-agenda-integration t "All org-journal entries are org-agenda entries")
-  :init
-  (defun org-journal-file-header-func (time)
-    "Custom function to create journal header."
-    (concat
-     (pcase org-journal-file-type
-       (`daily "#+TITLE: Daily Journal\n#+STARTUP: showeverything\n#+DESCRIPTION: My daily journal entry\n#+AUTHOR: Preston Pan\n#+options: broken-links:t")
-       (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-       (`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
-       (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
-  (setq org-journal-file-header 'org-journal-file-header-func))
+  (org-journal-file-header "#+TITLE: Daily Journal\n#+STARTUP: showeverything\n#+DESCRIPTION: My daily journal entry\n#+AUTHOR: Preston Pan\n#+date:\n#+options: broken-links:t" "set header files on new org journal entry"))
+;; Journal:1 ends here
 
+;; [[file:../config/emacs.org::*Doom Modeline][Doom Modeline:1]]
 (use-package doom-modeline
-  :config
-  (doom-modeline-mode 1))
+  :config (doom-modeline-mode 1))
+;; Doom Modeline:1 ends here
 
-(unless noninteractive
+;; [[file:../config/emacs.org::*Doom Theme][Doom Theme:1]]
 (use-package doom-themes
   :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
-  (doom-themes-treemacs-theme "doom-rouge")
+  (doom-themes-enable-bold t "use bold letters")
+  (doom-themes-enable-italic t "use italic letters")
+  (doom-themes-treemacs-theme "doom-colors" "set theme to something like catppuccin but doom")
   :config
-  (load-theme 'doom-rouge t)
-  (doom-themes-visual-bell-config)
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config)))
-;; (load-theme 'catppuccin :no-confirm)
+  (unless noninteractive (doom-themes-config)))
 
+(use-package catppuccin-theme
+  :config (when noninteractive (try (load-theme 'catppuccin-theme t))))
+
+(use-package solaire-mode
+  :after doom-themes
+  :config (solaire-global-mode +1))
+;; Doom Theme:1 ends here
+
+;; [[file:../config/emacs.org::*Grammar][Grammar:1]]
 (use-package writegood-mode
   :hook (text-mode . writegood-mode))
+;; Grammar:1 ends here
 
-(use-package org-superstar
+;; [[file:../config/emacs.org::*Make Org Look Better][Make Org Look Better:1]]
+(use-package org-modern
   :after (org)
-  :hook (org-mode . (lambda () (org-superstar-mode 1))))
+  :hook (org-mode . org-modern-mode)
+  :custom
+  (org-modern-block-fringe t)
+  (org-modern-block-name t)
+  (org-modern-star '("◉" "○" "◈" "◇"))
+  (org-modern-block-name '((t . t)))
+  (org-modern-keyword '((t . t)))
+  :config
+  (global-org-modern-mode))
+;; Make Org Look Better:1 ends here
 
+;; [[file:../config/emacs.org::*LSP][LSP:1]]
 (use-package lsp
-   :hook
-   (prog-mode . lsp))
-
-(with-eval-after-load 'lsp-mode
-  (setq lsp-typescript-format-enable t
-        lsp-typescript-indent-size 4
-        lsp-typescript-tab-size 4
-        lsp-typescript-indent-style "spaces"))
+  :custom
+  (lsp-use-plists t)
+  (lsp-typescript-format-enable t)
+  (lsp-typescript-indent-size 4)
+  (lsp-typescript-tab-size 4)
+  (lsp-typescript-indent-style "spaces")
+  :hook ((prog-mode . lsp)))
 
 (use-package editorconfig
-  :config
-  (editorconfig-mode 1))
+  :config (editorconfig-mode 1))
 
- (use-package flycheck
-   :config (global-flycheck-mode))
+(use-package flycheck
+  :config (global-flycheck-mode))
 
- (use-package platformio-mode
-:hook (prog-mode . platformio-conditionally-enable))
+(use-package platformio-mode
+  :hook (prog-mode . platformio-conditionally-enable))
+;; LSP:1 ends here
 
+;; [[file:../config/emacs.org::*C/C++][C/C++:1]]
 (use-package irony
-  :hook (
-  (c++-mode . irony-mode)
-  (c-mode . irony-mode)
-  (objc-mode . irony-mode)
-  (irony-mode . irony-cdb-autosetup-compile-options)))
+  :hook ((c++-mode . irony-mode)
+         (c-mode . irony-mode)
+         (objc-mode . irony-mode)
+         (irony-mode . irony-cdb-autosetup-compile-options)))
 
 (use-package irony-eldoc
   :hook ((irony-mode . irony-eldoc)))
+;; C/C++:1 ends here
 
+;; [[file:../config/emacs.org::*Solidity][Solidity:1]]
 (use-package solidity-mode)
-(use-package company-solidity)
+(use-package company-solidity
+  :after company)
 (use-package solidity-flycheck
-  :custom
-  (solidity-flycheck-solc-checker-active t))
+  :after flycheck
+  :custom (solidity-flycheck-solc-checker-active t))
+;; Solidity:1 ends here
 
+;; [[file:../config/emacs.org::*Projectile][Projectile:1]]
 (use-package projectile
   :custom
   (projectile-project-search-path '("~/org" "~/src" "~/monorepo" "~/projects") "search path for projects")
-  :config
-  (projectile-mode +1))
+  :config (projectile-mode +1))
+;; Projectile:1 ends here
 
+;; [[file:../config/emacs.org::*Dashboard][Dashboard:1]]
 (use-package dashboard
   :after (projectile)
   :custom
@@ -435,22 +530,29 @@
   (dashboard-set-init-info t)
   (dashboard-week-agenda t "Agenda in dashboard")
   (dashboard-items '((recents   . 5)
-			(bookmarks . 5)
-			(projects  . 5)
-			(agenda    . 5)
-			(registers . 5)) "Look at some items")
+                     (bookmarks . 5)
+                     (projects  . 5)
+                     (agenda    . 5)
+                     (registers . 5)) "Look at some items")
   :config
   (dashboard-setup-startup-hook))
+;; Dashboard:1 ends here
 
-(use-package counsel)
-
+;; [[file:../config/emacs.org::*Ivy][Ivy:1]]
 (use-package ivy
+  :demand t
   :custom
   (ivy-use-virtual-buffers t "Make searching more efficient")
   (enable-recursive-minibuffers t "Don't get soft locked when in a minibuffer")
   :bind
-  ("C-s" . swiper)
+  ("C-j" . ivy-immediate-done)
   ("C-c C-r" . ivy-resume)
+  :init (ivy-mode)
+  :config (ivy-rich-mode))
+
+(use-package counsel
+  :after ivy
+  :bind
   ("M-x" . counsel-M-x)
   ("C-x C-f" . counsel-find-file)
   ("<f1> f" . counsel-describe-function)
@@ -462,56 +564,53 @@
   ("C-c g" . counsel-git)
   ("C-c j" . counsel-git-grep)
   ("C-c k" . counsel-ag)
-  ("C-x l" . counsel-locate)
-  :config
-  (ivy-mode))
-(define-key ivy-minibuffer-map (kbd "C-j") 'ivy-immediate-done)
+  ("C-x l" . counsel-locate))
 
+(use-package swiper
+  :after ivy
+  :bind ("C-s" . swiper))
+
+(use-package ivy-posframe
+  :custom
+  (ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+  :config (ivy-posframe-mode 1))
+
+(use-package all-the-icons-ivy-rich
+  :after (ivy all-the-icons)
+  :config (all-the-icons-ivy-rich-mode 1))
+;; Ivy:1 ends here
+
+;; [[file:../config/emacs.org::*Magit][Magit:1]]
 (use-package magit)
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode +1))
+;; Magit:1 ends here
 
+;; [[file:../config/emacs.org::*IRC][IRC:1]]
 (use-package erc
-  :hook
-  ((erc-mode . erc-notifications-mode))
+  :hook ((erc-mode . erc-notifications-mode))
   :custom
   (erc-nick system-username "sets erc username to the one set in nix config")
   (erc-user-full-name system-fullname "sets erc fullname to the one set in nix config"))
+;; IRC:1 ends here
 
+;; [[file:../config/emacs.org::*Keybindings][Keybindings:1]]
 (use-package general
-  :init
-  (defun znc ()
-    (interactive)
-    (erc-tls :server "ret2pop.net"
-             :port "5000"))
-
-  (defun prestonpan ()
-    (interactive)
-    (erc-tls :server "nullring.xyz"
-	     :port   "6697"))
-
-  (defun liberachat ()
-    (interactive)
-    (erc-tls :server "irc.libera.chat"
-	     :port   "6697"))
-
-  (defun efnet ()
-    (interactive)
-    (erc-tls :server "irc.prison.net"
-	     :port   "6697"))
-
-  (defun matrix-org ()
-    (interactive)
-    (ement-connect))
-
-  (defun gimp-org ()
-    (interactive)
-    (erc-tls :server "irc.gimp.org"
-	     :port "6697"))
-
+  :after (evil evil-collection)
+  :init (general-create-definer leader-key :prefix "SPC")
   :config
-  (general-create-definer leader-key :prefix "SPC")
+  ;; these are just bindings but the symbols are all lazily handled by general
+  (create-irc-servers
+   (znc "ret2pop.net" "5000")
+   (prestonpan "nullring.xyz" "6697")
+   (libera-chat "irc.libera.chat" "6697")
+   (efnet "irc.prison.net" "6697")
+   (matrix-org "matrix.org" "8448")
+   (gimp-org "irc.gimp.org" "6697"))
+
   (leader-key 'normal
     "o c" '(org-capture :wk "Capture")
-
     ;; Org Mode
     "n" '(:ignore t :wk "Org mode plugins")
     "n j j" '(org-journal-new-entry :wk "Make new journal entry")
@@ -582,93 +681,109 @@
 
     "s i p" '(insert-urandom-password :wk "insert random password to buffer (for sops)")
 
-    "h r r" '(lambda () (interactive) (org-babel-load-file (expand-file-name "~/monorepo/config/emacs.org")))))
+    "h r r" '(lambda () (interactive) (load-file (expand-file-name "~/monorepo/nix/init.el")))))
+;; Keybindings:1 ends here
 
+;; [[file:../config/emacs.org::*Minuet][Minuet:1]]
 (use-package minuet
-    :bind
-    (("M-y" . #'minuet-complete-with-minibuffer)
-     ("C-c m" . #'minuet-show-suggestion)
-     :map minuet-active-mode-map
-     ("C-c r" . #'minuet-dismiss-suggestion)
-     ("TAB" . #'minuet-accept-suggestion))
-
-    :init
-    (add-hook 'prog-mode-hook #'minuet-auto-suggestion-mode)
-
-    :custom
-    (minuet-request-timeout 40 "Max timeout in seconds")
-    (minuet-provider 'openai-fim-compatible "FIM compatible OpenAI-like API (Ollama)")
-    (minuet-n-completions 1 "I am using ghost text so I only need one possible completion")
-    (minuet-context-window 1024 "how much context do I want?")
-
-    :config
-    (plist-put minuet-openai-fim-compatible-options :end-point "http://localhost:11434/v1/completions")
-
-    (plist-put minuet-openai-fim-compatible-options :name "Ollama")
-    (plist-put minuet-openai-fim-compatible-options :api-key "TERM")
-    (plist-put minuet-openai-fim-compatible-options :model "qwen2.5-coder:14b")
-
-    (minuet-set-optional-options minuet-openai-fim-compatible-options :max_tokens 50))
-
-(use-package elfeed
+  :bind
+  (("M-y" . #'minuet-complete-with-minibuffer)
+   ("C-c m" . #'minuet-show-suggestion)
+   :map minuet-active-mode-map
+   ("C-c r" . #'minuet-dismiss-suggestion)
+   ("TAB" . #'minuet-accept-suggestion))
+  :hook ((prog-mode-hook . minuet-auto-suggestion-mode))
   :custom
-  (elfeed-search-filter "@1-month-ago +unread" "Only display unread articles from a month ago")
+  (minuet-request-timeout 40 "Max timeout in seconds")
+  (minuet-provider 'openai-fim-compatible "FIM compatible OpenAI-like API (Ollama)")
+  (minuet-n-completions 1 "I am using ghost text so I only need one possible completion")
+  (minuet-context-window 1024 "how much context do I want?")
+  (minuet-openai-fim-compatible-options
+   '(
+     :end-point "http://localhost:11434/v1/completions"
+     :name "Ollama"
+     :api-key "TERM"
+     :template (
+                :prompt minuet--default-fim-prompt-function
+                :suffix minuet--default-fim-suffix-function)
+     :transform ()
+     :get-text-fn minuet--openai-fim-get-text-fn
+     :optional (:max-tokens 50)
+     :model "qwen2.5-coder:14b")))
+;; Minuet:1 ends here
 
-  :config
-  (run-with-timer 0 (* 60 60 4) 'elfeed-update)
-
-  :hook ((elfeed-search-mode . elfeed-update)))
+;; [[file:../config/emacs.org::*RSS Feed][RSS Feed:1]]
+(use-package elfeed
+  :hook ((elfeed-search-mode . elfeed-update))
+  :custom (elfeed-search-filter "@1-month-ago +unread" "Only display unread articles from a month ago")
+  :config (run-with-timer 0 (* 60 3) 'elfeed-update))
 
 (use-package elfeed-org
-  :custom
-  (rmh-elfeed-org-files '("~/monorepo/config/elfeed.org") "Use elfeed config in repo as default")
-  :config
-  (elfeed-org))
+  :after (elfeed org)
+  :demand t
+  :custom (rmh-elfeed-org-files '("~/monorepo/config/elfeed.org") "Use elfeed config in repo as default")
+  :config (elfeed-org))
+;; RSS Feed:1 ends here
 
+;; [[file:../config/emacs.org::*Youtube][Youtube:1]]
 (use-package elfeed-tube
   :after elfeed
   :demand t
-  :config
-  (elfeed-tube-setup)
   :bind (:map elfeed-show-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)
-         :map elfeed-search-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)))
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save)
+              :map elfeed-search-mode-map
+              ("F" . elfeed-tube-fetch)
+              ([remap save-buffer] . elfeed-tube-save))
+  :config (elfeed-tube-setup))
 
 (use-package elfeed-tube-mpv
   :bind (:map elfeed-show-mode-map
               ("C-c C-f" . elfeed-tube-mpv-follow-mode)
               ("C-c C-c" . elfeed-tube-mpv)
               ("C-c C-w" . elfeed-tube-mpv-where)
-         :map elfeed-search-mode-map
-	        ("M" . elfeed-tube-mpv)))
+              :map elfeed-search-mode-map
+              ("M" . elfeed-tube-mpv)))
+;; Youtube:1 ends here
 
-(use-package treemacs)
+;; [[file:../config/emacs.org::*Project Drawer][Project Drawer:1]]
+(use-package treemacs
+  :after doom-themes)
+
 (use-package treemacs-evil
   :after (treemacs evil))
+
 (use-package treemacs-projectile
   :after (treemacs projectile))
+
 (use-package treemacs-magit
   :after (treemacs magit))
 
+(use-package treemacs-all-the-icons
+  :after (treemacs all-the-icons))
+;; Project Drawer:1 ends here
+
+;; [[file:../config/emacs.org::*Eww][Eww:1]]
 (use-package eww
+  :bind (:map eww-mode-map
+              ("y Y" . eww-copy-page-url))
   :custom
   (search-engines
-	'((("google" "g") "https://google.com/search?q=%s")
-          (("duckduckgo" "d" "ddg") "https://duckduckgo.com/?q=%s")
-          (("rfc" "r") "https://www.rfc-editor.org/rfc/rfc%s.txt")
-          (("rfc-kw" "rk") "https://www.rfc-editor.org/search/rfc_search_detail.php?title=%s"))
-	"use this set of search engines")
-
+   '((("google" "g") "https://google.com/search?q=%s")
+     (("duckduckgo" "d" "ddg") "https://duckduckgo.com/?q=%s")
+     (("rfc" "r") "https://www.rfc-editor.org/rfc/rfc%s.txt")
+     (("rfc-kw" "rk") "https://www.rfc-editor.org/search/rfc_search_detail.php?title=%s"))
+   "use this set of search engines")
   (search-engine-default "google" "Use google as default")
-  (eww-search-prefix "https://google.com/search?q=" "Google prefix")
-  :hook ((eww-mode . (lambda () (local-set-key (kbd "y Y") #'eww-copy-page-url)))))
+  (eww-search-prefix "https://google.com/search?q=" "Google prefix"))
+;; Eww:1 ends here
 
+;; [[file:../config/emacs.org::*Nix Mode][Nix Mode:1]]
 (use-package nix-mode
   :mode "\\.nix\\'")
+;; Nix Mode:1 ends here
 
+;; [[file:../config/emacs.org::*Org Roam][Org Roam:1]]
 (use-package org-roam
   :after (org)
   :custom
@@ -676,27 +791,28 @@
   (org-roam-graph-viewer "librewolf" "Use librewolf to view org-roam graph")
   (org-roam-directory (file-truename "~/monorepo/mindmap") "Set org-roam directory inside monorepo")
   (org-roam-capture-templates '(("d" "default" plain "%?"
-				 :target (file+head "${title}.org"
-						    "#+title: ${title}\n#+author: Preston Pan\n#+description:\n#+options: broken-links:t")
-				 :unnarrowed t)) "org-roam files start with this snippet by default")
-  :config
-  (org-roam-db-autosync-mode)
-  ;; Otherwise links are broken when publishing
-  (org-roam-update-org-id-locations))
+                                 :target (file+head "${title}.org"
+                                                    "#+title: ${title}\n#+author: Preston Pan\n#+description:\n#+options: broken-links:t")
+                                 :unnarrowed t)) "org-roam files start with this snippet by default")
+  :config (org-roam-config))
 
 (unless noninteractive (use-package org-roam-ui
-  :after org-roam
-  :hook (after-init . org-roam-ui-mode)
-  :custom
-  (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
-  (org-roam-ui-follow t "Have cool visual while editing org-roam")
-  (org-roam-ui-update-on-save t "This option is obvious")
-  (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")))
+                         :after org-roam
+                         :hook (after-init . org-roam-ui-mode)
+                         :custom
+                         (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
+                         (org-roam-ui-follow t "Have cool visual while editing org-roam")
+                         (org-roam-ui-update-on-save t "This option is obvious")
+                         (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")))
+;; Org Roam:1 ends here
 
+;; [[file:../config/emacs.org::*Pinentry][Pinentry:1]]
 (unless noninteractive (use-package pinentry
-  :custom (epa-pinentry-mode `loopback "Set this option to match gpg-agent.conf")
-  :config (pinentry-start)))
+                         :custom (epa-pinentry-mode `loopback "Set this option to match gpg-agent.conf")
+                         :config (pinentry-start)))
+;; Pinentry:1 ends here
 
+;; [[file:../config/emacs.org::*Email][Email:1]]
 (use-package smtpmail
   :custom
   (user-mail-address system-email "Use our email")
@@ -733,37 +849,41 @@
   (mail-user-agent 'mu4e-user-agent)
   (message-mail-user-agent 'mu4e-user-agent)
   (mu4e-use-fancy-chars t "Random option to make mu4e look nicer"))
+;; Email:1 ends here
 
+;; [[file:../config/emacs.org::*Music][Music:1]]
 (unless noninteractive (use-package emms
-  :custom
-  (emms-source-file-default-directory (expand-file-name "~/music/") "Use directory specified in Nix")
-  (emms-player-mpd-music-directory (expand-file-name "~/music/") "Use directory specified in Nix")
-  (emms-player-mpd-server-name "localhost" "Connect to localhost")
-  (emms-player-mpd-server-port "6600" "Connect to port 6600")
-  (emms-player-list '(emms-player-mpd) "Use mpd")
-  (emms-lyrics-display-on-modeline t)
-  :hook
-  ((emms-playlist-mode . emms-lyrics-mode)
-   (emms-player-started . emms-lyrics-lrclib-get))
-  :init
-  (emms-all)
-  (add-to-list 'emms-info-functions 'emms-info-mpd)
-  (add-to-list 'emms-player-list 'emms-player-mpd)
-  :config (emms-player-mpd-connect)))
+                         :custom
+                         (emms-source-file-default-directory (expand-file-name "~/music/") "Use directory specified in Nix")
+                         (emms-player-mpd-music-directory (expand-file-name "~/music/") "Use directory specified in Nix")
+                         (emms-player-mpd-server-name "localhost" "Connect to localhost")
+                         (emms-player-mpd-server-port "6600" "Connect to port 6600")
+                         (emms-player-list '(emms-player-mpd) "Use mpd")
+                         (emms-lyrics-display-on-modeline t "Display lyrics for reading")
+                         (emms-info-functions '(emms-info-mpd emms-info-native emms-info-cueinfo) "functions for displaying information about tracks")
+                         :hook
+                         ((emms-playlist-mode . emms-lyrics-mode)
+                          (emms-player-started . emms-lyrics-lrclib-get))
+                         :init (emms-all)
+                         :config (emms-player-mpd-connect)))
+;; Music:1 ends here
 
+;; [[file:../config/emacs.org::*Tabs][Tabs:1]]
 (use-package centaur-tabs
   :custom
   (centaur-tabs-set-icons t "use icons for centaur-tabs")
   (centaur-tabs-set-modified-marker t "show when buffer modified")
   (centaur-tabs-icon-type 'all-the-icons "use all-the-icons for icons")
-  :demand
-  :config
-  (centaur-tabs-mode t)
   :bind
   ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward))
+  ("C-<next>" . centaur-tabs-forward)
+  :demand t
+  :config (centaur-tabs-mode t))
+;; Tabs:1 ends here
 
+;; [[file:../config/emacs.org::*Lean4][Lean4:1]]
 (unless noninteractive (use-package lean4-mode
-  :commands lean4-mode
-  :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
-       :rev "76895d8939111654a472cfc617cfd43fbf5f1eb6")))
+                         :commands lean4-mode
+                         :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
+                                   :rev "76895d8939111654a472cfc617cfd43fbf5f1eb6")))
+;; Lean4:1 ends here

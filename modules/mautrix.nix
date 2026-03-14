@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Mautrix][Mautrix:1]]
 { lib, config, ... }:
 {
   services.mautrix-discord = {
@@ -148,3 +149,4 @@
     };
   };
 }
+# Mautrix:1 ends here

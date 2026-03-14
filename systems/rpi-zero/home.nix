@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Home][Home:1]]
 { ... }:
 {
   imports = [
@@ -5,3 +6,4 @@
   ];
   config.monorepo.profiles.enable = false;
 }
+# Home:1 ends here

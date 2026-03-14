@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Kubo IPFS][Kubo IPFS:1]]
 { config, lib, ... }:
 {
   services.kubo = {
@@ -18,3 +19,4 @@
     };
   };
 }
+# Kubo IPFS:1 ends here

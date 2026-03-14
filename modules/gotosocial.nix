@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*GoToSocial][GoToSocial:1]]
 { lib, config, ... }:
 {
   services.gotosocial = {
@@ -12,3 +13,4 @@
     };
   };
 }
+# GoToSocial:1 ends here

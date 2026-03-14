@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Nix Topology][Nix Topology:1]]
 { config, ... }:
 let
   inherit
@@ -53,3 +54,4 @@ in
     };
   };
 }
+# Nix Topology:1 ends here

@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Hyprland][Hyprland:1]]
 { lib, config, wallpapers, pkgs, scripts, ... }:
 {
   wayland.windowManager.hyprland = {
@@ -190,3 +191,4 @@
     };
   };
 }
+# Hyprland:1 ends here

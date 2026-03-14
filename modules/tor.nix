@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Tor][Tor:1]]
 { config, lib, ... }:
 {
   services.tor = {
@@ -18,3 +19,4 @@
     };
   };
 }
+# Tor:1 ends here

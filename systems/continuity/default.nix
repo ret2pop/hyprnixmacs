@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Continuity][Continuity:1]]
 { ... }:
 {
   imports = [
@@ -16,3 +17,4 @@
     };
   };
 }
+# Continuity:1 ends here

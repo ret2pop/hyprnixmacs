@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*SSH][SSH:1]]
 { config, lib, ... }:
 {
   services.openssh = {
@@ -11,3 +12,4 @@
   };
   networking.firewall.allowedTCPPorts = lib.mkIf config.services.openssh.enable [ 22 ];
 }
+# SSH:1 ends here

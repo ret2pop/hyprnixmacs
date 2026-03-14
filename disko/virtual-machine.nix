@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Virtual Machine][Virtual Machine:1]]
 {
   boot = {
     size = "1M";
@@ -13,3 +14,4 @@
     };
   };
 }
+# Virtual Machine:1 ends here

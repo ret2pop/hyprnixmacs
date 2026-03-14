@@ -1,14 +1,15 @@
+# [[file:../../../config/nix.org::*Zsh][Zsh:1]]
 { pkgs, systemHostName, super, ... }:
 {
   programs.zsh = {
     enable = true;
     initContent = ''
-    umask 0022
-    export EXTRA_CCFLAGS="-I/usr/include"
-    source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-    export QT_QPA_PLATFORM="wayland"
-    export OLLAMA_MODEL="qwen3:14b"
-    '';
+      umask 0022
+      export EXTRA_CCFLAGS="-I/usr/include"
+      source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+      export QT_QPA_PLATFORM="wayland"
+      export OLLAMA_MODEL="qwen3:14b"
+      '';
 
     localVariables = {
       EDITOR = "emacsclient --create-frame --alternate-editor=vim";
@@ -39,9 +40,10 @@
       sai = "eval \"$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519 && ssh-add -l";
     };
     loginExtra = ''
-      if [[ "$(tty)" = "/dev/tty1" ]]; then
-          exec Hyprland
-      fi
-    '';
+        if [[ "$(tty)" = "/dev/tty1" ]]; then
+            exec Hyprland
+        fi
+      '';
   };
 }
+# Zsh:1 ends here

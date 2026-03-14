@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Git Server][Git Server:1]]
 { config, lib, ... }:
 {
   services.gitDaemon = {
@@ -9,3 +10,4 @@
     9418
   ];
 }
+# Git Server:1 ends here

@@ -1,3 +1,4 @@
+# [[file:../../../config/nix.org::*Spontaneity][Spontaneity:1]]
 { ... }:
 {
   imports = [
@@ -24,3 +25,4 @@
     boot.loader.grub.device = "nodev";
   };
 }
+# Spontaneity:1 ends here

@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*X11][X11:1]]
 { config, ... }:
 {
   services.xserver = {
@@ -7,9 +8,10 @@
     };
 
     desktopManager = {
-	    runXdgAutostartIfNone = true;
+      runXdgAutostartIfNone = true;
     };
 
     videoDrivers = (if config.monorepo.profiles.cuda.enable then [ "nvidia" ] else []);
   };
 }
+# X11:1 ends here

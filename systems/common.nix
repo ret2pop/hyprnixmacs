@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Common][Common:1]]
 { ... }:
 {
   imports = [
@@ -7,3 +8,4 @@
   ];
   # Put configuration (e.g. monorepo variable configuration) common to all configs here
 }
+# Common:1 ends here

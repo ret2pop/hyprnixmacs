@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Ext4][Ext4:1]]
 {
   ESP = (import ./esp-boot.nix) // {
     size = "500M";
@@ -13,3 +14,4 @@
     };
   };
 }
+# Ext4:1 ends here

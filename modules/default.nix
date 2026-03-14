@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Default Profile][Default Profile:1]]
 { lib, config, pkgs, ... }:
 let
   dirContents = builtins.readDir ./.;
@@ -8,12 +9,12 @@ in
 
   options = {
     monorepo = {
-	    profiles = {
-		    cuda.enable = lib.mkEnableOption "Enables CUDA support";
-		    documentation.enable = lib.mkEnableOption "Enables documentation on system.";
-		    secureBoot.enable = lib.mkEnableOption "Enables secure boot. See sbctl.";
-		    pipewire.enable = lib.mkEnableOption "Enables pipewire low latency audio setup";
-		    tor.enable = lib.mkEnableOption "Enables tor along with torsocks";
+      profiles = {
+        cuda.enable = lib.mkEnableOption "Enables CUDA support";
+        documentation.enable = lib.mkEnableOption "Enables documentation on system.";
+        secureBoot.enable = lib.mkEnableOption "Enables secure boot. See sbctl.";
+        pipewire.enable = lib.mkEnableOption "Enables pipewire low latency audio setup";
+        tor.enable = lib.mkEnableOption "Enables tor along with torsocks";
 
         server = {
           enable = lib.mkEnableOption "Enables server services";
@@ -29,15 +30,15 @@ in
         desktop.enable = lib.mkEnableOption "Enables everything common to desktops";
         impermanence.enable = lib.mkEnableOption "Enables imperamanence";
         home.enable = lib.mkEnableOption "Enables home profiles";
-	    };
+      };
     };
   };
 
   config = {
     environment.systemPackages = lib.mkIf config.monorepo.profiles.documentation.enable ((with pkgs; [
-	    linux-manual
-	    man-pages
-	    man-pages-posix
+      linux-manual
+      man-pages
+      man-pages-posix
       iproute2
       silver-searcher
       ripgrep
@@ -57,27 +58,28 @@ in
       {
         assertion = !(config.monorepo.profiles.workstation.enable && config.monorepo.profiles.server.enable);
         message = ''
-You can't enable both workstation and server profile together. Please select only one.
-'';
+  You can't enable both workstation and server profile together. Please select only one.
+  '';
       }
       {
         assertion = !(config.monorepo.profiles.desktop.enable && config.monorepo.profiles.server.enable);
         message = ''
-You can't enable both desktop and server profile together. Please select only one.
-'';
+  You can't enable both desktop and server profile together. Please select only one.
+  '';
       }
     ];
     monorepo = {
-	    profiles = {
+      profiles = {
         desktop.enable = lib.mkDefault config.monorepo.profiles.workstation.enable;
-		    documentation.enable = lib.mkDefault true;
-		    pipewire.enable = lib.mkDefault true;
-		    tor.enable = lib.mkDefault true;
+        documentation.enable = lib.mkDefault true;
+        pipewire.enable = lib.mkDefault true;
+        tor.enable = lib.mkDefault true;
         impermanence.enable = lib.mkDefault false;
         server.enable = lib.mkDefault false;
         ttyonly.enable = lib.mkDefault config.monorepo.profiles.server.enable;
         home.enable = lib.mkDefault config.monorepo.profiles.desktop.enable;
-	    };
+      };
     };
   };
 }
+# Default Profile:1 ends here

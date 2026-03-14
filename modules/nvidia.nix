@@ -1,3 +1,4 @@
+# [[file:../../config/nix.org::*Nvidia][Nvidia:1]]
 { config, lib, pkgs, ... }:
 {
   hardware = {
@@ -9,14 +10,15 @@
                               ] else []);
 
     nvidia = {
-	    modesetting.enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
-	    powerManagement = {
-		    enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
-		    finegrained = false;
-	    };
-	    open = config.monorepo.profiles.cuda.enable;
-	    package = config.boot.kernelPackages.nvidiaPackages.stable;
+      modesetting.enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
+      powerManagement = {
+        enable = lib.mkDefault config.monorepo.profiles.cuda.enable;
+        finegrained = false;
+      };
+      open = config.monorepo.profiles.cuda.enable;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
       nvidiaSettings = false;
     };
   };
 }
+# Nvidia:1 ends here
