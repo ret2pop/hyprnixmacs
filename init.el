@@ -172,6 +172,7 @@
 
 ;; [[file:../config/emacs.org::*Org Mode][Org Mode:1]]
 (use-package org
+  :demand t
   :after (f s dash nix-mode)
   :hook
   ((org-mode-hook . remove-annoying-pairing))
@@ -243,8 +244,14 @@
   (org-habit-show-habits-only-for-today nil "See org habit entries")
   (org-habit-show-all-today t "Show org habit graph"))
 
-(use-package htmlize
-  :after (catppuccin-theme))
+(when noninteractive
+  (use-package htmlize
+    :demand t
+    :after (catppuccin-theme)))
+
+(unless noninteractive
+  (use-package htmlize
+    :after (doom-themes)))
 
 (use-package ox-latex
   :after (org)
@@ -253,6 +260,7 @@
   (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
 
 (use-package ox-html
+  :demand t
   :after (org htmlize)
   :custom
   (org-html-htmlize-output-type 'css "allow styling from CSS file")
@@ -271,6 +279,7 @@
   :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
 
 (use-package ox-publish
+  :demand t
   :after (org f s dash ox-html)
   :custom
   (org-publish-project-alist
