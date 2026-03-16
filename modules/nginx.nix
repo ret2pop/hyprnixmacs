@@ -37,6 +37,7 @@
         };
         extraConfig = ''
   rewrite ^/graph_view/?(.*)$ https://graph.${config.monorepo.vars.remoteHost}/$1 permanent;
+  error_page 404 /404.html;
   '';
       };
 

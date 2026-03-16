@@ -118,6 +118,8 @@
 (use-package dash)
 (use-package s)
 (use-package f)
+(use-package yaml-mode
+  :demand t)
 ;; Random Packages:1 ends here
 
 ;; [[file:../config/emacs.org::*Emacs][Emacs:1]]
@@ -267,7 +269,7 @@
 
   (use-package htmlize
     :demand t
-    :after (catppuccin-theme doom-themes))
+    :after (catppuccin-theme doom-themes yaml-mode))
 
   (unless noninteractive
     (use-package htmlize
@@ -313,6 +315,7 @@
         :recursive t
         :publishing-function org-html-publish-to-html
         :headline-levels 4
+        :html-footnotes-section "<div id=\"footnotes\"><hr><div id=\"text-footnotes\"><span class=\"footnotes-label-hidden\">%s</span>%s</div></div>"
         :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
                             "<style>"
                             (->> (create-htmlize-css)
@@ -834,7 +837,8 @@
                          (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
                          (org-roam-ui-follow t "Have cool visual while editing org-roam")
                          (org-roam-ui-update-on-save t "This option is obvious")
-                         (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")))
+                         (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")
+                         :config (org-roam-ui-sync-theme)))
 ;; Org Roam:1 ends here
 
 ;; [[file:../config/emacs.org::*Pinentry][Pinentry:1]]
