@@ -121,198 +121,218 @@
 ;; Random Packages:1 ends here
 
 ;; [[file:../config/emacs.org::*Emacs][Emacs:1]]
-(use-package emacs
-  :custom
-  ;; global defaults
-  (indent-tabs-mode nil "no real tabs, only spaces")
-  (tab-width 2 "tab show as 2 spaces")
-  (standard-indent 2 "base indentation")
-  (custom-safe-themes t "I already manage my themes with nix")
-  (custom-file null-device "Don't save custom configs")
+  (use-package emacs
+    :custom
+    ;; global defaults
+    (indent-tabs-mode nil "no real tabs, only spaces")
+    (tab-width 2 "tab show as 2 spaces")
+    (standard-indent 2 "base indentation")
+    (custom-safe-themes t "I already manage my themes with nix")
+    (custom-file null-device "Don't save custom configs")
 
-  ;; Startup errors
-  (warning-minimum-level :emergency "Supress emacs warnings")
-  (confirm-kill-processes nil "Don't ask to quit")
-  (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
-  (browse-url-generic-program "librewolf" "set browser to librewolf")
-  (browse-url-secondary-browser-function 'browse-url-generic "set browser")
-  (browse-url-browser-function 'browse-url-generic "set browser")
-  (default-frame-alist '((alpha-background . 70)
-                         (vertical-scroll-bars)
-                         (internal-border-width . 24)
-                         (left-fringe . 8)
-                         (right-fringe . 8)))
+    ;; Startup errors
+    (warning-minimum-level :emergency "Supress emacs warnings")
+    (confirm-kill-processes nil "Don't ask to quit")
+    (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
+    (browse-url-generic-program "librewolf" "set browser to librewolf")
+    (browse-url-secondary-browser-function 'browse-url-generic "set browser")
+    (browse-url-browser-function 'browse-url-generic "set browser")
+    (default-frame-alist '((alpha-background . 70)
+                           (vertical-scroll-bars)
+                           (internal-border-width . 24)
+                           (left-fringe . 8)
+                           (right-fringe . 8)))
 
-  ;; Mouse wheel
-  (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
-  (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
-  (mouse-wheel-follow-mouse 't "Scroll correct window")
-  (scroll-conservatively 101 "Sort of smooth scrolling")
-  (scroll-step 1 "Scroll one line at a time")
-  (debug-on-error nil "Don't make the annoying popups")
-  (display-time-24hr-format t "Use 24 hour format to read the time")
-  (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
-  (use-short-answers t "Use y instead of yes")
-  (make-backup-files nil "Don't make backups")
-  (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
-  (fill-column 150)
-  (line-spacing 2 "Default line spacing")
-  (c-doc-comment-style '((c-mode . doxygen)
-                         (c++-mode . doxygen)))
+    ;; Mouse wheel
+    (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
+    (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
+    (mouse-wheel-follow-mouse 't "Scroll correct window")
+    (scroll-conservatively 101 "Sort of smooth scrolling")
+    (scroll-step 1 "Scroll one line at a time")
+    (debug-on-error nil "Don't make the annoying popups")
+    (display-time-24hr-format t "Use 24 hour format to read the time")
+    (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
+    (use-short-answers t "Use y instead of yes")
+    (make-backup-files nil "Don't make backups")
+    (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
+    (fill-column 150)
+    (line-spacing 2 "Default line spacing")
+    (c-doc-comment-style '((c-mode . doxygen)
+                           (c++-mode . doxygen)))
 
 
-  :hook ((text-mode . visual-line-mode)
-         (prog-mode . display-line-numbers-mode)
-         (prog-mode . display-fill-column-indicator-mode)
-         (org-mode . auto-fill-mode)
-         (org-mode . display-fill-column-indicator-mode)
-         (org-mode . display-line-numbers-mode))
-  :config (emacs-config))
+    :hook ((text-mode . visual-line-mode)
+           (prog-mode . display-line-numbers-mode)
+           (prog-mode . display-fill-column-indicator-mode)
+           (org-mode . auto-fill-mode)
+           (org-mode . display-fill-column-indicator-mode)
+           (org-mode . display-line-numbers-mode))
+    :config (emacs-config))
 ;; Emacs:1 ends here
 
 ;; [[file:../config/emacs.org::*Org Mode][Org Mode:1]]
-(use-package org
-  :demand t
-  :after (f s dash nix-mode)
-  :hook
-  ((org-mode-hook . remove-annoying-pairing))
-  :custom
-  ;; Fix terrible indentation issues
-  (org-edit-src-content-indentation 0)
-  (org-src-tab-acts-natively t)
-  (org-src-preserve-indentation t)
+  (use-package org
+    :demand t
+    :after (f s dash nix-mode)
+    :hook
+    ((org-mode . remove-annoying-pairing))
+    :custom
+    ;; Fix terrible indentation issues
+    (org-edit-src-content-indentation 0)
+    (org-src-tab-acts-natively t)
+    (org-src-preserve-indentation t)
 
-  (TeX-PDF-mode t)
-  (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
-  (org-export-with-broken-links t "publish website even with broken links")
-  (org-src-fontify-natively t "Colors!")
+    (TeX-PDF-mode t)
+    (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
+    (org-export-with-broken-links t "publish website even with broken links")
+    (org-src-fontify-natively t "Colors!")
 
-  ;; org-latex
-  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-  (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-  (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
-  (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+    ;; org-latex
+    (org-format-latex-header "\\documentclass{article} \
+  \\usepackage[usenames]{color} \
+  [DEFAULT-PACKAGES] \
+  [PACKAGES] \
+  \\pagestyle{empty}             % do not remove \
+  % The settings below are copied from fullpage.sty \
+  \\setlength{\\textwidth}{\\paperwidth} \
+  \\addtolength{\\textwidth}{-3cm} \
+  \\setlength{\\oddsidemargin}{1.5cm} \
+  \\addtolength{\\oddsidemargin}{-2.54cm} \
+  \\setlength{\\evensidemargin}{\\oddsidemargin} \
+  \\setlength{\\textheight}{\\paperheight} \
+  \\addtolength{\\textheight}{-\\headheight} \
+  \\addtolength{\\textheight}{-\\headsep} \
+  \\addtolength{\\textheight}{-\\footskip} \
+  \\addtolength{\\textheight}{-3cm} \
+  \\setlength{\\topmargin}{1.5cm} \
+  \\addtolength{\\topmargin}{-2.54cm} \
+  \\usepackage{amsmath} \
+  ")
+    (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+    (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+    (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+    (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
 
-  (TeX-engine 'xetex "set xelatex as default engine")
-  (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
-  (preview-image-type 'png "Use PNGs")
-  (org-format-latex-options
-   '(:foreground default
-                 :background default
-                 :scale 2
-                 :html-foreground "Black"
-                 :html-background "Transparent"
-                 :html-scale 1.5
-                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
-  (org-return-follows-link t "be able to follow links without mouse")
-  (org-startup-indented t "Indent the headings")
-  (org-image-actual-width '(300) "Cap width") 
-  (org-startup-with-latex-preview t "see latex previews on opening file")
-  (org-startup-with-inline-images t "See images on opening file")
-  (org-hide-emphasis-markers t "prettify org mode")
-  (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
-  (org-pretty-entities t "prettify org mode")
-  (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
-  (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
+    (TeX-engine 'xetex "set xelatex as default engine")
+    (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
+    ;; (preview-image-type 'png "Use PNGs")
+    (org-preview-latex-default-process 'dvipng)
+    (org-format-latex-options
+     '(:foreground default
+                   :background default
+                   :scale 2
+                   :html-foreground "Black"
+                   :html-background "Transparent"
+                   :html-scale 1.5
+                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
+    (org-return-follows-link t "be able to follow links without mouse")
+    (org-startup-indented t "Indent the headings")
+    (org-image-actual-width '(300) "Cap width") 
+    (org-startup-with-latex-preview t "see latex previews on opening file")
+    (org-startup-with-inline-images t "See images on opening file")
+    (org-hide-emphasis-markers t "prettify org mode")
+    (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
+    (org-pretty-entities t "prettify org mode")
+    (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
+    (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
 
-  ;; ricing
-  (org-auto-align-tags nil)
-  (org-tags-column 0)
-  (org-catch-invisible-edits 'show-and-error)
-  (org-special-ctrl-a/e t)
-  (org-insert-heading-respect-content t)
-  (org-hide-emphasis-markers t)
-  (org-pretty-entities t)
-  (org-agenda-tags-column 0)
-  (org-ellipsis "…")
-  :config
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '((shell . t)
-                                 (python . t)
-                                 (nix . t)
-                                 (latex . t))))
+    ;; ricing
+    (org-auto-align-tags nil)
+    (org-tags-column 0)
+    (org-catch-invisible-edits 'show-and-error)
+    (org-special-ctrl-a/e t)
+    (org-insert-heading-respect-content t)
+    (org-hide-emphasis-markers t)
+    (org-pretty-entities t)
+    (org-agenda-tags-column 0)
+    (org-ellipsis "…")
+    :config
+    (org-babel-do-load-languages 'org-babel-load-languages
+                                 '((shell . t)
+                                   (python . t)
+                                   (nix . t)
+                                   (latex . t))))
 
-(use-package org-tempo
-  :after org)
+  (use-package org-tempo
+    :after org)
 
-(use-package org-habit
-  :after org
-  :custom
-  (org-habit-preceding-days 7 "See org habit entries")
-  (org-habit-following-days 35 "See org habit entries")
-  (org-habit-show-habits t "See org habit entries")
-  (org-habit-show-habits-only-for-today nil "See org habit entries")
-  (org-habit-show-all-today t "Show org habit graph"))
+  (use-package org-habit
+    :after org
+    :custom
+    (org-habit-preceding-days 7 "See org habit entries")
+    (org-habit-following-days 35 "See org habit entries")
+    (org-habit-show-habits t "See org habit entries")
+    (org-habit-show-habits-only-for-today nil "See org habit entries")
+    (org-habit-show-all-today t "Show org habit graph"))
 
-(when noninteractive
   (use-package htmlize
     :demand t
-    :after (catppuccin-theme)))
+    :after (catppuccin-theme doom-themes))
 
-(unless noninteractive
-  (use-package htmlize
-    :after (doom-themes)))
+  (unless noninteractive
+    (use-package htmlize
+      :after (doom-themes)))
 
-(use-package ox-latex
-  :after (org)
-  :custom
-  (org-latex-compiler "xelatex" "Use latex as default")
-  (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
+  (use-package ox-latex
+    :after (org)
+    :custom
+    (org-latex-compiler "xelatex" "Use latex as default")
+    (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
 
-(use-package ox-html
-  :demand t
-  :after (org htmlize)
-  :custom
-  (org-html-htmlize-output-type 'css "allow styling from CSS file")
-  (org-html-with-latex 'html "let my html handler handle latex")
-  (org-html-mathjax-options nil "disable mathjax, use MathML")
-  (org-html-mathjax-template "" "disable mathjax, use MathML")
-  (org-html-head-include-default-style nil "use my own css for everything")
-  (org-html-head-include-scripts nil "use my own js for everything")
-  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
-  (org-html-divs '((preamble "header" "preamble")
-                   (content "main" "content")
-                   (postamble "footer" "postamble")) "semantic html exports")
-  (org-html-viewport '((width "device-width")
-                       (initial-scale "1.0")
-                       (minimum-scale "1.0")) "Prevent zooming out past default size")
-  :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
+  (use-package ox-html
+    :demand t
+    :after (org htmlize)
+    :custom
+    (org-html-htmlize-output-type 'css "allow styling from CSS file")
+    (org-html-with-latex 'html "let my html handler handle latex")
+    (org-html-mathjax-options nil "disable mathjax, use MathML")
+    (org-html-mathjax-template "" "disable mathjax, use MathML")
+    (org-html-head-include-default-style nil "use my own css for everything")
+    (org-html-head-include-scripts nil "use my own js for everything")
+    (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
+    (org-html-divs '((preamble "header" "preamble")
+                     (content "main" "content")
+                     (postamble "footer" "postamble")) "semantic html exports")
+    (org-html-viewport '((width "device-width")
+                         (initial-scale "1.0")
+                         (minimum-scale "1.0")) "Prevent zooming out past default size")
+    :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
 
-(use-package ox-publish
-  :demand t
-  :after (org f s dash ox-html)
-  :custom
-  (org-publish-project-alist
-   `(("website-org"
-      :base-directory "~/monorepo"
-      :base-extension "org"
-      :exclude "nix/README\\.org"
-      :publishing-directory "~/website_html"
-      :with-author t
-      :with-date t
-      :recursive t
-      :publishing-function org-html-publish-to-html
-      :headline-levels 4
-      :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                          "<style>"
-                          (->> (create-htmlize-css)
-                               (s-replace-regexp "<style[^>]*>" "")
-                               (s-replace "</style>" "")
-                               (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
-                               (s-replace "/*]]>*/-->" "")
-                               (s-trim)
-                               (minify-css))
-                          (f-read-text "~/monorepo/style.css" 'utf-8)
-                          "</style>")
-      :html-preamble t
-      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
-     ("website-static"
-      :base-directory "~/monorepo"
-      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
-      :publishing-directory "~/website_html/"
-      :recursive t
-      :publishing-function org-publish-attachment)
-     ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website"))
+  (use-package ox-publish
+    :demand t
+    :after (org f s dash ox-html)
+    :custom
+    (org-publish-project-alist
+     `(("website-org"
+        :base-directory "~/monorepo"
+        :base-extension "org"
+        :exclude "nix/README\\.org"
+        :publishing-directory "~/website_html"
+        :with-author t
+        :with-date t
+        :recursive t
+        :publishing-function org-html-publish-to-html
+        :headline-levels 4
+        :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
+                            "<style>"
+                            (->> (create-htmlize-css)
+                                 (s-replace-regexp "<style[^>]*>" "")
+                                 (s-replace "</style>" "")
+                                 (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
+                                 (s-replace "/*]]>*/-->" "")
+                                 (s-trim)
+                                 (minify-css))
+                            (f-read-text "~/monorepo/style.css" 'utf-8)
+                            "</style>")
+        :html-preamble t
+        :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>")))
+       ("website-static"
+        :base-directory "~/monorepo"
+        :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
+        :publishing-directory "~/website_html/"
+        :recursive t
+        :publishing-function org-publish-attachment)
+       ("website" :auto-sitemap t :components ("website-org" "website-static"))) "functions to publish website"))
 ;; Org Mode:1 ends here
 
 ;; [[file:../config/emacs.org::*All The Icons][All The Icons:1]]
@@ -789,8 +809,9 @@
 ;; Eww:1 ends here
 
 ;; [[file:../config/emacs.org::*Nix Mode][Nix Mode:1]]
-(use-package nix-mode
-  :mode "\\.nix\\'")
+  (use-package nix-mode
+    :demand t
+    :mode "\\.nix\\'")
 ;; Nix Mode:1 ends here
 
 ;; [[file:../config/emacs.org::*Org Roam][Org Roam:1]]
