@@ -1,6 +1,189 @@
-#+BIND: org-export-publishing-directory nil
-#+archive:
-#+options: exports:none
-#+filetags: :noexport:
-* HyprNixMacs
-This is my hyprnixmacs configuration, integrated into my monorepo. Documentation coming soon.
+#+title: hyprnixmacs
+#+options: toc:2 num:nil
+
+* Overview
+hyprnixmacs is a Nix flake that defines multiple NixOS machines and their Home Manager
+configurations from a single repository.
+
+The repository is organized around composable Nix modules for:
+- system profiles (desktop, workstation, server, tty-only)
+- host-specific hardware and role settings
+- service modules for self-hosted infrastructure
+- user-level Home Manager programs and development environments
+- disk layouts via disko
+- secret management via sops-nix
+- DNS data generation via nixos-dns
+
+The flake currently declares these hosts:
+- affinity
+- continuity
+- spontaneity
+- installer
+
+* High-level architecture
+** Flake entrypoint
+- =flake.nix= is the main entrypoint.
+- Inputs include =nixpkgs= (unstable), =home-manager=, =sops-nix=, =disko=,
+  =lanzaboote=, =nix-topology=, and =nixos-dns=.
+- Host configurations are generated from =flakevars.nix= (=hostnames= list).
+- Non-installer hosts get a common stack of modules (disko, home-manager, sops,
+  lanzaboote, topology, DNS).
+
+** Configuration model
+- =systems/<host>/default.nix= sets host role and storage variables.
+- =systems/common.nix= imports shared system modules.
+- =modules/default.nix= imports all system modules and defines profile options.
+- =systems/home.nix= links Home Manager users to =systems/<host>/home.nix=.
+- =modules/home/default.nix= imports all Home Manager modules and defines
+  user profile options.
+
+This gives a layered model:
+1. host-level intent (server/workstation/desktop)
+2. shared profile defaults
+3. service modules that activate conditionally
+4. user-level Home Manager settings
+
+* Repository layout
+- =flake.nix=, =flake.lock=, =flakevars.nix=: flake definition and host/domain variables.
+- =systems/=: host definitions and host home-manager entry files.
+- =modules/=: system modules (services, networking, security, hardware toggles).
+- =modules/home/=: Home Manager modules (shell, editors, desktop apps, media,
+  Hyprland stack, mail tooling, language toolchains).
+- =disko/=: partitioning layouts (ext4, btrfs, VM, sd-card, GPT/ESP helpers).
+- =dns/default.nix=: DNS declarations used to generate provider config/zone files.
+- =topology/default.nix=: network/service topology definition for nix-topology.
+- =secrets/*.yaml=: encrypted SOPS files for desktop/server/common secrets.
+- =data/=: static assets used by some modules (for example MOTD/CSS resources).
+
+* Hosts and roles
+** affinity
+- workstation profile
+- ext4 filesystem target on =/dev/nvme0n1=
+- CUDA profile enabled
+
+** continuity
+- desktop profile
+- btrfs filesystem target on =/dev/sda=
+- impermanence profile enabled
+
+** spontaneity
+- server profile
+- static IPv4/IPv6 and gateway configuration
+- grub enabled, pipewire disabled, tor disabled
+- device target =/dev/vda=
+
+** installer
+- minimal installation ISO profile
+- includes SSH + NetworkManager
+- ships a helper script (=nix_installer=) for cloning a target repo,
+  applying disko, and running =nixos-install=
+
+* Profile system
+System profile options are exposed under =monorepo.profiles= in
+=modules/default.nix=.
+
+Primary toggles:
+- =server.enable=
+- =workstation.enable=
+- =desktop.enable=
+- =ttyonly.enable=
+- =home.enable=
+- =impermanence.enable=
+- =pipewire.enable=
+- =tor.enable=
+- =cuda.enable=
+- =grub.enable=
+- =secureBoot.enable=
+
+The module enforces role constraints, including assertions that prevent enabling
+server and desktop/workstation simultaneously.
+
+* System modules
+The system layer is split into service-focused modules in =modules/=,
+including:
+- networking and access: =ssh.nix=, =nginx.nix=, =fail2ban.nix=, =tor.nix=
+- developer and vcs services: =git-daemon.nix=, =gitolite.nix=, =cgit.nix=,
+  =public_inbox.nix=
+- messaging/federation stack: =conduit.nix=, =mautrix.nix=,
+  =matrix-appservice-irc.nix=, =ngircd.nix=, =znc.nix=, =matterbridge.nix=
+- mail and notifications: =maddy.nix=, =ntfy-sh.nix=
+- media and social services: =icecast.nix=, =gotosocial.nix=
+- distributed/compute services: =kubo.nix=, =i2pd.nix=, =ollama.nix=
+- host/runtime helpers: =docker.nix=, =pipewire.nix=, =impermanence.nix=,
+  =nvidia.nix=, =cuda.nix=
+- shared policy and variable modules: =configuration.nix=, =vars.nix=,
+  =secrets.nix=
+
+* Home Manager modules
+Home configuration is imported from =modules/home/= and controlled by
+=monorepo.profiles= options in =modules/home/default.nix=.
+
+Home profile areas include:
+- shell/editor/tooling: zsh, git, emacs
+- desktop/wayland stack: hyprland, waybar, mako, wofi, kitty, gammastep, gtk,
+  fcitx
+- browsers/media/email sync: firefox, mpv, mbsync, msmtp
+- language toolchains: C, shell, Rust, Python, JS/TS, Nix, Haskell, Coq,
+  Lean, Agda, Idris, Solidity, OpenSCAD
+- optional domains: crypto tooling, art tooling, music tooling
+
+* Secrets and credentials
+- Secrets are managed with =sops-nix=.
+- System secrets are sourced from:
+  - =secrets/secrets.yaml= for desktop-oriented hosts
+  - =secrets/vps_secrets.yaml= for server-oriented hosts
+- Home-level secrets also use sops and are symlinked under
+  =/run/user/1000/secrets=.
+- The configured age key path is
+  =/home/<user>/.config/sops/age/keys.txt=.
+
+* Disk provisioning
+Disk layouts are defined in =disko/= and exposed through =evalDisko=
+flake outputs for each non-installer host.
+
+Common layouts include:
+- ext4-based scheme
+- btrfs-based scheme
+- VM layout
+- SD-card layout
+
+* DNS and topology
+- DNS records are declared through nixos-dns module data and generated as:
+  - BIND-style zone files
+  - octoDNS configuration
+- Generated outputs are available in flake packages (=zoneFiles=, =octodns=).
+- Topology output is generated with nix-topology from
+  =topology/default.nix= and live host configs.
+
+* Development workflow
+** Enter development shell
+#+begin_src bash
+nix develop
+#+end_src
+
+The shell includes tooling such as statix/deadnix and Python packages for
+octoDNS workflows.
+
+** Build a host configuration
+#+begin_src bash
+nix build .#nixosConfigurations.<host>.config.system.build.toplevel
+#+end_src
+
+** Build VM target for a host
+#+begin_src bash
+nix build .#nixosConfigurations.<host>.config.system.build.vm
+#+end_src
+
+** Run integration tests defined by the flake
+#+begin_src bash
+nix flake check
+#+end_src
+
+The flake defines host integration tests that boot VM nodes and perform basic
+service/activity smoke checks.
+
+* Notes
+- This repository is intended to be adapted by editing =flakevars.nix=,
+  host files under =systems/=, and profile/service toggles in modules.
+- The installer profile includes automation but still expects host-specific
+  review before deployment (disk target, generated host files, and secrets).
