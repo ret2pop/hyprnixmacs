@@ -131,7 +131,7 @@ PROJECT is the current project."
            (with-temp-buffer
              (org-mode)
 
-             (insert (format "* [[file:%s][%s]]\n" file title))
+             (insert (format "* %s\n" title))
              (org-set-property "RSS_PERMALINK" link)
              (org-set-property "PUBDATE" date)
              (insert-file-contents file)
@@ -397,7 +397,7 @@ PROJECT is the current project."
                           (f-read-text "~/monorepo/style.css" 'utf-8)
                           "</style>")
       :html-preamble t
-      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a></p><hr>"))
+      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a> | <a href=\"/blog/rss.xml\">rss feed</a></p><hr>"))
 
       ;; sitemap.html stuff
       :auto-sitemap t
