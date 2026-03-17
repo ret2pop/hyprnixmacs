@@ -53,6 +53,8 @@ epkgs: [
   epkgs.mixed-pitch
   epkgs.minuet
   epkgs.nix-mode
+  epkgs.ox-rss
+  epkgs.ob-nix
   epkgs.org-contrib
   epkgs.org-fragtog
   epkgs.org-journal
