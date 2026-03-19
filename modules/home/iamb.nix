@@ -1,5 +1,5 @@
 # [[file:../../../config/nix.org::*iamb][iamb:1]]
-{ super, config, ... }:
+{ super, lib, config, ... }:
 {
   programs.iamb = {
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;

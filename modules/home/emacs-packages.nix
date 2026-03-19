@@ -73,7 +73,6 @@ epkgs: [
   epkgs.projectile
   epkgs.rustic
   epkgs.s
-  epkgs.scheme-mode
   epkgs.solaire-mode
   epkgs.scad-mode
   epkgs.simple-httpd

@@ -1167,7 +1167,8 @@ PROJECT is the current project."
                          (org-roam-ui-follow t "Have cool visual while editing org-roam")
                          (org-roam-ui-update-on-save t "This option is obvious")
                          (org-roam-ui-open-on-start t "Have cool visual open in qutebrowser when emacs loads")
-                         :config (org-roam-ui-sync-theme)))
+                         ;; lol this is really bad but we'll let it pass because it is a race condition i probably can't fix
+                         :config (run-with-timer 10 nil #'org-roam-ui-sync-theme)))
 ;; Org Roam:1 ends here
 
 ;; [[file:../config/emacs.org::*Pinentry][Pinentry:1]]

@@ -179,6 +179,7 @@ in
       lang-haskell.enable = lib.mkDefault config.monorepo.profiles.enable;
       lang-idris.enable = lib.mkDefault config.monorepo.profiles.enable;
       lang-agda.enable = lib.mkDefault config.monorepo.profiles.enable;
+      lang-scheme.enable = lib.mkDefault config.monorepo.profiles.enable;
 
       crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
       art.enable = lib.mkDefault config.monorepo.profiles.enable;
