@@ -31,6 +31,8 @@ epkgs: [
   epkgs.evil-org
   epkgs.f
   epkgs.flycheck
+  epkgs.geiser
+  epkgs.geiser-chez
   epkgs.general
   epkgs.git-gutter
   epkgs.gptel
@@ -56,6 +58,8 @@ epkgs: [
   epkgs.ox-rss
   epkgs.ob-nix
   epkgs.org-contrib
+  epkgs.org-ql
+  epkgs.org-super-agenda
   epkgs.org-fragtog
   epkgs.org-journal
   epkgs.org-modern
@@ -69,6 +73,7 @@ epkgs: [
   epkgs.projectile
   epkgs.rustic
   epkgs.s
+  epkgs.scheme-mode
   epkgs.solaire-mode
   epkgs.scad-mode
   epkgs.simple-httpd

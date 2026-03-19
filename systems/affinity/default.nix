@@ -5,6 +5,7 @@
     ../common.nix
   ];
   config = {
+    boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
     monorepo = {
       vars.device = "/dev/nvme0n1";
       vars.fileSystem = "ext4";

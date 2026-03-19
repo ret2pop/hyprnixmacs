@@ -19,6 +19,7 @@ in
     "continuity"
     "spontaneity"
     "installer"
+    "rpi-zero"
   ];
 }
 # Configurables:1 ends here

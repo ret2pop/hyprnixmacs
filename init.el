@@ -79,8 +79,7 @@
     (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC"))
     (set-fontset-font t 'kana (font-spec :family "Noto Sans CJK JP"))
     (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
-    (set-fontset-font t 'symbol (font-spec :family "Symbols Nerd Font Mono") nil 'append))
-  (set-frame-parameter nil 'alpha-background 70))
+    (set-fontset-font t 'symbol (font-spec :family "Symbols Nerd Font Mono") nil 'append)))
 
 ;; imperative
 (defun evil-config ()
@@ -110,7 +109,6 @@
 
 ;; same as above
 (defun remove-annoying-pairing () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))
-
 
 ;; taken from blog https://writepermission.com/org-blogging-rss-feed.html
 (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
@@ -196,10 +194,10 @@ PROJECT is the current project."
     (warning-minimum-level :emergency "Supress emacs warnings")
     (confirm-kill-processes nil "Don't ask to quit")
     (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
-    (browse-url-generic-program "librewolf" "set browser to librewolf")
+    (browse-url-generic-program "qutebrowser" "set browser to librewolf")
     (browse-url-secondary-browser-function 'browse-url-generic "set browser")
     (browse-url-browser-function 'browse-url-generic "set browser")
-    (default-frame-alist '((alpha-background . 70)
+    (default-frame-alist '((alpha-background . 80)
                            (vertical-scroll-bars)
                            (internal-border-width . 24)
                            (left-fringe . 8)
@@ -235,7 +233,7 @@ PROJECT is the current project."
 ;; [[file:../config/emacs.org::*Org Mode][Org Mode:1]]
 (use-package org
   :demand t
-  :after (f s dash nix-mode)
+  :after (f s dash nix-mode scheme-mode)
   :hook
   ((org-mode . remove-annoying-pairing))
   :custom
@@ -315,6 +313,7 @@ PROJECT is the current project."
                                '((shell . t)
                                  (python . t)
                                  (nix . t)
+                                 (scheme . t)
                                  (latex . t))))
 
 (use-package org-tempo
@@ -581,6 +580,36 @@ PROJECT is the current project."
   (org-journal-enable-agenda-integration t "All org-journal entries are org-agenda entries")
   (org-journal-file-header "#+TITLE: Daily Journal\n#+STARTUP: showeverything\n#+DESCRIPTION: My daily journal entry\n#+AUTHOR: Preston Pan\n#+date:\n#+options: broken-links:t" "set header files on new org journal entry"))
 ;; Journal:1 ends here
+
+;; [[file:../config/emacs.org::*Org Super Agenda][Org Super Agenda:1]]
+(use-package org-super-agenda
+  :after org
+  :custom
+  (org-super-agenda-groups
+   '((:name "Overdue"
+            :deadline past)
+     (:name "Today"
+            :time-grid t
+            :scheduled today)
+     (:name "Important"
+            :priority "A")
+     (:name "Due soon"
+            :deadline future)
+     (:name "Next"
+            :todo "NEXT")
+     (:name "Waiting"
+            :todo "WAIT")
+     (:name "Projects"
+            :tag "project")))
+
+  :config
+  (org-super-agenda-mode))
+;; Org Super Agenda:1 ends here
+
+;; [[file:../config/emacs.org::*Org Ql][Org Ql:1]]
+(use-package org-ql
+  :after org)
+;; Org Ql:1 ends here
 
 ;; [[file:../config/emacs.org::*Doom Modeline][Doom Modeline:1]]
 (use-package doom-modeline
@@ -862,10 +891,180 @@ PROJECT is the current project."
 ;; Minuet:1 ends here
 
 ;; [[file:../config/emacs.org::*RSS Feed][RSS Feed:1]]
+(defun my/elfeed-export-recent-tsv (outfile days)
+  (interactive "FExport recent Elfeed TSV to file: \nnDays: ")
+  (require 'elfeed)
+  (elfeed-db-load)
+  (let ((cutoff (- (float-time) (* days 86400))))
+    (with-temp-file outfile
+      (insert "date\tfeed-title\tfeed-url\ttitle\turl\ttags\n")
+      (maphash
+       (lambda (_id entry)
+         (when (>= (elfeed-entry-date entry) cutoff)
+           (let* ((feed (elfeed-entry-feed entry))
+                  (date (seconds-to-time (elfeed-entry-date entry)))
+                  (date-str (format-time-string "%Y-%m-%d %H:%M:%S" date))
+                  (feed-title (or (and feed (elfeed-feed-title feed)) ""))
+                  (feed-url (or (and feed (elfeed-feed-url feed)) ""))
+                  (title (or (elfeed-entry-title entry) ""))
+                  (url (or (elfeed-entry-link entry) ""))
+                  (tags (mapconcat #'symbol-name (elfeed-entry-tags entry) ",")))
+             (insert
+              (mapconcat
+               #'identity
+               (list date-str feed-title feed-url title url tags)
+               "\t")
+              "\n"))))
+       elfeed-db-entries))))
+
+(defvar elfeed-ai-agent-hype-regex
+  '("\\b\\(?:autonomous\\|multi[-[:space:]]?\\|ai[[:space:]]+\\)agents?\\b"
+    "\\bagentic[[:space:]]+\\(?:workflow\\|framework\\|ai\\|architecture\\)\\b"
+    "\\bagent[[:space:]]+\\(?:swarm\\|orchestration\\|loop\\)\\b"
+    "\\bfor[[:space:]]+agents?\\b"
+    "\\b\\(?:optimizing\\|optimising\\|building\\|designed?\\|designing\\)\\b.*\\bfor[[:space:]]+agents?\\b"))
+
+(defvar elfeed-ai-product-brand-regex
+  '("\\bchatgpt\\b"
+    "\\bclaude\\(?:[[:space:]]?\\(?:3\\|3\\.5\\|3\\.7\\)\\)?\\b"
+    "\\bgrok\\b"
+    "\\bgemini\\(?:[[:space:]]?\\(?:pro\\|flash\\|ultra\\)\\)?\\b"
+    "\\bdall[-[:space:]]?e\\(?:[[:space:]]?[1-9]\\)?\\b"
+    "\\b\\(?:midjourney\\|sora\\|perplexity\\)\\b"
+    "\\b\\(?:llama[-[:space:]]?[1-9]?\\|mistral\\|qwen\\|deepseek\\)\\b"
+    "\\b\\(?:cursor\\|windsurf\\|notebooklm\\|aider\\|cline\\|roo[-[:space:]]?code\\)\\b"
+    "\\b\\(?:v0\\|bolt\\.new\\|lovable\\)\\b"
+    "\\b\\w*claw\\w*\\b"))
+
+(defvar elfeed-ai-model-vendor-regex
+  '("\\bopenai\\b"
+    "\\banthropic\\b"
+    "\\bxai\\b"
+    "\\b\\(?:google[[:space:]]+\\)?deepmind\\b"
+    "\\bhugging[-[:space:]]?face\\b"
+    "\\b\\(?:cohere\\|meta[[:space:]]+ai\\|mistral[[:space:]]+ai\\)\\b"))
+
+(defvar elfeed-ai-model-family-regex
+  '("\\bgpt\\(?:-?[2345]\\|-?4\\.1\\|-?4\\.5\\|[-[:space:]]?o\\(?:1\\|3\\|4\\)\\)\\b"
+    "\\bgenai\\b"
+    "\\b[lvs]lms?\\b"
+    "\\bagi\\b"
+    "\\bgenerative[[:space:]]+ai\\b"
+    "\\b\\(?:foundation\\|diffusion\\|large[[:space:]]+language\\)[[:space:]]+models?\\b"
+    "\\b\\(?:rag\\|lora\\|fine[-[:space:]]?tun\\(?:ing\\|ed\\)\\)\\b"
+    "\\bprompt[[:space:]]+engineering\\b"))
+
+(defvar elfeed-ai-wrapper-marketing-regex
+  '("\\b\\(?:ai\\|llm\\|gpt\\|chatgpt\\|claude\\|grok\\|gemini\\)[-[:space:]]?powered\\b"
+    "\\bai[-[:space:]]?\\(?:driven\\|native\\|first\\|generated\\|assisted\\)\\b"
+    "\\b\\(?:build\\|built\\|building\\)\\b.*\\bwith[[:space:]]+\\(?:ai\\|llms?\\|gpt\\|chatgpt\\|claude\\|grok\\|gemini\\)\\b"
+    "\\bchat[[:space:]]+with[[:space:]]+\\(?:your\\|any\\)[[:space:]]+\\(?:data\\|pdfs?\\|code\\|docs?\\|database\\)\\b"
+    "\\bsupercharg\\(?:ed?\\|ing\\)[[:space:]]+\\(?:your\\|with\\)[[:space:]]+\\(?:ai\\|llms?\\)\\b"
+    "\\b\\w+[-[:space:]]?\\(?:copilot\\|assistant\\|agent\\)\\b"))
+
+(defvar elfeed-ai-rolecast-regex
+  '("\\bturning[[:space:]]+\\(?:an?\\|the\\)?[[:space:]]*\\(?:llm\\|ai\\|model\\|agent\\)[[:space:]]+into[[:space:]]+\\(?:an?\\|the\\)?[[:space:]]*\\w+\\b"
+    "\\b\\(?:your\\|an?\\)[[:space:]]+\\(?:ai\\|llm\\|agent\\)[[:space:]]+\\(?:teammate\\|coworker\\|coder\\|researcher\\|assistant\\|manager\\|judge\\)\\b"
+    "\\b\\(?:replace\\|automate\\)[[:space:]]+your[[:space:]]+\\(?:team\\|developers?\\|engineers?\\|designers?\\)[[:space:]]+with[[:space:]]+ai\\b"
+    "\\bai[[:space:]]+\\(?:software[[:space:]]+\\)?\\(?:engineer\\|developer\\)\\b"))
+
+(defvar elfeed-show-hn-demo-regex
+  '("\\b\\(?:show\\|ask\\|tell\\)\\W+hn"
+    "\\b\\(?:launch\\|launching\\|launched\\)\\W+hn"
+    "\\b\\(?:i\\|we\\)\\W+\\(?:built\\|made\\|created\\)\\W+\\(?:a\\|an\\|this\\)\\b"
+    "\\b\\(?:introducing\\|announcing\\)\\W+"
+    "\\b\\(?:my\\|our\\)\\W+weekend\\W+project\\b"))
+
+(defvar elfeed-anti-capitalist-slop-regex
+  '(;; Targets the specific "reddit-tier" anti-capitalist buzzwords, not actual economics
+    "\\blate[-[:space:]]?stage[[:space:]]+capitalism\\b"
+    "\\btechno[-[:space:]]?feudalism\\b"
+    "\\benshittification\\b" ; Highly correlated with circlejerk tech/capitalism complaining
+    "\\bcorporate[[:space:]]+greed\\b"
+    "\\b(?:eat[[:space:]]+the[[:space:]]+rich|class[[:space:]]+warfare)\\b"
+    "\\bruling[[:space:]]+class\\b"
+    "\\bsilicon[[:space:]]+valley[[:space:]]+elites?\\b"))
+
+(defvar elfeed-anti-immigrant-slop-regex
+  '(;; Targets the sensationalist framing of immigration, not neutral border news
+    "\\b(?:border|migrant)[[:space:]]+crisis\\b"
+    "\\bmass[[:space:]]+(?:im)?migration\\b"
+    "\\billegal[[:space:]]+(?:aliens?|immigrants?)\\b"
+    "\\bgreat[[:space:]]+replacement\\b"
+    "\\bopen[[:space:]]+borders?\\b"))
+
+(defvar elfeed-ai-doomerism-regex
+  '(;; Targets the moral panic/resource whining around AI, not legitimate AI benchmarks or legal updates
+    "\\bplagiarism[[:space:]]+machines?\\b"
+    "\\bstolen[[:space:]]+(?:art|data|content)\\b"
+    "\\b(?:ai|llms?|generative)[[:space:]]+(?:theft|stealing)\\b"
+    "\\bcopyright[[:space:]]+(?:theft|infringement)\\b"
+    "\\b(?:boiling[[:space:]]+the[[:space:]]+oceans?|guzzling[[:space:]]+(?:water|power|electricity))\\b"
+    "\\bunethic(?:al|s)[[:space:]]+(?:ai|tech)\\b"))
+
+(defvar elfeed-anti-tech-circlejerk-regex
+  '(;; Targets the general "tech is ruining society" populist outrage
+    "\\btech[[:space:]]+bros?\\b"
+    "\\bdead[[:space:]]+internet[[:space:]]+theory\\b"
+    "\\bruin(?:ing|ed)?[[:space:]]+the[[:space:]]+internet\\b"
+    "\\btech[[:space:]]+dystopia\\b"
+    "\\btech[[:space:]]+(?:backlash|reckoning)\\b"))
+
+(defvar elfeed-crypto-slop-regex
+  '(;; Targets Web3 buzzwords safely without breaking system design news
+    "\\bdecentrali[zs]ed[[:space:]]+(?:finance|exchange|web|autonomous|apps?|identity)\\b"
+    "\\b(?:defi|dapps?|daos?)\\b"
+    "\\b(?:web3|web[[:space:]]3\\.0)\\b"
+    "\\bcrypto(?:currency|currencies)?\\b"
+    "\\bnfts?\\b"))
+
+(defvar elfeed-general-culture-war-regex
+  '(;; Targets the evergreen vocabulary of online tribalism
+    "\\b\\(?:virtue[[:space:]]+signal\\(?:ing\\)?\\|mind[[:space:]]+virus\\|psyop\\|grifter\\|gaslight\\(?:ing\\)?\\)\\b"
+    "\\bculture[[:space:]]+war\\b"
+    "\\b\\(?:left\\|right\\)[-[:space:]]?wing[[:space:]]+\\(?:mob\\|agenda\\|propaganda\\|bias\\|tears\\)\\b"
+    "\\becho[[:space:]]+chamber\\b"
+    "\\bpolitical[[:space:]]+theater\\b"))
+
+(defvar elfeed-economic-doomerism-regex
+  '(;; Targets the hyper-sensationalized financial collapse crowd
+    "\\bfiat[[:space:]]+\\(?:currency\\|money\\)[[:space:]]+\\(?:collapse\\|ponzi\\)\\b"
+    "\\bhyperinflation[[:space:]]+\\(?:is[[:space:]]+here\\|incoming\\)\\b"
+    "\\b\\(?:great\\|massive\\)[[:space:]]+wealth[[:space:]]+transfer\\b"
+    "\\bcollapse[[:space:]]+of[[:space:]]+\\(?:western\\|civilization\\|society\\)\\b"))
+
+(defvar elfeed-hn-filter-list
+  `(,elfeed-ai-agent-hype-regex
+    ,elfeed-ai-product-brand-regex
+    ,elfeed-ai-model-vendor-regex
+    ,elfeed-ai-model-family-regex
+    ,elfeed-ai-wrapper-marketing-regex
+    ,elfeed-ai-rolecast-regex
+    ,elfeed-anti-tech-circlejerk-regex
+    ,elfeed-ai-doomerism-regex
+    ,elfeed-anti-immigrant-slop-regex
+    ,elfeed-anti-capitalist-slop-regex
+    ,elfeed-crypto-slop-regex
+    ,elfeed-general-culture-war-regex
+    ,elfeed-economic-doomerism-regex
+    ,elfeed-show-hn-demo-regex))
+
+(defun elfeed-list-to-filter (filter-list)
+  (mapconcat #'identity filter-list "\\|"))
+
+(defun elfeed-final-filter (filter-lists)
+  ;; Use standard non-capturing group \(?: ... \)
+  (concat
+   "\\(?:"
+   (mapconcat #'elfeed-list-to-filter filter-lists "\\|")
+   "\\)"))
+
 (use-package elfeed
   :hook ((elfeed-search-mode . elfeed-update))
-  :custom (elfeed-search-filter "@1-month-ago +unread" "Only display unread articles from a month ago")
-  :config (run-with-timer 0 (* 60 3) 'elfeed-update))
+  :custom
+  (elfeed-search-filter (format "@1-month-ago +unread !%s" (elfeed-final-filter elfeed-hn-filter-list)) "Only display unread articles from a month ago")
+  (elfeed-curl-max-connections 8 "less max connections for less lag")
+  :config (run-with-timer 0 (* 60 10) 'elfeed-update))
 
 (use-package elfeed-org
   :after (elfeed org)
@@ -933,12 +1132,26 @@ PROJECT is the current project."
     :mode "\\.nix\\'")
 ;; Nix Mode:1 ends here
 
+;; [[file:../config/emacs.org::*Scheme][Scheme:1]]
+(use-package scheme-mode
+  :mode ("\\.sls\\'" "\\.scm\\'"))
+
+(use-package geiser
+  :after scheme)
+
+(use-package geiser-chez
+  :after geiser
+  :custom
+  (geiser-active-implementations '(chez))
+  (geiser-chez-binary "chez"))
+;; Scheme:1 ends here
+
 ;; [[file:../config/emacs.org::*Org Roam][Org Roam:1]]
 (use-package org-roam
   :after (org)
   :custom
   (org-roam-db-update-on-save t "Update org-roam db")
-  (org-roam-graph-viewer "librewolf" "Use librewolf to view org-roam graph")
+  (org-roam-graph-viewer "qutebrowser" "Use qutebrowser to view org-roam graph")
   (org-roam-directory (file-truename "~/monorepo/mindmap") "Set org-roam directory inside monorepo")
   (org-roam-capture-templates '(("d" "default" plain "%?"
                                  :target (file+head "${title}.org"
@@ -953,7 +1166,7 @@ PROJECT is the current project."
                          (org-roam-ui-sync-theme t "Use emacs theme for org-roam-ui")
                          (org-roam-ui-follow t "Have cool visual while editing org-roam")
                          (org-roam-ui-update-on-save t "This option is obvious")
-                         (org-roam-ui-open-on-start t "Have cool visual open in librewolf when emacs loads")
+                         (org-roam-ui-open-on-start t "Have cool visual open in qutebrowser when emacs loads")
                          :config (org-roam-ui-sync-theme)))
 ;; Org Roam:1 ends here
 

@@ -10,7 +10,6 @@
     scripts.url = "github:ret2pop/scripts";
     wallpapers.url = "github:ret2pop/wallpapers";
     sounds.url = "github:ret2pop/sounds";
-    deep-research.url = "github:ret2pop/ollama-deep-researcher";
     impermanence.url = "github:nix-community/impermanence";
 
     nix-topology = {
@@ -54,7 +53,6 @@
       sops-nix,
       nix-topology,
       nixos-dns,
-      deep-research,
       impermanence,
       git-hooks,
       ...
@@ -62,38 +60,25 @@
     @attrs:
       let
         vars = import ./flakevars.nix;
+        generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
+
+        rpiCheck = hostname: (builtins.match "rpi-.*" hostname) != null;
+        noRpi = builtins.filter (hostname: (! rpiCheck hostname));
+        noInstaller = builtins.filter (hostname: (hostname != "installer"));
+        filterHosts = noInstaller (noRpi vars.hostnames);
         system = "x86_64-linux";
+        getSystem = hostname: if rpiCheck hostname
+                              then "aarch64-linux"
+                              else "x86_64-linux";
 
         pkgs = import nixpkgs { inherit system; };
-        generate = nixos-dns.utils.generate nixpkgs.legacyPackages."${system}";
 
         dnsConfig = {
           inherit (self) nixosConfigurations;
           extraConfig = import ./dns/default.nix;
         };
 
-        rpiCheck = hostname: (builtins.match "rpi-.*" hostname) != null;
-        noRpi = builtins.filter (hostname: (! rpiCheck hostname));
-        noInstaller = builtins.filter (hostname: (hostname != "installer"));
-        filterHosts = noInstaller (noRpi vars.hostnames);
-
-        mkHostModules = hostname:
-          if (hostname == "installer") then ([
-            (./. + "/systems/${hostname}/default.nix")
-            { networking.hostName = "${hostname}"; }
-            nix-topology.nixosModules.default
-          ]) else (if (rpiCheck hostname) then [
-            (./. + "/systems/${hostname}/default.nix")
-            disko.nixosModules.disko
-            home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
-            lanzaboote.nixosModules.lanzaboote
-          ] else [
-            {
-              environment.systemPackages = with nixpkgs.lib; [
-                deep-research.packages."${system}".deep-research
-              ];
-            }
+        commonModules = hostname: [
             impermanence.nixosModules.impermanence
             nix-topology.nixosModules.default
             lanzaboote.nixosModules.lanzaboote
@@ -109,24 +94,32 @@
               networking.hostName = "${hostname}";
             }
             (./. + "/systems/${hostname}/default.nix")
-          ]);
+        ];
+
+        mkHostModules = hostname:
+          if (hostname == "installer") then [
+            (./. + "/systems/${hostname}/default.nix")
+            { networking.hostName = "${hostname}"; }
+            nix-topology.nixosModules.default
+          ] else (if (rpiCheck hostname)
+                  then (commonModules hostname) ++ [
+                    "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+                  ]
+                  else (commonModules hostname));
 
         # function that generates all systems from hostnames
-        mkConfigs = map (hostname:
-          let
-            hostSystem = if (rpiCheck hostname) then "aarch64-linux" else system;
-          in
-            {
-              name = "${hostname}";
-              value = nixpkgs.lib.nixosSystem {
-                system = hostSystem;
-                specialArgs = attrs // {
-                  isIntegrationTest = false;
-                  monorepoSelf = null;
-                };
-                modules = mkHostModules hostname;
-              };
-            });
+        mkConfigs = map (hostname: {
+          name = "${hostname}";
+          value = nixpkgs.lib.nixosSystem {
+            system = getSystem hostname;
+            specialArgs = attrs // {
+              system = (getSystem hostname);
+              isIntegrationTest = false;
+              monorepoSelf = null;
+            };
+            modules = mkHostModules hostname;
+          };
+        });
 
         mkDiskoFiles = map (hostname: {
           name = "${hostname}";
@@ -234,7 +227,7 @@
             }
         );
 
-        integrationTests = builtins.listToAttrs (mkIntegrationTests filterHosts);
+        integrationTests = builtins.listToAttrs (mkIntegrationTests (noInstaller vars.hostnames));
         pre-commit-check = git-hooks.lib.${system}.run {
           src = ./.;
           hooks = builtins.listToAttrs (mkBuildChecks filterHosts) // {

@@ -4,14 +4,22 @@
   imports = [
     ../common.nix
   ];
+
   config = {
-    zramSwap = {
-      enable = true;
-      algorithm = "zstd";
-      memoryPercent = 100;
+    boot = {
+      loader = {
+        grub.enable = false;
+        generic-extlinux-compatible.enable = true;
+      };
+      initrd.kernelModules = [ "vc4" "bcm2835_dma" "i2c_bcm2835" ];
+      kernelParams = [
+        "console=ttyS1,115200n8"
+      ];
     };
-    boot.loader.grub.enable = false;
-    boot.loader.generic-extlinux-compatible.enable = true;
+
+    zramSwap.memoryPercent = 100;
+    services.gitDaemon.enable = true;
+
     monorepo = {
       vars.device = "/dev/mmcblk0";
       profiles = {

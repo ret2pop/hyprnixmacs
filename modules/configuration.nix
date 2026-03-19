@@ -1,5 +1,5 @@
 # [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, system, ... }:
 let
   userGroups = [
     "nginx"
@@ -29,10 +29,10 @@ in
     "d /srv/git 0755 git git -"
   ];
 
-  zramSwap = lib.mkIf config.monorepo.profiles.desktop.enable {
+  zramSwap = {
     enable = true;
     algorithm = "zstd";
-    memoryPercent = 50;
+    memoryPercent = lib.mkDefault 50;
   };
 
   # Shim for testing
@@ -125,6 +125,7 @@ in
     options rtw89_core disable_ps_mode=y
     options rtw89_pci disable_aspm_l1=y disable_aspm_l1ss=y disable_clkreq=y
     options iwlwifi 11n_disable=8 uapsd_disable=1 bt_coex_active=0 disable_11ax=1 power_save=0
+    options brcmfmac roamoff=1 feature_disable=0x82000
   '';
     extraModulePackages = [ ];
 
@@ -150,7 +151,9 @@ in
     };
 
     loader = {
-      systemd-boot.enable = lib.mkForce ((! config.monorepo.profiles.grub.enable) && (! config.monorepo.profiles.secureBoot.enable));
+      systemd-boot.enable = lib.mkForce
+        (((! config.monorepo.profiles.grub.enable) &&
+          (! config.monorepo.profiles.secureBoot.enable)) && (system != "aarch64-linux"));
       efi.canTouchEfiVariables = lib.mkForce (! config.monorepo.profiles.grub.enable);
     };
 
@@ -341,7 +344,7 @@ in
   hardware = {
     wirelessRegulatoryDatabase = true;
     enableAllFirmware = true;
-    cpu.intel.updateMicrocode = true;
+    cpu.intel.updateMicrocode = lib.mkDefault (system == "x86_64-linux");
     graphics.enable = ! config.monorepo.profiles.ttyonly.enable;
 
     bluetooth = {
@@ -409,7 +412,7 @@ in
     forcePageTableIsolation = true;
 
     tpm2 = {
-      enable = true;
+      enable = system != "aarch64-linux";
       pkcs11.enable = true;
       tctiEnvironment.enable = true;
     };
@@ -438,11 +441,10 @@ in
   environment.extraInit = ''
     umask 0022
     '';
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs;  [
     restic
     sbctl
     gitFull
-    git-lfs
     git-lfs-transfer
     vim
     curl
@@ -457,7 +459,7 @@ in
     chown -R git:git "$1"
     ''
     )
-  ];
+  ] ++ (if system != "aarch64-linux" then [ git-lfs ] else []);
 
   users.groups = lib.genAttrs userGroups (_: lib.mkDefault {});
 

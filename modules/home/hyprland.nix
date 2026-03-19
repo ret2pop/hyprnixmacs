@@ -24,7 +24,7 @@
         "fcitx5 -d --replace"
         "fcitx5-remote -r"
         "emacs"
-        "librewolf"
+        "qutebrowser"
       ];
       env = [
         "LIBVA_DRIVER_NAME,nvidia"
@@ -56,6 +56,11 @@
         {
           name = "librewolf";
           "match:class" = "librewolf";
+          workspace = 2;
+        }
+        {
+          name = "qutebrowser";
+          "match:class" = "qutebrowser";
           workspace = 2;
         }
         {
@@ -91,7 +96,7 @@
       ];
 
       bind = [
-        "$mod, F, exec, librewolf"
+        "$mod, F, exec, qutebrowser"
         "$mod, Return, exec, kitty"
         "$mod, E, exec, emacs"
         "$mod, B, exec, bitcoin-qt"

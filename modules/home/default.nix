@@ -27,6 +27,7 @@ in
       lang-coq.enable = lib.mkEnableOption "Enables coq language support";
       lang-lean.enable = lib.mkEnableOption "Enables lean language support";
       lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
+      lang-scheme.enable = lib.mkEnableOption "Enables scheme language support";
       crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
       art.enable = lib.mkEnableOption "Enables various art programs";
       music.enable = lib.mkEnableOption "Enables mpd";
@@ -48,6 +49,10 @@ in
                       bear
                       clang-tools
                       autotools-language-server
+                    ]) else [])
+                    ++
+                    (if config.monorepo.profiles.lang-scheme.enable then (with pkgs; [
+                      chez
                     ]) else [])
                     ++
                     (if config.monorepo.profiles.workstation.enable then (with pkgs; [
@@ -159,7 +164,7 @@ in
       cuda.enable = lib.mkDefault super.monorepo.profiles.cuda.enable;
 
       # Programming
-      graphics.enable = lib.mkDefault (! super.monorepo.profiles.ttyonly.enable);
+      graphics.enable = lib.mkDefault ((! super.monorepo.profiles.ttyonly.enable) && config.monorepo.profiles.enable);
       hyprland.enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
       lang-c.enable = lib.mkDefault config.monorepo.profiles.enable;
       lang-rust.enable = lib.mkDefault config.monorepo.profiles.enable;

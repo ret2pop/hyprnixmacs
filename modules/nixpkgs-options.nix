@@ -1,8 +1,11 @@
 # [[file:../../config/nix.org::*Nixpkgs][Nixpkgs:1]]
-{ lib, config, isIntegrationTest, ... }:
+{ lib, config, isIntegrationTest, system, ... }:
 {
   nixpkgs = lib.mkIf (! isIntegrationTest) {
-    hostPlatform = lib.mkDefault "x86_64-linux";
+    hostPlatform = lib.mkDefault system;
+    buildPlatform = lib.mkIf (system == "aarch64-linux") (lib.mkDefault "x86_64-linux");
+    overlays = [
+    ];
     config = {
       allowUnfree = true;
       cudaSupport = lib.mkDefault config.monorepo.profiles.cuda.enable;

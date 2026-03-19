@@ -68,7 +68,7 @@
       dn42 = {
         format = "yaml";
       };
-    } else {
+    } else (if config.monorepo.profiles.server.enable then {
       znc = {
         format = "yaml";
       };
@@ -111,7 +111,7 @@
         format = "yaml";
         owner = "nginx";
       };
-    };
+    } else {});
   };
 }
 # Secrets:1 ends here

@@ -5,7 +5,7 @@ let
 in
 {
   services.cgit."my-projects" = {
-    enable = lib.mkDefault config.services.gitDaemon.enable;
+    enable = lib.mkDefault config.monorepo.profiles.server.enable;
     scanPath = "${config.users.users.git.home}"; 
     settings = {
       root-title = "Nullring Git Server";

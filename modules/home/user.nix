@@ -54,7 +54,7 @@
       pavucontrol alsa-utils imagemagick ffmpeg helvum
 
       # Net
-      curl rsync gitFull iamb ungoogled-chromium
+      curl rsync gitFull ungoogled-chromium
 
       # Tor
       torsocks tor-browser
@@ -80,6 +80,7 @@
       libnotify
       htop
       minify
+      python3Packages.adblock
 
       (pkgs.writeShellScriptBin "help"
         ''
@@ -164,13 +165,13 @@
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     defaultApplications = {
       "x-scheme-handler/mailto" = "emacsclient-mail.desktop";
-      "text/html" = "librewolf.desktop";
-      "text/xml" = "librewolf.desktop";
-      "application/xhtml+xml" = "librewolf.desktop";
-      "x-scheme-handler/http" = "librewolf.desktop";
-      "x-scheme-handler/https" = "librewolf.desktop";
-      "x-scheme-handler/about" = "librewolf.desktop";
-      "x-scheme-handler/unknown" = "librewolf.desktop";
+      "text/html" = "qutebrowser.desktop";
+      "text/xml" = "qutebrowser.desktop";
+      "application/xhtml+xml" = "qutebrowser.desktop";
+      "x-scheme-handler/http" = "qutebrowser.desktop";
+      "x-scheme-handler/https" = "qutebrowser.desktop";
+      "x-scheme-handler/about" = "qutebrowser.desktop";
+      "x-scheme-handler/unknown" = "qutebrowser.desktop";
     };
   };
 
