@@ -54,7 +54,7 @@
       pavucontrol alsa-utils imagemagick ffmpeg helvum
 
       # Net
-      curl rsync gitFull ungoogled-chromium
+      curl rsync gitFull ungoogled-chromium devd
 
       # Tor
       torsocks tor-browser

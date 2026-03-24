@@ -22,6 +22,7 @@
     };
 
     shellAliases = {
+      ret2pop-serve = "devd -ol ~/website_html/";
       clone-secrets = "git clone ssh://\"$1\"/home/preston/secrets \"$HOME/secrets\"";
       get-channel-id = "yt-dlp --print \"%(channel_id)s\" --playlist-end 1 \"$1\"";
       se = "sops edit";
@@ -41,7 +42,7 @@
     };
     loginExtra = ''
         if [[ "$(tty)" = "/dev/tty1" ]]; then
-            exec Hyprland
+            exec start-hyprland
         fi
       '';
   };
