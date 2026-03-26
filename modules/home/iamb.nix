@@ -6,7 +6,7 @@
     settings = {
       default_profile = "personal";
       profiles.personal = {
-        user_id = "${super.monorepo.vars.internetName}@matrix.${super.monorepo.vars.orgHost}";
+        user_id = "@${super.monorepo.vars.internetName}:matrix.${super.monorepo.vars.orgHost}";
       };
       image_preview.protocol = {
         type = "kitty";

@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "catppuccin-qutebrowser": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1741931053,
+        "narHash": "sha256-FmxrgpFlp+cMUdCx5HHIiLMGWML23p+pfxTKT/X0UME=",
+        "owner": "catppuccin",
+        "repo": "qutebrowser",
+        "rev": "808adc3d7d5be6fc573d6be6e9c888cb96b5d6e6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "qutebrowser",
+        "type": "github"
+      }
+    },
     "crane": {
       "inputs": {
         "nixpkgs": [
@@ -507,6 +523,7 @@
     },
     "root": {
       "inputs": {
+        "catppuccin-qutebrowser": "catppuccin-qutebrowser",
         "disko": "disko",
         "git-hooks": "git-hooks",
         "home-manager": "home-manager",
@@ -582,11 +599,11 @@
     },
     "sounds": {
       "locked": {
-        "lastModified": 1737024247,
-        "narHash": "sha256-OTtqUYIe713ti4vaa8hS1Z0UvD/X4J9XkLzKgl2+RBE=",
+        "lastModified": 1774486938,
+        "narHash": "sha256-2eGREGFU2BqUTS90Vuk6MGd0AMAcVyo5CdRD2PjXQLU=",
         "owner": "ret2pop",
         "repo": "sounds",
-        "rev": "9714690a6d216f9c55bfe56969d6e7d98768559f",
+        "rev": "f401687096553013f16644cefc05ac08beb675c1",
         "type": "github"
       },
       "original": {

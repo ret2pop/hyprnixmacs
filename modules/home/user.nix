@@ -161,17 +161,17 @@
       '';
     };
   };
-  xdg.mimeApps = {
+xdg.mimeApps = {
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
     defaultApplications = {
       "x-scheme-handler/mailto" = "emacsclient-mail.desktop";
-      "text/html" = "qutebrowser.desktop";
-      "text/xml" = "qutebrowser.desktop";
-      "application/xhtml+xml" = "qutebrowser.desktop";
-      "x-scheme-handler/http" = "qutebrowser.desktop";
-      "x-scheme-handler/https" = "qutebrowser.desktop";
-      "x-scheme-handler/about" = "qutebrowser.desktop";
-      "x-scheme-handler/unknown" = "qutebrowser.desktop";
+      "text/html" = "org.qutebrowser.qutebrowser.desktop";
+      "text/xml" = "org.qutebrowser.qutebrowser.desktop";
+      "application/xhtml+xml" = "org.qutebrowser.qutebrowser.desktop";
+      "x-scheme-handler/http" = "org.qutebrowser.qutebrowser.desktop";
+      "x-scheme-handler/https" = "org.qutebrowser.qutebrowser.desktop";
+      "x-scheme-handler/about" = "org.qutebrowser.qutebrowser.desktop";
+      "x-scheme-handler/unknown" = "org.qutebrowser.qutebrowser.desktop";
     };
   };
 

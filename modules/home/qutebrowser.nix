@@ -1,5 +1,5 @@
 # [[file:../../../config/nix.org::*QuteBrowser][QuteBrowser:1]]
-{ lib, config, ... }:
+{ lib, config, catppuccin-qutebrowser, ... }:
 {
   programs.qutebrowser = {
     enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
@@ -12,7 +12,27 @@
     };
     settings = {
       content.blocking.method = "both";
+      fonts.default_family = "Lora";
+      fonts.default_size = "12pt";
+
+      # Command/completion UI
+      fonts.statusbar = "12pt Lora";
+      fonts.completion.entry = "12pt Lora";
+      fonts.completion.category = "bold 12pt Lora";
+      fonts.prompts = "12pt Lora";
+
+      # Tabs
+      fonts.tabs.selected = "12pt Lora";
+      fonts.tabs.unselected = "12pt Lora";
+
+      # Hints
+      fonts.hints = "bold 12pt Lora";
     };
+    extraConfig = (builtins.readFile "${catppuccin-qutebrowser}/setup.py") +
+''
+config.load_autoconfig()
+setup(c, "mocha", True)
+'';
   };
 }
 # QuteBrowser:1 ends here

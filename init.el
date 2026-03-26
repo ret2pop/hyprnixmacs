@@ -65,7 +65,7 @@
 
   ;; start with sane defaults
   (pixel-scroll-precision-mode 1)
-  (display-battery-mode 1)
+  ;; (display-battery-mode 1)
   (display-time-mode 1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
@@ -75,12 +75,14 @@
   ;; load theme, fonts, and transparency. Prettify symbols.
   (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
   (set-face-attribute 'variable-pitch nil :font "Lora" :height 1.1)
-
+  (set-face-attribute 'alert-urgent-face nil :inherit nil)
   (when (display-graphic-p)
-    (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC"))
-    (set-fontset-font t 'kana (font-spec :family "Noto Sans CJK JP"))
-    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji"))
-    (set-fontset-font t 'symbol (font-spec :family "Symbols Nerd Font Mono") nil 'append)))
+    (set-fontset-font t 'han   (font-spec :family "Noto Sans CJK SC"))
+    (set-fontset-font t 'kana  (font-spec :family "Noto Sans CJK JP"))
+    (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji") nil 'prepend)
+    (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'append)
+    (set-fontset-font t '(#x1f300 . #x1f5ff) (font-spec :family "Noto Color Emoji") nil 'prepend)
+    (set-fontset-font t '(#xe000 . #xf8ff) (font-spec :family "Symbols Nerd Font Mono") nil 'append)))
 
 ;; imperative
 (defun evil-config ()
@@ -114,14 +116,14 @@
 ;; taken from blog https://writepermission.com/org-blogging-rss-feed.html
 (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
   "Publish RSS with PLIST, only when FILENAME is 'rss.org'.
-PUB-DIR is when the output will be placed."
+  PUB-DIR is when the output will be placed."
   (if (equal "rss.org" (file-name-nondirectory filename))
       (org-rss-publish-to-rss plist filename pub-dir)))
 
 (defun format-rss-feed-entry (entry style project)
   "Format ENTRY for the RSS feed.
-ENTRY is a file name.  STYLE is either 'list' or 'tree'.
-PROJECT is the current project."
+  ENTRY is a file name.  STYLE is either 'list' or 'tree'.
+  PROJECT is the current project."
   (cond ((not (directory-name-p entry))
          (let* ((file (org-publish--expand-file-name entry project))
                 (title (org-publish-find-title entry project))
@@ -168,6 +170,106 @@ PROJECT is the current project."
 (defun rp/org-sitemap-publish-function (plist filename pub-dir)
   (when (string-equal (file-name-nondirectory filename) "sitemap.xml")
     (org-publish-attachment plist filename pub-dir)))
+
+(defvar my-mu4e-search-history nil)
+
+(defun my-mu4e-search-with-ivy ()
+  "Search mu4e using the native prompt wrapped in Ivy."
+  (interactive)
+  ;; We use mu4e's own query reader if possible, otherwise fallback
+  (let ((query (completing-read "mu4e search: " 
+                                my-mu4e-search-history nil nil nil 
+                                'my-mu4e-search-history)))
+    (unless (string-blank-p query)
+      (mu4e-search query))))
+
+(defun my-mu4e-narrow-with-ivy ()
+  "Live-preview matches in the current buffer using Ivy, 
+then append the typed input to the mu4e database query."
+  (interactive)
+  (let* ((current-query (or (mu4e-last-query) ""))
+         ;; 1. Collect all lines in the current headers buffer for the preview
+         (lines (save-excursion
+                  (goto-char (point-min))
+                  (let (res)
+                    (while (not (eobp))
+                      (push (buffer-substring-no-properties 
+                             (line-beginning-position) 
+                             (line-end-position)) 
+                            res)
+                      (forward-line 1))
+                    (reverse res)))))
+    
+    ;; 2. Launch Ivy with the collected lines
+    (ivy-read (format "Narrow '%s' with: " current-query)
+              lines
+              :action (lambda (_)
+                        ;; 3. IGNORE the selected line (_). 
+                        ;; Instead, grab exactly what you typed into the prompt.
+                        (let ((input ivy-text))
+                          (if (string-blank-p input)
+                              (message "No narrowing term provided. Canceled.")
+                            ;; 4. Combine the old query with your new input and query Xapian
+                            (mu4e-search (format "(%s) AND (%s)" current-query input))))))))
+
+(defvar my-current-weather "Fetching weather..."
+  "Stores the latest fetched weather string.")
+
+;; 2. The asynchronous fetch function
+(defun my-fetch-weather-async ()
+  "Fetch weather asynchronously without blocking Emacs."
+  (interactive)
+  (let ((buf (get-buffer-create " *wttr-output*")))
+    (with-current-buffer buf (erase-buffer))
+    (make-process
+     :name "wttr-fetch"
+     :buffer buf
+     :command '("curl" "-s" "--max-time" "2" "wttr.in/?format=3")
+     ;; The sentinel runs when the process finishes (success or fail)
+     :sentinel (lambda (process event)
+                 (when (string-match-p "finished" event)
+                   (let ((output (with-current-buffer (process-buffer process)
+                                   (string-trim (buffer-string)))))
+                     ;; Validate output just like your old try macro did
+                     (if (or (string-blank-p output)
+                             (string-match-p "BLOCK FAILED\\|Unknown location\\|<html>" output))
+                         (setq my-current-weather "Weather currently unavailable.")
+                       (setq my-current-weather output)))
+                   
+                   ;; If the dashboard is visible, refresh it so the new text appears!
+                   (when (get-buffer-window "*dashboard*" 'visible)
+                     (with-current-buffer "*dashboard*"
+                       (dashboard-refresh-buffer))))))))
+
+;; 3. Your new, simplified (and fast!) dashboard widget
+(defun my-dashboard-insert-weather-clock (list-size)
+  "Insert a styled clock and the pre-fetched weather variable."
+  (let ((clock (format-time-string "%I:%M %p  •  %A, %B %d")))
+    (insert "\n")
+    (insert (propertize clock 'face '(:height 1.5 :weight bold :foreground "#51afef")))
+    (insert "\n\n")
+    ;; Just insert the variable. No network calls happen here.
+    (insert (propertize my-current-weather 'face '(:foreground "#a9a1e1" :weight semi-bold)))
+    (insert "\n\n")))
+
+(defun my-refresh-dashboard-if-visible ()
+  "Refresh the dashboard buffer, but only if it's currently visible in a window."
+  (when (get-buffer-window "*dashboard*" 'visible)
+    (with-current-buffer "*dashboard*"
+      (dashboard-refresh-buffer))))
+
+(defun my-setup-dashboard-timer ()
+  "Start a timer to refresh the dashboard every 60 seconds."
+  ;; Cancel any existing timer first to avoid creating multiple timers
+  (when (timerp my-dashboard-refresh-timer)
+    (cancel-timer my-dashboard-refresh-timer))
+  ;; Run the refresh function every 60 seconds
+  (setq my-dashboard-refresh-timer (run-with-timer 60 60 #'my-refresh-dashboard-if-visible)))
+
+(defun my-fix-htmlize-invalid-face-bug (orig-fn face attribute &optional frame inherit)
+  (if (eq face t)
+      'unspecified
+    (funcall orig-fn face attribute frame inherit)))
 ;; State:1 ends here
 
 ;; [[file:../config/emacs.org::*Random Packages][Random Packages:1]]
@@ -190,6 +292,20 @@ PROJECT is the current project."
     (standard-indent 2 "base indentation")
     (custom-safe-themes t "I already manage my themes with nix")
     (custom-file null-device "Don't save custom configs")
+    (jit-lock-chunk-size 16384 "actually load code blocks")
+    (jit-lock-stealth-time 1.25 "fontify in the background after 1.25s of idle time")
+    (jit-lock-stealth-nice 0.1 "don't freeze Emacs while stealth fontifying")
+    ;; ---------------------------------------------------------------------------
+    ;; UTF-8 Everywhere
+    ;; ---------------------------------------------------------------------------
+    (set-language-environment "UTF-8")
+    (set-default-coding-systems 'utf-8)
+    (prefer-coding-system 'utf-8)
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (set-selection-coding-system 'utf-8)
+    (locale-coding-system 'utf-8)
+    (use-default-font-for-symbols nil)
 
     ;; Startup errors
     (warning-minimum-level :emergency "Supress emacs warnings")
@@ -198,12 +314,11 @@ PROJECT is the current project."
     (browse-url-generic-program "qutebrowser" "set browser to librewolf")
     (browse-url-secondary-browser-function 'browse-url-generic "set browser")
     (browse-url-browser-function 'browse-url-generic "set browser")
-    (default-frame-alist '((alpha-background . 80)
+    (default-frame-alist '((alpha-background . 100)
                            (vertical-scroll-bars)
                            (internal-border-width . 24)
                            (left-fringe . 8)
                            (right-fringe . 8)))
-
     ;; Mouse wheel
     (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
     (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
@@ -231,27 +346,36 @@ PROJECT is the current project."
     :config (emacs-config))
 ;; Emacs:1 ends here
 
+;; [[file:../config/emacs.org::*Network][Network:1]]
+(use-package enwc :custom (enwc-default-backend 'nm "use networkmanager backend"))
+;; Network:1 ends here
+
+;; [[file:../config/emacs.org::*System Monitor][System Monitor:1]]
+(use-package proced
+  :custom (proced-enable-color-flag t "use colors in proced"))
+;; System Monitor:1 ends here
+
 ;; [[file:../config/emacs.org::*Org Mode][Org Mode:1]]
-  (use-package org
-    :demand t
-    :after (f s dash nix-mode)
-    :hook
-    ((org-mode . remove-annoying-pairing))
-    :custom
-    (org-export-allow-bind-keywords t "don't emit warnings")
-    (org-confirm-babel-evaluate nil "I want to evaluate stuff when publishing")
-    ;; Fix terrible indentation issues
-    (org-edit-src-content-indentation 0)
-    (org-src-tab-acts-natively t)
-    (org-src-preserve-indentation t)
+(use-package org
+  :demand t
+  :after (f s dash nix-mode)
+  :hook
+  ((org-mode . remove-annoying-pairing))
+  :custom
+  (org-export-allow-bind-keywords t "don't emit warnings")
+  (org-confirm-babel-evaluate nil "I want to evaluate stuff when publishing")
+  ;; Fix terrible indentation issues
+  (org-edit-src-content-indentation 0)
+  (org-src-tab-acts-natively t)
+  (org-src-preserve-indentation t)
 
     (TeX-PDF-mode t)
     (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
     (org-export-with-broken-links t "publish website even with broken links")
     (org-src-fontify-natively t "Colors!")
 
-    ;; org-latex
-    (org-format-latex-header "\\documentclass{article} \
+  ;; org-latex
+  (org-format-latex-header "\\documentclass{article} \
     \\usepackage[usenames]{color} \
     [DEFAULT-PACKAGES] \
     [PACKAGES] \
@@ -271,10 +395,10 @@ PROJECT is the current project."
     \\addtolength{\\topmargin}{-2.54cm} \
     \\usepackage{amsmath} \
     ")
-    (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-    (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
-    (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
-    (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+  (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
+  (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
+  (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
 
     (TeX-engine 'xetex "set xelatex as default engine")
     (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
@@ -329,9 +453,10 @@ PROJECT is the current project."
     (org-habit-show-habits-only-for-today nil "See org habit entries")
     (org-habit-show-all-today t "Show org habit graph"))
 
-  (use-package htmlize
-    :demand t
-    :after (catppuccin-theme doom-themes yaml-mode))
+(use-package htmlize
+  :demand t
+  :after (catppuccin-theme doom-themes yaml-mode)
+  :config (advice-add 'face-attribute :around #'my-fix-htmlize-invalid-face-bug))
 
   (unless noninteractive
     (use-package htmlize
@@ -380,24 +505,25 @@ PROJECT is the current project."
         :with-date t
         :with-broken-links t
         :language en
-
-        :recursive t
-        :publishing-function org-html-publish-to-html
-        :headline-levels 4
-        :html-footnotes-section "<div id=\"footnotes\"><hr><div id=\"text-footnotes\"><span class=\"footnotes-label-hidden\">%s</span>%s</div></div>"
-        :html-head ,(concat "<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
-                            "<style>"
-                            (->> (create-htmlize-css)
-                                 (s-replace-regexp "<style[^>]*>" "")
-                                 (s-replace "</style>" "")
-                                 (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
-                                 (s-replace "/*]]>*/-->" "")
-                                 (s-trim)
-                                 (minify-css))
-                            (f-read-text "~/monorepo/style.css" 'utf-8)
-                            "</style>")
-        :html-preamble t
-        :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a> | <a href=\"/blog/rss.xml\">rss feed</a></p><hr>"))
+      :recursive t
+      :publishing-function org-html-publish-to-html
+      :headline-levels 4
+      :html-footnotes-section "<div id=\"footnotes\"><hr><div id=\"text-footnotes\"><span class=\"footnotes-label-hidden\">%s</span>%s</div></div>"
+      :html-head ,(concat "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS Feed\" href=\"/blog/rss.xml\"><meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
+                          "<style>"
+                          (or (ignore-errors
+                                (->> (create-htmlize-css)
+                                     (s-replace-regexp "<style[^>]*>" "")
+                                     (s-replace "</style>" "")
+                                     (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
+                                     (s-replace "/*]]>*/-->" "")
+                                     (s-trim)
+                                     (minify-css)))
+                              "/* HTMLIZE FAILED TO LOAD - CHECK EMACS INIT ERRORS */")
+                          (f-read-text "~/monorepo/style.css" 'utf-8)
+                          "</style>")
+      :html-preamble t
+      :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a> | <a href=\"/blog/rss.xml\">rss feed</a></p><hr>"))
 
         ;; sitemap.html stuff
         :auto-sitemap t
@@ -658,6 +784,17 @@ PROJECT is the current project."
   (global-org-modern-mode))
 ;; Make Org Look Better:1 ends here
 
+;; [[file:../config/emacs.org::*Notifications][Notifications:1]]
+(use-package org-alert
+  :after (org ox-publish)
+  :custom
+  (alert-default-style 'libnotify)
+  (org-alert-interval 300)
+  (org-alert-notify-cutoff 10)
+  (org-alert-notify-after-event-cutoff 10)
+  :config (org-alert-enable))
+;; Notifications:1 ends here
+
 ;; [[file:../config/emacs.org::*LSP][LSP:1]]
 (use-package lsp
   :custom
@@ -709,17 +846,39 @@ PROJECT is the current project."
 (use-package dashboard
   :after (projectile)
   :custom
-  (dashboard-banner-logo-title "Welcome, Commander!" "Set title for dashboard")
-  (dashboard-icon-type 'nerd-icons "Use nerd icons")
-  (dashboard-vertically-center-content t "Center content")
+  (dashboard-banner-logo-title "Introducing: Ret2pop" "Set title for dashboard")
+  (dashboard-startup-banner "/home/preston/monorepo/nix/data/logo.png")
+  (dashboard-icon-type 'all-the-icons "Use nerd icons")
+  (dashboard-center-content t "Center content")
   (dashboard-set-init-info t)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+
   (dashboard-week-agenda t "Agenda in dashboard")
   (dashboard-items '((recents   . 5)
-                     (bookmarks . 5)
                      (projects  . 5)
-                     (agenda    . 5)
-                     (registers . 5)) "Look at some items")
-  :config (unless noninteractive (dashboard-setup-startup-hook)))
+                     (agenda    . 5)) "Look at some items")
+  (dashboard-startupify-list '(dashboard-insert-banner
+                               dashboard-insert-newline
+                               dashboard-insert-banner-title
+                               dashboard-insert-newline
+                               dashboard-insert-navigator
+                               dashboard-insert-newline
+                               dashboard-insert-init-info
+                               dashboard-insert-items
+                               dashboard-insert-newline
+                               dashboard-insert-footer))
+  :config
+  (unless noninteractive (dashboard-setup-startup-hook))
+
+  (my-fetch-weather-async)
+  (defvar my-weather-timer nil)
+  (when (timerp my-weather-timer)
+    (cancel-timer my-weather-timer))
+  (setq my-weather-timer (run-with-timer 900 900 #'my-fetch-weather-async))
+
+  (add-to-list 'dashboard-item-generators '(weather-clock . my-dashboard-insert-weather-clock))
+  (add-to-list 'dashboard-items '(weather-clock . 1)))
 ;; Dashboard:1 ends here
 
 ;; [[file:../config/emacs.org::*Ivy][Ivy:1]]
@@ -841,6 +1000,7 @@ PROJECT is the current project."
     "o r s" '(elfeed :wk "rss feed")
     "o a" '(org-agenda :wk "Open agenda")
     "o w" '(eww :wk "web browser")
+    "o n" '(enwc :wk "NetworkManager Interface")
     "m m" '(emms :wk "Music player")
     "s m" '(proced :wk "System Manager")
     "l p" '(list-processes :wk "List Emacs Processes")
@@ -1067,10 +1227,10 @@ PROJECT is the current project."
 
 (use-package elfeed
   :hook ((elfeed-search-mode . elfeed-update))
+  :general (:states 'normal :keymaps 'elfeed-search-mode-map "r" 'elfeed-update)
   :custom
   (elfeed-search-filter (format "@1-month-ago +unread !%s" (elfeed-final-filter elfeed-hn-filter-list)) "Only display unread articles from a month ago")
-  (elfeed-curl-max-connections 8 "less max connections for less lag")
-  :config (run-with-timer 0 (* 60 10) 'elfeed-update))
+  (elfeed-curl-max-connections 8 "less max connections for less lag"))
 
 (use-package elfeed-org
   :after (elfeed org)
@@ -1196,6 +1356,17 @@ PROJECT is the current project."
 
 (use-package mu4e
   :after smtpmail
+  :general
+  (:states '(normal motion) :keymaps 'mu4e-main-mode-map
+           "s" #'my-ivy-mu4e-search)
+
+  (:states '(normal motion) :keymaps 'mu4e-headers-mode-map
+           "s" #'my-ivy-mu4e-search
+           "/" #'my-mu4e-narrow-with-ivy)
+
+  (:states '(normal motion) :keymaps 'mu4e-thread-mode-map
+           "s" #'my-ivy-mu4e-search
+           "/" #'my-mu4e-narrow-with-ivy)
   :hook
   ((mu4e-compose-mode . mml-secure-message-sign-pgpmime))
   :custom
@@ -1212,6 +1383,7 @@ PROJECT is the current project."
   (mu4e-compose-reply-ignore-address (list "no-?reply" system-email) "ignore my own address and noreply")
   (mu4e-html2text-command "w3m -T text/html" "Use w3m to convert html to text")
   (mu4e-update-interval 300 "Update duration")
+  (mu4e-completing-read-function 'ivy-completing-read)
   (mu4e-headers-auto-update t "Auto-updates feed")
   (mu4e-view-show-images t "Shows images")
   (mu4e-compose-signature-auto-include nil)

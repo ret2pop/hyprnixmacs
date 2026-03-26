@@ -42,7 +42,7 @@
     };
     loginExtra = ''
         if [[ "$(tty)" = "/dev/tty1" ]]; then
-            exec start-hyprland
+            exec qtile start -b wayland
         fi
       '';
   };
