@@ -28,6 +28,7 @@ in
       lang-lean.enable = lib.mkEnableOption "Enables lean language support";
       lang-haskell.enable = lib.mkEnableOption "Enables haskell language support";
       lang-scheme.enable = lib.mkEnableOption "Enables scheme language support";
+      lang-data.enable = lib.mkEnableOption "Enables markup languages support";
       crypto.enable = lib.mkEnableOption "Enables various cryptocurrency wallets";
       art.enable = lib.mkEnableOption "Enables various art programs";
       music.enable = lib.mkEnableOption "Enables mpd";
@@ -77,11 +78,18 @@ in
                     (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
                       poetry
                       python3
-                      python314Packages.python-lsp-server
+                      semgrep
+                      ty
+                      ruff
+                      python314Packages.debugpy
                     ]) else [])
                     ++
                     (if config.monorepo.profiles.lang-sol.enable then (with pkgs; [
                       solc
+                    ]) else [])
+                    ++
+                    (if config.monorepo.profiles.lang-data.enable then (with pkgs; [
+                      yaml-language-server
                     ]) else [])
                     ++
                     (if config.monorepo.profiles.lang-openscad.enable then (with pkgs; [
@@ -180,6 +188,7 @@ in
       lang-idris.enable = lib.mkDefault config.monorepo.profiles.enable;
       lang-agda.enable = lib.mkDefault config.monorepo.profiles.enable;
       lang-scheme.enable = lib.mkDefault config.monorepo.profiles.enable;
+      lang-data.enable = lib.mkDefault config.monorepo.profiles.enable;
 
       crypto.enable = lib.mkDefault config.monorepo.profiles.enable;
       art.enable = lib.mkDefault config.monorepo.profiles.enable;

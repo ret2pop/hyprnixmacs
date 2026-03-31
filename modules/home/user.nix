@@ -48,10 +48,10 @@
 
       # Apps
       octaveFull
-      grim swww vim kotatogram-desktop tg qwen-code element-desktop signal-desktop signal-cli thunderbird jami
+      grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp
 
       # Sound/media
-      pavucontrol alsa-utils imagemagick ffmpeg helvum
+      pavucontrol alsa-utils imagemagick ffmpeg helvum pulseaudio
 
       # Net
       curl rsync gitFull ungoogled-chromium devd

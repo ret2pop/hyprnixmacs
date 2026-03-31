@@ -1,5 +1,5 @@
 # [[file:../../../config/nix.org::*Emacs][Emacs:1]]
-{ lib, config, pkgs, super, ... }:
+{ lib, config, pkgs, super, self, ... }:
 {
   programs.emacs = 
     {
@@ -7,6 +7,7 @@
       package = pkgs.emacs-pgtk;
       extraConfig = ''
   (setq debug-on-error t)
+  (setq logo-file "${self}/data/logo.png")
   (setq system-email "${super.monorepo.vars.email}")
   (setq system-username "${super.monorepo.vars.internetName}")
   (setq system-fullname "${super.monorepo.vars.fullName}")

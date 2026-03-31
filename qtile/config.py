@@ -9,7 +9,7 @@ from qtile_extras.layout.decorations import RoundedCorners
 import re
 # Imports:1 ends here
 
-# [[file:../../config/qtile.org::*Config][Config:1]]
+# [[file:../../config/qtile.org::*Data][Data:1]]
 mod = "mod4"
 terminal = "kitty"
 wallpaper = WALLPAPER
@@ -54,7 +54,9 @@ workspace_keys = {
     "8": "8",
     "9": "9",
 }
+# Data:1 ends here
 
+# [[file:../../config/qtile.org::*Config][Config:1]]
 groups = [
     Group("1", matches=[Match(wm_class=re.compile(r"^emacs$", re.IGNORECASE))]),
     Group("2", matches=[Match(wm_class=re.compile(r"(qutebrowser|org\.qutebrowser\.qutebrowser)", re.IGNORECASE))]),

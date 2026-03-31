@@ -283,67 +283,67 @@ then append the typed input to the mu4e database query."
 ;; Random Packages:1 ends here
 
 ;; [[file:../config/emacs.org::*Emacs][Emacs:1]]
-  (use-package emacs
-    :custom
-    ;; global defaults
-    (enable-local-variables :all "don't emit local variable warnings when publishing")
-    (indent-tabs-mode nil "no real tabs, only spaces")
-    (tab-width 2 "tab show as 2 spaces")
-    (standard-indent 2 "base indentation")
-    (custom-safe-themes t "I already manage my themes with nix")
-    (custom-file null-device "Don't save custom configs")
-    (jit-lock-chunk-size 16384 "actually load code blocks")
-    (jit-lock-stealth-time 1.25 "fontify in the background after 1.25s of idle time")
-    (jit-lock-stealth-nice 0.1 "don't freeze Emacs while stealth fontifying")
-    ;; ---------------------------------------------------------------------------
-    ;; UTF-8 Everywhere
-    ;; ---------------------------------------------------------------------------
-    (set-language-environment "UTF-8")
-    (set-default-coding-systems 'utf-8)
-    (prefer-coding-system 'utf-8)
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    (set-selection-coding-system 'utf-8)
-    (locale-coding-system 'utf-8)
-    (use-default-font-for-symbols nil)
+(use-package emacs
+  :custom
+  ;; global defaults
+  (enable-local-variables :all "don't emit local variable warnings when publishing")
+  (indent-tabs-mode nil "no real tabs, only spaces")
+  (tab-width 2 "tab show as 2 spaces")
+  (standard-indent 2 "base indentation")
+  (custom-safe-themes t "I already manage my themes with nix")
+  (custom-file null-device "Don't save custom configs")
+  (jit-lock-chunk-size 16384 "actually load code blocks")
+  (jit-lock-stealth-time 1.25 "fontify in the background after 1.25s of idle time")
+  (jit-lock-stealth-nice 0.1 "don't freeze Emacs while stealth fontifying")
+  ;; ---------------------------------------------------------------------------
+  ;; UTF-8 Everywhere
+  ;; ---------------------------------------------------------------------------
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (locale-coding-system 'utf-8)
+  (use-default-font-for-symbols nil)
 
-    ;; Startup errors
-    (warning-minimum-level :emergency "Supress emacs warnings")
-    (confirm-kill-processes nil "Don't ask to quit")
-    (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
-    (browse-url-generic-program "qutebrowser" "set browser to librewolf")
-    (browse-url-secondary-browser-function 'browse-url-generic "set browser")
-    (browse-url-browser-function 'browse-url-generic "set browser")
-    (default-frame-alist '((alpha-background . 100)
-                           (vertical-scroll-bars)
-                           (internal-border-width . 24)
-                           (left-fringe . 8)
-                           (right-fringe . 8)))
-    ;; Mouse wheel
-    (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
-    (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
-    (mouse-wheel-follow-mouse 't "Scroll correct window")
-    (scroll-conservatively 101 "Sort of smooth scrolling")
-    (scroll-step 1 "Scroll one line at a time")
-    (debug-on-error nil "Don't make the annoying popups")
-    (display-time-24hr-format t "Use 24 hour format to read the time")
-    (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
-    (use-short-answers t "Use y instead of yes")
-    (make-backup-files nil "Don't make backups")
-    (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
-    (fill-column 150)
-    (line-spacing 2 "Default line spacing")
-    (c-doc-comment-style '((c-mode . doxygen)
-                           (c++-mode . doxygen)))
+  ;; Startup errors
+  (warning-minimum-level :emergency "Supress emacs warnings")
+  (confirm-kill-processes nil "Don't ask to quit")
+  (debug-ignored-errors (cons 'remote-file-error debug-ignored-errors) "Remove annoying error from debug errors")
+  (browse-url-generic-program "qutebrowser" "set browser to librewolf")
+  (browse-url-secondary-browser-function 'browse-url-generic "set browser")
+  (browse-url-browser-function 'browse-url-generic "set browser")
+  (default-frame-alist '((alpha-background . 100)
+                         (vertical-scroll-bars)
+                         (internal-border-width . 24)
+                         (left-fringe . 8)
+                         (right-fringe . 8)))
+  ;; Mouse wheel
+  (mouse-wheel-scroll-amount '(1 ((shift) . 1)) "Nicer scrolling")
+  (mouse-wheel-progressive-speed nil "Make scrolling non laggy")
+  (mouse-wheel-follow-mouse 't "Scroll correct window")
+  (scroll-conservatively 101 "Sort of smooth scrolling")
+  (scroll-step 1 "Scroll one line at a time")
+  (debug-on-error nil "Don't make the annoying popups")
+  (display-time-24hr-format t "Use 24 hour format to read the time")
+  (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
+  (use-short-answers t "Use y instead of yes")
+  (make-backup-files nil "Don't make backups")
+  (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
+  (fill-column 150)
+  (line-spacing 2 "Default line spacing")
+  (c-doc-comment-style '((c-mode . doxygen)
+                         (c++-mode . doxygen)))
 
 
-    :hook ((text-mode . visual-line-mode)
-           (prog-mode . display-line-numbers-mode)
-           (prog-mode . display-fill-column-indicator-mode)
-           (org-mode . auto-fill-mode)
-           (org-mode . display-fill-column-indicator-mode)
-           (org-mode . display-line-numbers-mode))
-    :config (emacs-config))
+  :hook ((text-mode . visual-line-mode)
+         (prog-mode . display-line-numbers-mode)
+         (prog-mode . display-fill-column-indicator-mode)
+         (org-mode . auto-fill-mode)
+         (org-mode . display-fill-column-indicator-mode)
+         (org-mode . display-line-numbers-mode))
+  :config (emacs-config))
 ;; Emacs:1 ends here
 
 ;; [[file:../config/emacs.org::*Network][Network:1]]
@@ -400,28 +400,32 @@ then append the typed input to the mu4e database query."
   (org-latex-to-html-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
   (org-latex-to-mathml-convert-command "printf '%%s' %i | pandoc -f latex -t html --mathml | tr -d '\\n' | sed -e 's/^<p>//' -e 's/<\\/p>$//'" "latex to MathML with special character handling")
 
-    (TeX-engine 'xetex "set xelatex as default engine")
-    (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
-    ;; (preview-image-type 'png "Use PNGs")
-    (org-preview-latex-default-process 'dvipng)
-    (org-format-latex-options
-     '(:foreground default
-                   :background default
-                   :scale 2
-                   :html-foreground "Black"
-                   :html-background "Transparent"
-                   :html-scale 1.5
-                   :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
-    (org-return-follows-link t "be able to follow links without mouse")
-    (org-startup-indented t "Indent the headings")
-    (org-image-actual-width '(300) "Cap width") 
-    (org-startup-with-latex-preview t "see latex previews on opening file")
-    (org-startup-with-inline-images t "See images on opening file")
-    (org-hide-emphasis-markers t "prettify org mode")
-    (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
-    (org-pretty-entities t "prettify org mode")
-    (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
-    (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
+  (TeX-engine 'xetex "set xelatex as default engine")
+  (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
+  ;; (preview-image-type 'png "Use PNGs")
+  (org-preview-latex-default-process 'dvipng)
+  (org-format-latex-options
+   '(:foreground default
+                 :background default
+                 :scale 2
+                 :html-foreground "Black"
+                 :html-background "Transparent"
+                 :html-scale 1.5
+                 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) "space latex better")
+  (org-return-follows-link t "be able to follow links without mouse")
+  (org-startup-indented t "Indent the headings")
+  (org-image-actual-width '(300) "Cap width") 
+  (org-startup-with-latex-preview t "see latex previews on opening file")
+  (org-startup-with-inline-images t "See images on opening file")
+  (org-hide-emphasis-markers t "prettify org mode")
+  (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
+  (org-pretty-entities t "prettify org mode")
+  (org-agenda-files (list "~/monorepo/agenda.org" "~/org/notes.org" "~/org/agenda.org") "set default org files")
+  (org-agenda-block-separator "")
+  (org-fontify-whole-heading-line t)
+  (org-fontify-done-headline t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
 
     ;; ricing
     (org-auto-align-tags nil)
@@ -700,6 +704,76 @@ then append the typed input to the mu4e database query."
 
 (use-package page-break-lines
   :config (page-break-lines-mode))
+
+(use-package evil-mc
+  :after evil
+  :config (global-evil-mc-mode 1))
+
+(use-package evil-surround
+  :after evil
+  :config
+  (global-evil-surround-mode 1))
+
+(use-package evil-lion
+  :config
+  (evil-lion-mode))
+
+(use-package evil-multiedit
+  :after evil
+  :config
+  (evil-multiedit-default-keybinds))
+
+(use-package evil-textobj-tree-sitter
+  :ensure t
+  ;; Ensure Evil is loaded first so the text-object maps exist
+  :after evil
+  
+  ;; 1. The Keybindings
+  :bind ((:map evil-outer-text-objects-map
+               ("f" . my-treesit-outer-function)
+               ("c" . my-treesit-outer-class)
+               ("a" . my-treesit-outer-arg))
+         
+         (:map evil-inner-text-objects-map
+               ("f" . my-treesit-inner-function)
+               ("c" . my-treesit-inner-class)
+               ("a" . my-treesit-inner-arg))
+               
+         (:map evil-normal-state-map
+               ("] f" . my-treesit-goto-next-function)
+               ("[ f" . my-treesit-goto-prev-function)
+               ("] c" . my-treesit-goto-next-class)
+               ("[ c" . my-treesit-goto-prev-class)))
+
+  ;; 2. The Command Definitions
+  :config
+  ;; Link the custom names we bound above to the actual Tree-sitter closures
+  (defalias 'my-treesit-outer-function (evil-textobj-tree-sitter-get-textobj "function.outer"))
+  (defalias 'my-treesit-inner-function (evil-textobj-tree-sitter-get-textobj "function.inner"))
+  
+  (defalias 'my-treesit-outer-class    (evil-textobj-tree-sitter-get-textobj "class.outer"))
+  (defalias 'my-treesit-inner-class    (evil-textobj-tree-sitter-get-textobj "class.inner"))
+  
+  ;; "a" is standard Vim terminology for "argument" (parameter)
+  (defalias 'my-treesit-outer-arg      (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+  (defalias 'my-treesit-inner-arg      (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+
+  ;; Navigation commands are standard interactive functions, so we wrap them cleanly
+  (defun my-treesit-goto-next-function ()
+    (interactive)
+    (evil-textobj-tree-sitter-goto-textobj "function.outer"))
+    
+  (defun my-treesit-goto-prev-function ()
+    (interactive)
+    (evil-textobj-tree-sitter-goto-textobj "function.outer" t))
+
+  (defun my-treesit-goto-next-class ()
+    (interactive)
+    (evil-textobj-tree-sitter-goto-textobj "class.outer"))
+    
+  (defun my-treesit-goto-prev-class ()
+    (interactive)
+    (evil-textobj-tree-sitter-goto-textobj "class.outer" t)))
 ;; Packages:1 ends here
 
 ;; [[file:../config/emacs.org::*Journal][Journal:1]]
@@ -796,14 +870,43 @@ then append the typed input to the mu4e database query."
 ;; Notifications:1 ends here
 
 ;; [[file:../config/emacs.org::*LSP][LSP:1]]
-(use-package lsp
+(use-package lsp-mode
   :custom
   (lsp-use-plists t)
   (lsp-typescript-format-enable t)
   (lsp-typescript-indent-size 4)
   (lsp-typescript-tab-size 4)
   (lsp-typescript-indent-style "spaces")
-  :hook ((prog-mode . lsp)))
+
+  (lsp-auto-guess-root t)
+  (lsp-restart 'auto-restart)
+  (lsp-keep-workspace-alive t)
+
+  :hook ((python-mode    . lsp-deferred)
+         (python-ts-mode . lsp-deferred)
+         (emacs-lisp-mode . lsp-deferred)
+         (yaml-mode      . lsp-deferred)
+         (yaml-ts-mode   . lsp-deferred)
+         (json-mode      . lsp-deferred)
+         (json-ts-mode   . lsp-deferred)
+         (toml-mode      . lsp-deferred)
+         (toml-ts-mode   . lsp-deferred)
+         (sh-mode        . lsp-deferred)
+         (nix-mode       . lsp-deferred))
+  :commands (lsp lsp-deferred)
+  :general
+  (:states 'normal :keymaps 'lsp-mode-map
+           "gI" #'lsp-find-implementation
+           "gy" #'lsp-find-type-definition
+           "K"  #'lsp-describe-thing-at-point))
+
+(use-package lsp-ui
+  :after lsp-mode
+  :general
+  (:states 'normal :keymaps 'lsp-mode-map
+           "gd" #'lsp-ui-peek-find-definitions
+           "gr" #'lsp-ui-peek-find-references)
+  :hook (lsp-mode . lsp-ui-mode))
 
 (use-package editorconfig
   :config (editorconfig-mode 1))
@@ -813,6 +916,11 @@ then append the typed input to the mu4e database query."
 
 (use-package platformio-mode
   :hook (prog-mode . platformio-conditionally-enable))
+
+(use-package dap-mode
+  :custom
+  (dap-auto-configure-features '(sessions locals controls tooltip))
+  :hook (lsp-mode . dap-mode))
 ;; LSP:1 ends here
 
 ;; [[file:../config/emacs.org::*C/C++][C/C++:1]]
@@ -846,13 +954,14 @@ then append the typed input to the mu4e database query."
 (use-package dashboard
   :after (projectile)
   :custom
-  (dashboard-banner-logo-title "Introducing: Ret2pop" "Set title for dashboard")
-  (dashboard-startup-banner "/home/preston/monorepo/nix/data/logo.png")
+  (dashboard-banner-logo-title "Introducing: Ret2pop!" "Set title for dashboard")
+  (dashboard-startup-banner logo-file)
   (dashboard-icon-type 'all-the-icons "Use nerd icons")
   (dashboard-center-content t "Center content")
   (dashboard-set-init-info t)
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
+  (dashboard-projects-backend 'projectile)
 
   (dashboard-week-agenda t "Agenda in dashboard")
   (dashboard-items '((recents   . 5)
@@ -1252,6 +1361,8 @@ then append the typed input to the mu4e database query."
   :config (elfeed-tube-setup))
 
 (use-package elfeed-tube-mpv
+  :after elfeed-tube
+  :demand t
   :bind (:map elfeed-show-mode-map
               ("C-c C-f" . elfeed-tube-mpv-follow-mode)
               ("C-c C-c" . elfeed-tube-mpv)
@@ -1262,12 +1373,14 @@ then append the typed input to the mu4e database query."
 
 ;; [[file:../config/emacs.org::*Project Drawer][Project Drawer:1]]
 (use-package treemacs
+  :demand t
   :after doom-themes)
 
 (use-package treemacs-evil
   :after (treemacs evil))
 
 (use-package treemacs-projectile
+  :demand t
   :after (treemacs projectile))
 
 (use-package treemacs-magit
@@ -1423,6 +1536,55 @@ then append the typed input to the mu4e database query."
   :demand t
   :config (centaur-tabs-mode t))
 ;; Tabs:1 ends here
+
+;; [[file:../config/emacs.org::*Sops][Sops:1]]
+(unless noninteractive
+  (use-package sops
+    :bind (("C-c C-c" . sops-save-file)
+           ("C-c C-k" . sops-cancel)
+           ("C-c C-d" . sops-edit-file))
+    :init (global-sops-mode 1)))
+;; Sops:1 ends here
+
+;; [[file:../config/emacs.org::*Pulseaudio][Pulseaudio:1]]
+(unless noninteractive
+  (use-package pulseaudio-control
+    :config (pulseaudio-control-default-keybindings)))
+;; Pulseaudio:1 ends here
+
+;; [[file:../config/emacs.org::*TreeSitter][TreeSitter:1]]
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+;; TreeSitter:1 ends here
+
+;; [[file:../config/emacs.org::*Indentation][Indentation:1]]
+(use-package aggressive-indent
+  :hook ((js-ts-mode . aggressive-indent-mode)
+         (css-ts-mode . aggressive-indent-mode)
+         (json-ts-mode . aggressive-indent-mode)
+         (nix-mode . aggressive-indent-mode)
+         (c-ts-mode . aggressive-indent-mode)))
+;; Indentation:1 ends here
+
+;; [[file:../config/emacs.org::*Pulsar][Pulsar:1]]
+(use-package pulsar
+  :custom
+  (pulsar-delay 0.055)
+  (pulsar-iterations 5)
+  (pulsar-face 'pulsar-green)
+  (pulsar-region-face 'pulsar-yellow)
+  (pulsar-highlight-face 'pulsar-magenta)
+  :bind
+  (:map global-map
+    ("C-x l" . pulsar-pulse-line)
+    ("C-x L" . pulsar-highlight-permanently-dwim))
+  :init
+  (pulsar-global-mode 1))
+;; Pulsar:1 ends here
 
 ;; [[file:../config/emacs.org::*Lean4][Lean4:1]]
 (unless noninteractive (use-package lean4-mode

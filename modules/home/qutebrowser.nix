@@ -9,6 +9,7 @@
       w = "https://en.wikipedia.org/wiki/Special:Search?search={}&amp;go=Go&amp;ns0=1";
       aw = "https://wiki.archlinux.org/?search={}";
       nw = "https://wiki.nixos.org/index.php?search={}";
+      npk = "https://search.nixos.org/packages?channel=unstable&query={}";
     };
     settings = {
       content.blocking.method = "both";

@@ -1,5 +1,6 @@
 # [[file:../../../config/nix.org::*Emacs Packages][Emacs Packages:1]]
 epkgs: with epkgs; [
+  aggressive-indent
   all-the-icons
   agda2-mode
   auctex
@@ -9,6 +10,7 @@ epkgs: with epkgs; [
   company-solidity
   counsel
   centaur-tabs
+  dap-mode
   dash
   dashboard
   doom-themes
@@ -28,7 +30,12 @@ epkgs: with epkgs; [
   evil
   evil-collection
   evil-commentary
+  evil-multiedit
+  evil-mc
+  evil-surround
   evil-org
+  evil-lion
+  evil-textobj-tree-sitter
   f
   flycheck
   geiser
@@ -46,6 +53,7 @@ epkgs: with epkgs; [
   latex-preview-pane
   lsp-ivy
   lsp-mode
+  lsp-ui
   lsp-haskell
   lyrics-fetcher
   mastodon
@@ -66,6 +74,8 @@ epkgs: with epkgs; [
   org-modern
   org-roam
   org-roam-ui
+  pulseaudio-control
+  pulsar
   page-break-lines
   password-store
   pdf-tools
@@ -75,6 +85,7 @@ epkgs: with epkgs; [
   polymode
   rustic
   s
+  sops
   solaire-mode
   scad-mode
   simple-httpd
