@@ -73,7 +73,7 @@
   (global-auto-revert-mode 1)
 
   ;; load theme, fonts, and transparency. Prettify symbols.
-  (when (display-graphic-p)
+  (unless noninteractive (when (display-graphic-p)
     (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
     (set-face-attribute 'variable-pitch nil :font "Lora" :height 1.1)
     (set-fontset-font t 'han   (font-spec :family "Noto Sans CJK SC"))
@@ -81,7 +81,7 @@
     (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji") nil 'prepend)
     (set-fontset-font t 'symbol (font-spec :family "Noto Color Emoji") nil 'append)
     (set-fontset-font t '(#x1f300 . #x1f5ff) (font-spec :family "Noto Color Emoji") nil 'prepend)
-    (set-fontset-font t '(#xe000 . #xf8ff) (font-spec :family "Symbols Nerd Font Mono") nil 'append)))
+    (set-fontset-font t '(#xe000 . #xf8ff) (font-spec :family "Symbols Nerd Font Mono") nil 'append))))
 
 ;; imperative
 (defun evil-config ()
@@ -113,16 +113,59 @@
 (defun remove-annoying-pairing () (remove-hook 'post-self-insert-hook #'yaml-electric-bar-and-angle t))
 
 ;; taken from blog https://writepermission.com/org-blogging-rss-feed.html
+;; (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
+;;   "Publish RSS with PLIST, only when FILENAME is 'rss.org'.
+;;   PUB-DIR is when the output will be placed."
+;;   (if (equal "rss.org" (file-name-nondirectory filename))
+;;       (org-rss-publish-to-rss plist filename pub-dir)))
+
+;; (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
+;;   "Publish an Org file to RSS without creating Org IDs."
+;;   (let* ((ext (concat "." (or (plist-get plist :rss-extension)
+;;                               org-rss-extension
+;;                               "xml")))
+;;          (visiting (find-buffer-visiting filename))
+;;          (buf (or visiting
+;;                   (let ((org-inhibit-startup t))
+;;                     (find-file-noselect filename)))))
+;;     (unwind-protect
+;;         (with-current-buffer buf
+;;           (let ((org-inhibit-startup t))
+;;             ;; Keep PUBDATE generation.
+;;             (org-rss-add-pubdate-property)
+;;             (save-buffer))
+;;           (org-publish-org-to 'rss filename ext plist pub-dir))
+;;       (unless visiting
+;;         (kill-buffer buf)))))
+
 (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
-  "Publish RSS with PLIST, only when FILENAME is 'rss.org'.
-  PUB-DIR is when the output will be placed."
-  (if (equal "rss.org" (file-name-nondirectory filename))
-      (org-rss-publish-to-rss plist filename pub-dir)))
+  (org-publish-org-to
+   'rss
+   filename
+   (concat "." (or (plist-get plist :rss-extension)
+                   org-rss-extension
+                   "xml"))
+   plist
+   pub-dir))
+
+;; (defun rp/org-rss-publish-to-rss (plist filename pub-dir)
+;;   "Use stock RSS publishing for normal posts, but bypass UID/PUBDATE
+;; mutation for the generated rss.org sitemap."
+;;   (if (string-equal (file-name-nondirectory filename) "rss.org")
+;;       (org-publish-org-to
+;;        'rss
+;;        filename
+;;        (concat "." (or (plist-get plist :rss-extension)
+;;                        org-rss-extension
+;;                        "xml"))
+;;        plist
+;;        pub-dir)
+;;     (org-rss-publish-to-rss plist filename pub-dir)))
 
 (defun format-rss-feed-entry (entry style project)
   "Format ENTRY for the RSS feed.
-  ENTRY is a file name.  STYLE is either 'list' or 'tree'.
-  PROJECT is the current project."
+ENTRY is a file name.  STYLE is either 'list' or 'tree'.
+PROJECT is the current project."
   (cond ((not (directory-name-p entry))
          (let* ((file (org-publish--expand-file-name entry project))
                 (title (org-publish-find-title entry project))
@@ -140,6 +183,7 @@
          ;; Return only last subdir.
          (file-name-nondirectory (directory-file-name entry)))
         (t entry)))
+
 
 (defun format-rss-feed (title list)
   "Generate the rss.org file from the formatted list."
@@ -266,9 +310,9 @@ then append the typed input to the mu4e database query."
   (setq my-dashboard-refresh-timer (run-with-timer 60 60 #'my-refresh-dashboard-if-visible)))
 
 (defun my-fix-htmlize-invalid-face-bug (orig-fn face attribute &optional frame inherit)
-  (if (eq face t)
-      'unspecified
-    (funcall orig-fn face attribute frame inherit)))
+  (if (facep face)
+      (funcall orig-fn face attribute frame inherit)
+      'unspecified))
 ;; State:1 ends here
 
 ;; [[file:../config/emacs.org::*Random Packages][Random Packages:1]]
@@ -458,6 +502,7 @@ then append the typed input to the mu4e database query."
 
 (use-package htmlize
   :demand t
+  :after (doom-themes yaml-mode)
   :config (advice-add 'face-attribute :around #'my-fix-htmlize-invalid-face-bug))
 
 (use-package ox-latex
@@ -510,15 +555,13 @@ then append the typed input to the mu4e database query."
       :html-footnotes-section "<div id=\"footnotes\"><hr><div id=\"text-footnotes\"><span class=\"footnotes-label-hidden\">%s</span>%s</div></div>"
       :html-head ,(concat "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS Feed\" href=\"/blog/rss.xml\"><meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Inconsolata-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<meta name=\"theme-color\" content=\"#ffffff\">\n<link rel=\"preload\" href=\"/fonts/Lora-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Bold.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"preload\" href=\"/fonts/CormorantGaramond-Medium.woff2\" as=\"font\" type=\"font/woff2\" crossorigin>\n<link rel=\"manifest\" href=\"/site.webmanifest\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/favicon-16x16.png\">\n<link rel=\"mask-icon\" href=\"/safari-pinned-tab.svg\" color=\"#5bbad5\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/favicon-32x32.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/apple-touch-icon.png\"><meta name=\"msapplication-TileColor\" content=\"#da532c\">\n"
                           "<style>"
-                          (or (ignore-errors
-                                (->> (create-htmlize-css)
-                                     (s-replace-regexp "<style[^>]*>" "")
-                                     (s-replace "</style>" "")
-                                     (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
-                                     (s-replace "/*]]>*/-->" "")
-                                     (s-trim)
-                                     (minify-css)))
-                              "/* HTMLIZE FAILED TO LOAD - CHECK EMACS INIT ERRORS */")
+                          (->> (create-htmlize-css)
+                               (s-replace-regexp "<style[^>]*>" "")
+                               (s-replace "</style>" "")
+                               (s-replace "<![CDATA[/*><![CDATA[/*>\n" "")
+                               (s-replace "/*]]>*/-->" "")
+                               (s-trim)
+                               (minify-css))
                           (f-read-text "~/monorepo/style.css" 'utf-8)
                           "</style>")
       :html-preamble t
@@ -531,19 +574,43 @@ then append the typed input to the mu4e database query."
       :sitemap-style list
       :sitemap-sort-files anti-chronologically)
 
+     ;; ("website-blog-rss"
+     ;;  :base-directory "~/monorepo/blog"
+     ;;  :base-extension "org"
+     ;;  :recursive nil
+     ;;  :exclude "rss\\.org\\|index\\.org\\|404\\.org"
+     ;;  :rss-extension "xml"
+
+     ;;  :publishing-directory "~/website_html/blog"
+     ;;  :publishing-function rp/org-rss-publish-to-rss
+     ;;  :html-link-home "https://ret2pop.net/blog/"
+     ;;  :html-link-use-abs-url t
+
+     ;;  ;; use custom sitemap functionality to publish rss feed
+     ;;  :auto-sitemap t
+     ;;  :sitemap-filename "rss.org"
+     ;;  :sitemap-title "Blog Feed"
+     ;;  :sitemap-style list
+     ;;  :sitemap-sort-folders ignore
+     ;;  :sitemap-sort-files anti-chronologically
+     ;;  :sitemap-format-entry format-rss-feed-entry
+     ;;  :sitemap-function format-rss-feed)
+
      ("website-blog-rss"
       :base-directory "~/monorepo/blog"
       :base-extension "org"
       :recursive nil
-      :exclude "rss\\.org\\|index\\.org\\|404\\.org"
-      :rss-extension "xml"
 
+      ;; Only publish the generated feed source.
+      :exclude ".*"
+      :include ("rss.org")
+
+      :rss-extension "xml"
       :publishing-directory "~/website_html/blog"
       :publishing-function rp/org-rss-publish-to-rss
       :html-link-home "https://ret2pop.net/blog/"
       :html-link-use-abs-url t
 
-      ;; use custom sitemap functionality to publish rss feed
       :auto-sitemap t
       :sitemap-filename "rss.org"
       :sitemap-title "Blog Feed"
@@ -798,8 +865,8 @@ then append the typed input to the mu4e database query."
 
   (use-package general
     :after (evil evil-collection)
-    :init (general-create-definer leader-key :prefix "SPC")
     :config
+    (general-create-definer leader-key :prefix "SPC")
     ;; these are just bindings but the symbols are all lazily handled by general
     (create-irc-servers
      (znc "ret2pop.net" "5000")
@@ -933,15 +1000,13 @@ then append the typed input to the mu4e database query."
 
 ;; [[file:../config/emacs.org::*Doom Theme][Doom Theme:1]]
 (use-package doom-themes
+  :demand t
   :custom
   (doom-themes-enable-bold t "use bold letters")
   (doom-themes-enable-italic t "use italic letters")
   (doom-themes-treemacs-theme "doom-colors" "set theme to something like catppuccin but doom")
   :config
   (unless noninteractive (doom-themes-config)))
-
-(use-package catppuccin-theme
-  :config (when noninteractive (try (load-theme 'catppuccin-theme t))))
 
 (use-package solaire-mode
   :after doom-themes
@@ -1158,8 +1223,12 @@ then append the typed input to the mu4e database query."
   :bind
   ("C-j" . ivy-immediate-done)
   ("C-c C-r" . ivy-resume)
-  :init (ivy-mode)
-  :config (ivy-rich-mode))
+  :config
+  (ivy-mode))
+
+(use-package ivy-rich
+  :config
+  (ivy-rich-mode))
 
 (use-package counsel
   :after ivy
@@ -1664,7 +1733,7 @@ then append the typed input to the mu4e database query."
   (:map global-map
     ("C-x l" . pulsar-pulse-line)
     ("C-x L" . pulsar-highlight-permanently-dwim))
-  :init
+  :config
   (pulsar-global-mode 1))
 ;; Pulsar:1 ends here
 
