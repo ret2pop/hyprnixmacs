@@ -417,8 +417,6 @@ in
       tctiEnvironment.enable = true;
     };
 
-    auditd.enable = true;
-    audit.enable = true;
     chromiumSuidSandbox.enable = (! config.monorepo.profiles.ttyonly.enable);
     sudo.enable = true;
   };

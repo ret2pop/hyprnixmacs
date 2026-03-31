@@ -51,7 +51,7 @@
       grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp
 
       # Sound/media
-      pavucontrol alsa-utils imagemagick ffmpeg helvum pulseaudio
+      pavucontrol alsa-utils imagemagick ffmpeg pulseaudio
 
       # Net
       curl rsync gitFull ungoogled-chromium devd
