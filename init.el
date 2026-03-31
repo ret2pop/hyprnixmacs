@@ -73,10 +73,9 @@
   (global-auto-revert-mode 1)
 
   ;; load theme, fonts, and transparency. Prettify symbols.
-  (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
-  (set-face-attribute 'variable-pitch nil :font "Lora" :height 1.1)
-  (set-face-attribute 'alert-urgent-face nil :inherit nil)
   (when (display-graphic-p)
+    (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 130)
+    (set-face-attribute 'variable-pitch nil :font "Lora" :height 1.1)
     (set-fontset-font t 'han   (font-spec :family "Noto Sans CJK SC"))
     (set-fontset-font t 'kana  (font-spec :family "Noto Sans CJK JP"))
     (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji") nil 'prepend)
@@ -369,10 +368,10 @@ then append the typed input to the mu4e database query."
   (org-src-tab-acts-natively t)
   (org-src-preserve-indentation t)
 
-    (TeX-PDF-mode t)
-    (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
-    (org-export-with-broken-links t "publish website even with broken links")
-    (org-src-fontify-natively t "Colors!")
+  (TeX-PDF-mode t)
+  (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
+  (org-export-with-broken-links t "publish website even with broken links")
+  (org-src-fontify-natively t "Colors!")
 
   ;; org-latex
   (org-format-latex-header "\\documentclass{article} \
@@ -427,88 +426,84 @@ then append the typed input to the mu4e database query."
   (org-fontify-quote-and-verse-blocks t)
   (org-default-notes-file (concat org-directory "/notes.org") "Notes file")
 
-    ;; ricing
-    (org-auto-align-tags nil)
-    (org-tags-column 0)
-    (org-catch-invisible-edits 'show-and-error)
-    (org-special-ctrl-a/e t)
-    (org-insert-heading-respect-content t)
-    (org-hide-emphasis-markers t)
-    (org-pretty-entities t)
-    (org-agenda-tags-column 0)
-    (org-ellipsis "…")
-    :config
-    (org-babel-do-load-languages 'org-babel-load-languages
-                                 '((shell . t)
-                                   (python . t)
-                                   (nix . t)
-                                   (scheme . t)
-                                   (latex . t))))
+  ;; ricing
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  (org-hide-emphasis-markers t)
+  (org-pretty-entities t)
+  (org-agenda-tags-column 0)
+  (org-ellipsis "…")
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell . t)
+                                 (python . t)
+                                 (nix . t)
+                                 (scheme . t)
+                                 (latex . t))))
 
-  (use-package org-tempo
-    :after org)
+(use-package org-tempo
+  :after org)
 
-  (use-package org-habit
-    :after org
-    :custom
-    (org-habit-preceding-days 7 "See org habit entries")
-    (org-habit-following-days 35 "See org habit entries")
-    (org-habit-show-habits t "See org habit entries")
-    (org-habit-show-habits-only-for-today nil "See org habit entries")
-    (org-habit-show-all-today t "Show org habit graph"))
+(use-package org-habit
+  :after org
+  :custom
+  (org-habit-preceding-days 7 "See org habit entries")
+  (org-habit-following-days 35 "See org habit entries")
+  (org-habit-show-habits t "See org habit entries")
+  (org-habit-show-habits-only-for-today nil "See org habit entries")
+  (org-habit-show-all-today t "Show org habit graph"))
 
 (use-package htmlize
   :demand t
-  :after (catppuccin-theme doom-themes yaml-mode)
   :config (advice-add 'face-attribute :around #'my-fix-htmlize-invalid-face-bug))
 
-  (unless noninteractive
-    (use-package htmlize
-      :after (doom-themes)))
+(use-package ox-latex
+  :after (org)
+  :custom
+  (org-latex-compiler "xelatex" "Use latex as default")
+  (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
 
-  (use-package ox-latex
-    :after (org)
-    :custom
-    (org-latex-compiler "xelatex" "Use latex as default")
-    (org-latex-pdf-process '("xelatex -interaction=nonstopmode -output-directory=%o %f") "set xelatex as default"))
+(use-package ox-html
+  :demand t
+  :after (org htmlize)
+  :custom
+  (org-html-htmlize-output-type 'css "allow styling from CSS file")
+  (org-html-with-latex 'html "let my html handler handle latex")
+  (org-html-mathjax-options nil "disable mathjax, use MathML")
+  (org-html-mathjax-template "" "disable mathjax, use MathML")
+  (org-html-head-include-default-style nil "use my own css for everything")
+  (org-html-head-include-scripts nil "use my own js for everything")
+  (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
+  (org-html-divs '((preamble "header" "preamble")
+                   (content "main" "content")
+                   (postamble "footer" "postamble")) "semantic html exports")
+  (org-html-viewport '((width "device-width")
+                       (initial-scale "1.0")
+                       (minimum-scale "1.0")) "Prevent zooming out past default size")
+  :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
 
-  (use-package ox-html
-    :demand t
-    :after (org htmlize)
-    :custom
-    (org-html-htmlize-output-type 'css "allow styling from CSS file")
-    (org-html-with-latex 'html "let my html handler handle latex")
-    (org-html-mathjax-options nil "disable mathjax, use MathML")
-    (org-html-mathjax-template "" "disable mathjax, use MathML")
-    (org-html-head-include-default-style nil "use my own css for everything")
-    (org-html-head-include-scripts nil "use my own js for everything")
-    (org-html-postamble (concat "Copyright © 2024 " system-fullname) "set copyright notice on bottom of site")
-    (org-html-divs '((preamble "header" "preamble")
-                     (content "main" "content")
-                     (postamble "footer" "postamble")) "semantic html exports")
-    (org-html-viewport '((width "device-width")
-                         (initial-scale "1.0")
-                         (minimum-scale "1.0")) "Prevent zooming out past default size")
-    :config (advice-add 'org-html-latex-environment :around #'org-html-latex-environment-pandoc-fix))
+(use-package ox-rss
+  :after org
+  :demand t)
 
-  (use-package ox-rss
-    :after org
-    :demand t)
+(use-package ox-publish
+  :demand t
+  :after (org f s dash ox-html ox-rss)
+  :custom
+  (org-publish-project-alist
+   `(("website-org"
+      :base-directory "~/monorepo"
+      :base-extension "org"
+      :exclude "nix/README\\.org\\|blog/rss\\.org\\|result/.*\\|nix/.*"
+      :publishing-directory "~/website_html"
+      :with-author t
+      :with-date t
+      :with-broken-links t
+      :language en
 
-  (use-package ox-publish
-    :demand t
-    :after (org f s dash ox-html ox-rss)
-    :custom
-    (org-publish-project-alist
-     `(("website-org"
-        :base-directory "~/monorepo"
-        :base-extension "org"
-        :exclude "nix/README\\.org\\|blog/rss\\.org\\|result/.*\\|nix/.*"
-        :publishing-directory "~/website_html"
-        :with-author t
-        :with-date t
-        :with-broken-links t
-        :language en
       :recursive t
       :publishing-function org-html-publish-to-html
       :headline-levels 4
@@ -529,59 +524,59 @@ then append the typed input to the mu4e database query."
       :html-preamble t
       :html-preamble-format (("en" "<p class=\"preamble\"><a href=\"/index.html\">home</a> | <a href=\"./index.html\">section main page</a> | <a href=\"/blog/rss.xml\">rss feed</a></p><hr>"))
 
-        ;; sitemap.html stuff
-        :auto-sitemap t
-        :sitemap-filename "sitemap.org"
-        :sitemap-title "Site Index"
-        :sitemap-style list
-        :sitemap-sort-files anti-chronologically)
+      ;; sitemap.html stuff
+      :auto-sitemap t
+      :sitemap-filename "sitemap.org"
+      :sitemap-title "Site Index"
+      :sitemap-style list
+      :sitemap-sort-files anti-chronologically)
 
-       ("website-blog-rss"
-        :base-directory "~/monorepo/blog"
-        :base-extension "org"
-        :recursive nil
-        :exclude "rss\\.org\\|index\\.org\\|404\\.org"
-        :rss-extension "xml"
+     ("website-blog-rss"
+      :base-directory "~/monorepo/blog"
+      :base-extension "org"
+      :recursive nil
+      :exclude "rss\\.org\\|index\\.org\\|404\\.org"
+      :rss-extension "xml"
 
-        :publishing-directory "~/website_html/blog"
-        :publishing-function rp/org-rss-publish-to-rss
-        :html-link-home "https://ret2pop.net/blog/"
-        :html-link-use-abs-url t
+      :publishing-directory "~/website_html/blog"
+      :publishing-function rp/org-rss-publish-to-rss
+      :html-link-home "https://ret2pop.net/blog/"
+      :html-link-use-abs-url t
 
-        ;; use custom sitemap functionality to publish rss feed
-        :auto-sitemap t
-        :sitemap-filename "rss.org"
-        :sitemap-title "Blog Feed"
-        :sitemap-style list
-        :sitemap-sort-folders ignore
-        :sitemap-sort-files anti-chronologically
-        :sitemap-format-entry format-rss-feed-entry
-        :sitemap-function format-rss-feed)
+      ;; use custom sitemap functionality to publish rss feed
+      :auto-sitemap t
+      :sitemap-filename "rss.org"
+      :sitemap-title "Blog Feed"
+      :sitemap-style list
+      :sitemap-sort-folders ignore
+      :sitemap-sort-files anti-chronologically
+      :sitemap-format-entry format-rss-feed-entry
+      :sitemap-function format-rss-feed)
 
-       ("website-sitemap-xml"
-        :base-directory "~/monorepo"
-        :base-extension "org"
-        :recursive t
-        :exclude "nix/README\\.org\\|blog/rss\\.org"
-        :publishing-directory "~/website_html"
-        :publishing-function rp/org-sitemap-publish-function
-        :auto-sitemap t
-        :sitemap-filename "sitemap.xml"
-        :sitemap-format-entry org-sitemap-format-entry-xml
-        :sitemap-style list
-        :sitemap-function org-sitemap-format-xml)
+     ("website-sitemap-xml"
+      :base-directory "~/monorepo"
+      :base-extension "org"
+      :recursive t
+      :exclude "nix/README\\.org\\|blog/rss\\.org"
+      :publishing-directory "~/website_html"
+      :publishing-function rp/org-sitemap-publish-function
+      :auto-sitemap t
+      :sitemap-filename "sitemap.xml"
+      :sitemap-format-entry org-sitemap-format-entry-xml
+      :sitemap-style list
+      :sitemap-function org-sitemap-format-xml)
 
-       ("website-static"
-        :base-directory "~/monorepo"
-        :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
-        :publishing-directory "~/website_html/"
-        :recursive t
-        :publishing-function org-publish-attachment)
+     ("website-static"
+      :base-directory "~/monorepo"
+      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|ico\\|asc\\|pub\\|webmanifest\\|xml\\|svg\\|txt\\|webp\\|conf"
+      :publishing-directory "~/website_html/"
+      :recursive t
+      :publishing-function org-publish-attachment)
 
-       ("website"
-        :auto-sitemap t
-        :components ("website-org" "website-static" "website-blog-rss" "website-sitemap-xml")))
-     "functions to publish website"))
+     ("website"
+      :auto-sitemap t
+      :components ("website-org" "website-static" "website-blog-rss" "website-sitemap-xml")))
+   "functions to publish website"))
 ;; Org Mode:1 ends here
 
 ;; [[file:../config/emacs.org::*All The Icons][All The Icons:1]]
@@ -591,8 +586,7 @@ then append the typed input to the mu4e database query."
 
 ;; [[file:../config/emacs.org::*Variable Pitch Font][Variable Pitch Font:1]]
 (use-package mixed-pitch
-  :hook ((text-mode . mixed-pitch-mode)
-         (org-mode . mixed-pitch-mode))
+  :hook ((org-mode . mixed-pitch-mode))
   :custom (mixed-pitch-set-height t)
   :config
   (dolist (face '(org-latex-and-related
@@ -611,7 +605,19 @@ then append the typed input to the mu4e database query."
 ;; [[file:../config/emacs.org::*Indent Bars][Indent Bars:1]]
 (use-package indent-bars
   :after (nix-mode)
-  :hook ((python-mode yaml-mode nix-mode) . indent-bars-mode))
+  :hook (
+         (python-ts-mode . indent-bars-mode)
+         (css-ts-mode . indent-bars-mode)
+         (haskell-mode . indent-bars-mode)
+         (js-ts-mode . indent-bars-mode)
+         (c-ts-mode . indent-bars-mode)
+         (c++-ts-mode . indent-bars-mode)
+         (rust-ts-mode . indent-bars-mode)
+         (go-ts-mode . indent-bars-mode)
+         (python-mode . indent-bars-mode)
+         (yaml-ts-mode . indent-bars-mode)
+         (nix-mode . indent-bars-mode)
+         (emacs-lisp-mode . indent-bars-mode)))
 ;; Indent Bars:1 ends here
 
 ;; [[file:../config/emacs.org::*Autopair][Autopair:1]]
@@ -642,15 +648,29 @@ then append the typed input to the mu4e database query."
 
 ;; [[file:../config/emacs.org::*Completion][Completion:1]]
 (use-package company
-  :custom (company-backends '(company-ispell company-capf company-yasnippet company-files) "Set company backends")
+  :custom
+  (company-backends '(company-capf company-files company-yasnippet company-ispell))
+  
+  (company-idle-delay 0.1)
+  (company-minimum-prefix-length 1)
+  (company-require-match nil)
+  (company-selection-wrap-around t)
+  (company-tooltip-align-annotations t)
+
   :bind (:map company-active-map
               ("RET" . nil)
               ("<return>" . nil)
-              ("tab" . company-complete-selection)
-              ("<tab>" . company-complete-selection))
+              ("TAB" . company-complete-selection)
+              ("<tab>" . company-complete-selection)
+              ("C-j" . company-select-next)
+              ("C-k" . company-select-previous))
+  
   :hook ((after-init . global-company-mode)))
+
 (use-package company-box
-  :hook (company-mode . company-box-mode))
+  :hook (company-mode . company-box-mode)
+  :custom
+  (company-box-scrollbar nil))
 ;; Completion:1 ends here
 
 ;; [[file:../config/emacs.org::*Spelling][Spelling:1]]
@@ -669,111 +689,200 @@ then append the typed input to the mu4e database query."
 ;; Spelling:1 ends here
 
 ;; [[file:../config/emacs.org::*Packages][Packages:1]]
-(use-package evil
-  :demand t
-  :custom (evil-want-keybinding nil "Don't load a whole bunch of default keybindings")
-  :bind
-  (:map evil-normal-state-map
-        ("/" . swiper)
-        ("?" . (lambda () (interactive) (swiper "--reverse"))))
-  :config (evil-config))
+  (use-package evil
+    :demand t
+    :custom (evil-want-keybinding nil "Don't load a whole bunch of default keybindings")
+    :bind
+    (:map evil-normal-state-map
+          ("/" . swiper)
+          ("?" . (lambda () (interactive) (swiper "--reverse"))))
+    :config (evil-config))
 
-(use-package evil-collection
-  :demand t
-  :after (evil)
-  :bind (:map evil-motion-state-map
-              ("SPC" . nil)
-              ("RET" . nil)
-              ("TAB" . nil))
-  :config (evil-collection-init))
+  (use-package evil-collection
+    :demand t
+    :after (evil)
+    :bind (:map evil-motion-state-map
+                ("SPC" . nil)
+                ("RET" . nil)
+                ("TAB" . nil))
+    :config (evil-collection-init))
 
-(use-package evil-commentary
-  :after (evil)
-  :config (evil-commentary-mode))
+  (use-package evil-commentary
+    :after (evil)
+    :config (evil-commentary-mode))
 
-(use-package evil-org
-  :after (evil org)
-  :hook (org-mode . evil-org-mode))
+  (use-package evil-org
+    :after (evil org)
+    :hook (org-mode . evil-org-mode))
 
-(use-package evil-org-agenda
-  :after (evil-org)
-  :config (evil-org-agenda-set-keys))
+  (use-package evil-org-agenda
+    :after (evil-org)
+    :config (evil-org-agenda-set-keys))
 
-(use-package which-key
-  :config (which-key-mode))
+  (use-package which-key
+    :config (which-key-mode))
 
-(use-package page-break-lines
-  :config (page-break-lines-mode))
+  (use-package page-break-lines
+    :config (page-break-lines-mode))
 
-(use-package evil-mc
-  :after evil
-  :config (global-evil-mc-mode 1))
+  (use-package evil-mc
+    :after evil
+    :config (global-evil-mc-mode 1))
 
-(use-package evil-surround
-  :after evil
-  :config
-  (global-evil-surround-mode 1))
+  (use-package evil-surround
+    :after evil
+    :config
+    (global-evil-surround-mode 1))
 
-(use-package evil-lion
-  :config
-  (evil-lion-mode))
+  (use-package evil-lion
+    :config
+    (evil-lion-mode))
 
-(use-package evil-multiedit
-  :after evil
-  :config
-  (evil-multiedit-default-keybinds))
+  (use-package evil-multiedit
+    :after evil
+    :config
+    (evil-multiedit-default-keybinds))
 
-(use-package evil-textobj-tree-sitter
-  :ensure t
-  ;; Ensure Evil is loaded first so the text-object maps exist
-  :after evil
-  
-  ;; 1. The Keybindings
-  :bind ((:map evil-outer-text-objects-map
-               ("f" . my-treesit-outer-function)
-               ("c" . my-treesit-outer-class)
-               ("a" . my-treesit-outer-arg))
-         
-         (:map evil-inner-text-objects-map
-               ("f" . my-treesit-inner-function)
-               ("c" . my-treesit-inner-class)
-               ("a" . my-treesit-inner-arg))
-               
-         (:map evil-normal-state-map
-               ("] f" . my-treesit-goto-next-function)
-               ("[ f" . my-treesit-goto-prev-function)
-               ("] c" . my-treesit-goto-next-class)
-               ("[ c" . my-treesit-goto-prev-class)))
-
-  ;; 2. The Command Definitions
-  :config
-  ;; Link the custom names we bound above to the actual Tree-sitter closures
-  (defalias 'my-treesit-outer-function (evil-textobj-tree-sitter-get-textobj "function.outer"))
-  (defalias 'my-treesit-inner-function (evil-textobj-tree-sitter-get-textobj "function.inner"))
-  
-  (defalias 'my-treesit-outer-class    (evil-textobj-tree-sitter-get-textobj "class.outer"))
-  (defalias 'my-treesit-inner-class    (evil-textobj-tree-sitter-get-textobj "class.inner"))
-  
-  ;; "a" is standard Vim terminology for "argument" (parameter)
-  (defalias 'my-treesit-outer-arg      (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-  (defalias 'my-treesit-inner-arg      (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
-
-  ;; Navigation commands are standard interactive functions, so we wrap them cleanly
-  (defun my-treesit-goto-next-function ()
-    (interactive)
-    (evil-textobj-tree-sitter-goto-textobj "function.outer"))
+  (use-package evil-textobj-tree-sitter
+    :ensure t
+    ;; Ensure Evil is loaded first so the text-object maps exist
+    :after evil
     
-  (defun my-treesit-goto-prev-function ()
-    (interactive)
-    (evil-textobj-tree-sitter-goto-textobj "function.outer" t))
+    ;; 1. The Keybindings
+    :bind ((:map evil-outer-text-objects-map
+                 ("f" . my-treesit-outer-function)
+                 ("c" . my-treesit-outer-class)
+                 ("a" . my-treesit-outer-arg))
+           
+           (:map evil-inner-text-objects-map
+                 ("f" . my-treesit-inner-function)
+                 ("c" . my-treesit-inner-class)
+                 ("a" . my-treesit-inner-arg))
+                 
+           (:map evil-normal-state-map
+                 ("] f" . my-treesit-goto-next-function)
+                 ("[ f" . my-treesit-goto-prev-function)
+                 ("] c" . my-treesit-goto-next-class)
+                 ("[ c" . my-treesit-goto-prev-class)))
 
-  (defun my-treesit-goto-next-class ()
-    (interactive)
-    (evil-textobj-tree-sitter-goto-textobj "class.outer"))
+    ;; 2. The Command Definitions
+    :config
+    ;; Link the custom names we bound above to the actual Tree-sitter closures
+    (defalias 'my-treesit-outer-function (evil-textobj-tree-sitter-get-textobj "function.outer"))
+    (defalias 'my-treesit-inner-function (evil-textobj-tree-sitter-get-textobj "function.inner"))
     
-  (defun my-treesit-goto-prev-class ()
-    (interactive)
-    (evil-textobj-tree-sitter-goto-textobj "class.outer" t)))
+    (defalias 'my-treesit-outer-class    (evil-textobj-tree-sitter-get-textobj "class.outer"))
+    (defalias 'my-treesit-inner-class    (evil-textobj-tree-sitter-get-textobj "class.inner"))
+    
+    ;; "a" is standard Vim terminology for "argument" (parameter)
+    (defalias 'my-treesit-outer-arg      (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+    (defalias 'my-treesit-inner-arg      (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+
+    ;; Navigation commands are standard interactive functions, so we wrap them cleanly
+    (defun my-treesit-goto-next-function ()
+      (interactive)
+      (evil-textobj-tree-sitter-goto-textobj "function.outer"))
+      
+    (defun my-treesit-goto-prev-function ()
+      (interactive)
+      (evil-textobj-tree-sitter-goto-textobj "function.outer" t))
+
+    (defun my-treesit-goto-next-class ()
+      (interactive)
+      (evil-textobj-tree-sitter-goto-textobj "class.outer"))
+      
+    (defun my-treesit-goto-prev-class ()
+      (interactive)
+      (evil-textobj-tree-sitter-goto-textobj "class.outer" t)))
+
+
+  (use-package general
+    :after (evil evil-collection)
+    :init (general-create-definer leader-key :prefix "SPC")
+    :config
+    ;; these are just bindings but the symbols are all lazily handled by general
+    (create-irc-servers
+     (znc "ret2pop.net" "5000")
+     (prestonpan "nullring.xyz" "6697")
+     (libera-chat "irc.libera.chat" "6697")
+     (efnet "irc.prison.net" "6697")
+     (matrix-org "matrix.org" "8448")
+     (gimp-org "irc.gimp.org" "6697"))
+
+    (leader-key 'normal
+      "o c" '(org-capture :wk "Capture")
+      ;; Org Mode
+      "n" '(:ignore t :wk "Org mode plugins")
+      "n j j" '(org-journal-new-entry :wk "Make new journal entry")
+      "n r f" '(org-roam-node-find :wk "Find roam node")
+      "n r i" '(org-roam-node-insert :wk "Insert roam node")
+      "n r a" '(org-roam-alias-add :wk "Add alias to org roam node")
+      "n r g" '(org-roam-graph :wk "Graph roam database")
+      "m I" '(org-id-get-create :wk "Make org id")
+
+      ;; Programming Projects
+      "." '(counsel-find-file :wk "find file")
+      "p a" '(projectile-add-known-project :wk "Add to project list")
+      
+      "N f" '(nix-flake :wk "nix flake menu")
+      "f" '(:ignore t :wk "file operations")
+      "f p" '(projectile-switch-project :wk "find project to switch to")
+      "f f" '(counsel-fzf :wk "find file in project")
+      "f s" '(counsel-rg :wk "find string in project")
+
+      "y n s" '(yas-new-snippet :wk "Create new snippet")
+
+      "g" '(:ignore t :wk "Magit")
+      "g /" '(magit-dispatch :wk "git commands")
+      "g P" '(magit-push :wk "git push")
+      "g c" '(magit-commit :wk "git commit")
+      "g p" '(magit-pull :wk "Pull from git")
+      "g s" '(magit-status :wk "Change status of files")
+      "g i" '(magit-init :wk "init new git project")
+      "g r" '(magit-rebase :wk "Rebase branch")
+      "g m" '(magit-merge :wk "Merge branches")
+      "g b" '(magit-branch :wk "Git branch")
+
+      "o p" '(treemacs :wk "Project Drawer")
+      "o P" '(treemacs-projectile :wk "Import Projectile project to treemacs")
+
+      "w r" '(writeroom-mode :wk "focus mode for writing")
+
+      ;; Applications
+      "o" '(:ignore t :wk "Open application")
+      "o t" '(projectile-run-vterm-other-window :wk "Terminal")
+      "o e" '(projectile-run-eshell :wk "Elisp Interpreter")
+      "o m" '(mu4e :wk "Email")
+      "o M" '(matrix-org :wk "Connect to matrix")
+      "o r s" '(elfeed :wk "rss feed")
+      "o a" '(org-agenda :wk "Open agenda")
+      "o w" '(eww :wk "web browser")
+      "o n" '(enwc :wk "NetworkManager Interface")
+      "m m" '(emms :wk "Music player")
+      "s m" '(proced :wk "System Manager")
+      "l p" '(list-processes :wk "List Emacs Processes")
+
+      "m P p" '(org-publish :wk "Publish website components")
+      "s e" '(sudo-edit :wk "Edit file with sudo")
+
+      ;; "f f" '(eglot-format :wk "Format code buffer")
+      "i p c" '(prestonpan :wk "Connect to my IRC server")
+      "i l c" '(liberachat :wk "Connect to libera chat server")
+      "i e c" '(efnet :wk "Connect to efnet chat server")
+      "i g c" '(gimp-org :wk "Connect to gimp chat server")
+      "i z c" '(znc :wk "Connect to my ZNC instance")
+
+      ;; Documentation
+      "h" '(:ignore t :wk "Documentation")
+      "h v" '(counsel-describe-variable :wk "Describe variable")
+      "h f" '(counsel-describe-function :wk "Describe function")
+      "h h" '(help :wk "Help")
+      "h m" '(woman :wk "Manual")
+      "h i" '(info :wk "Info")
+
+      "s i p" '(insert-urandom-password :wk "insert random password to buffer (for sops)")
+
+      "h r r" '(lambda () (interactive) (load-file (expand-file-name "~/monorepo/nix/init.el")))))
 ;; Packages:1 ends here
 
 ;; [[file:../config/emacs.org::*Journal][Journal:1]]
@@ -870,7 +979,71 @@ then append the typed input to the mu4e database query."
 ;; Notifications:1 ends here
 
 ;; [[file:../config/emacs.org::*LSP][LSP:1]]
+(use-package python
+  :after lsp-mode
+  :hook (python-ts-mode . lsp-deferred))
+
+(use-package yaml-mode
+  :after lsp-mode
+  :hook (yaml-ts-mode . lsp-deferred))
+
+(use-package go-ts-mode
+  :after lsp-mode
+  :hook (go-ts-mode . lsp-deferred))
+
+(use-package haskell-mode
+  :after lsp-mode
+  :hook (haskell-mode . lsp-deferred))
+
+(use-package scheme-mode
+  :hook (scheme-mode . lsp-deferred)
+  :after lsp-mode
+  :mode ("\\.sls\\'" "\\.scm\\'"))
+
+(use-package elisp-mode
+  :after lsp-mode
+  :hook (emacs-lisp-mode . lsp-deferred))
+
+(use-package cc-mode
+  :after lsp-mode
+  :hook ((c-mode . lsp-deferred)
+         (c-ts-mode . lsp-deferred)))
+
+(use-package css-mode
+  :after lsp-mode
+  :hook ((css-mode . lsp-deferred)
+         (css-ts-mode . lsp-deferred)))
+
+(use-package js
+  :after lsp-mode
+  :hook ((js-mode . lsp-deferred)
+         (js-ts-mode . lsp-deferred)
+         (tsx-ts-mode . lsp-deferred)))
+
+(use-package json-mode
+  :after lsp-mode
+  :hook ((json-mode . lsp-deferred)
+         (json-ts-mode . lsp-deferred)))
+
+(use-package toml-mode
+  :after lsp-mode
+  :hook ((toml-ts-mode . lsp-deferred)))
+
+(use-package nix-mode
+  :demand t
+  :after lsp-mode
+  :hook (nix-mode . lsp-deferred)
+  :mode "\\.nix\\'")
+
+(use-package sh-script
+  :after lsp-mode
+  :hook (sh-mode . lsp-deferred))
+
+(use-package poetry
+  :config (poetry-tracking-mode 1))
+
 (use-package lsp-mode
+  :demand t
   :custom
   (lsp-use-plists t)
   (lsp-typescript-format-enable t)
@@ -882,18 +1055,6 @@ then append the typed input to the mu4e database query."
   (lsp-restart 'auto-restart)
   (lsp-keep-workspace-alive t)
 
-  :hook ((python-mode    . lsp-deferred)
-         (python-ts-mode . lsp-deferred)
-         (emacs-lisp-mode . lsp-deferred)
-         (yaml-mode      . lsp-deferred)
-         (yaml-ts-mode   . lsp-deferred)
-         (json-mode      . lsp-deferred)
-         (json-ts-mode   . lsp-deferred)
-         (toml-mode      . lsp-deferred)
-         (toml-ts-mode   . lsp-deferred)
-         (sh-mode        . lsp-deferred)
-         (nix-mode       . lsp-deferred))
-  :commands (lsp lsp-deferred)
   :general
   (:states 'normal :keymaps 'lsp-mode-map
            "gI" #'lsp-find-implementation
@@ -936,8 +1097,6 @@ then append the typed input to the mu4e database query."
 
 ;; [[file:../config/emacs.org::*Solidity][Solidity:1]]
 (use-package solidity-mode)
-(use-package company-solidity
-  :after company)
 (use-package solidity-flycheck
   :after flycheck
   :custom (solidity-flycheck-solc-checker-active t))
@@ -1037,6 +1196,34 @@ then append the typed input to the mu4e database query."
 (use-package git-gutter
   :config
   (global-git-gutter-mode +1))
+
+(defun ret2pop/enable-smerge-maybe ()
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^<<<<<<< " nil t)
+      (smerge-mode 1))))
+
+(use-package smerge-mode
+  :hook ((find-file . ret2pop/enable-smerge-maybe))
+  :general
+  (:states '(normal motion)
+   :keymaps 'smerge-mode-map
+   "]c" #'smerge-next
+   "[c" #'smerge-prev)
+  (:states '(normal visual)
+   :keymaps 'smerge-mode-map
+   :prefix ","
+   "n" #'smerge-next
+   "p" #'smerge-prev
+   "u" #'smerge-keep-upper
+   "l" #'smerge-keep-lower
+   "m" #'smerge-keep-current
+   "o" #'smerge-keep-other
+   "a" #'smerge-keep-all
+   "b" #'smerge-keep-base
+   "r" #'smerge-resolve
+   "R" #'smerge-refine
+   "e" #'smerge-ediff))
 ;; Magit:1 ends here
 
 ;; [[file:../config/emacs.org::*IRC][IRC:1]]
@@ -1047,122 +1234,22 @@ then append the typed input to the mu4e database query."
   (erc-user-full-name system-fullname "sets erc fullname to the one set in nix config"))
 ;; IRC:1 ends here
 
-;; [[file:../config/emacs.org::*Keybindings][Keybindings:1]]
-(use-package general
-  :after (evil evil-collection)
-  :init (general-create-definer leader-key :prefix "SPC")
-  :config
-  ;; these are just bindings but the symbols are all lazily handled by general
-  (create-irc-servers
-   (znc "ret2pop.net" "5000")
-   (prestonpan "nullring.xyz" "6697")
-   (libera-chat "irc.libera.chat" "6697")
-   (efnet "irc.prison.net" "6697")
-   (matrix-org "matrix.org" "8448")
-   (gimp-org "irc.gimp.org" "6697"))
-
-  (leader-key 'normal
-    "o c" '(org-capture :wk "Capture")
-    ;; Org Mode
-    "n" '(:ignore t :wk "Org mode plugins")
-    "n j j" '(org-journal-new-entry :wk "Make new journal entry")
-    "n r f" '(org-roam-node-find :wk "Find roam node")
-    "n r i" '(org-roam-node-insert :wk "Insert roam node")
-    "n r a" '(org-roam-alias-add :wk "Add alias to org roam node")
-    "n r g" '(org-roam-graph :wk "Graph roam database")
-    "m I" '(org-id-get-create :wk "Make org id")
-
-    ;; Programming Projects
-    "." '(counsel-find-file :wk "find file")
-    "p a" '(projectile-add-known-project :wk "Add to project list")
-    
-    "N f" '(nix-flake :wk "nix flake menu")
-    "f" '(:ignore t :wk "file operations")
-    "f p" '(projectile-switch-project :wk "find project to switch to")
-    "f f" '(counsel-fzf :wk "find file in project")
-    "f s" '(counsel-rg :wk "find string in project")
-
-    "y n s" '(yas-new-snippet :wk "Create new snippet")
-
-    "g" '(:ignore t :wk "Magit")
-    "g /" '(magit-dispatch :wk "git commands")
-    "g P" '(magit-push :wk "git push")
-    "g c" '(magit-commit :wk "git commit")
-    "g p" '(magit-pull :wk "Pull from git")
-    "g s" '(magit-status :wk "Change status of files")
-    "g i" '(magit-init :wk "init new git project")
-    "g r" '(magit-rebase :wk "Rebase branch")
-    "g m" '(magit-merge :wk "Merge branches")
-    "g b" '(magit-branch :wk "Git branch")
-
-    "o p" '(treemacs :wk "Project Drawer")
-    "o P" '(treemacs-projectile :wk "Import Projectile project to treemacs")
-
-    "w r" '(writeroom-mode :wk "focus mode for writing")
-
-    ;; Applications
-    "o" '(:ignore t :wk "Open application")
-    "o t" '(vterm :wk "Terminal")
-    "o e" '(eshell :wk "Elisp Interpreter")
-    "o m" '(mu4e :wk "Email")
-    "o M" '(matrix-org :wk "Connect to matrix")
-    "o r s" '(elfeed :wk "rss feed")
-    "o a" '(org-agenda :wk "Open agenda")
-    "o w" '(eww :wk "web browser")
-    "o n" '(enwc :wk "NetworkManager Interface")
-    "m m" '(emms :wk "Music player")
-    "s m" '(proced :wk "System Manager")
-    "l p" '(list-processes :wk "List Emacs Processes")
-
-    "m P p" '(org-publish :wk "Publish website components")
-    "s e" '(sudo-edit :wk "Edit file with sudo")
-
-    ;; "f f" '(eglot-format :wk "Format code buffer")
-    "i p c" '(prestonpan :wk "Connect to my IRC server")
-    "i l c" '(liberachat :wk "Connect to libera chat server")
-    "i e c" '(efnet :wk "Connect to efnet chat server")
-    "i g c" '(gimp-org :wk "Connect to gimp chat server")
-    "i z c" '(znc :wk "Connect to my ZNC instance")
-
-    ;; Documentation
-    "h" '(:ignore t :wk "Documentation")
-    "h v" '(counsel-describe-variable :wk "Describe variable")
-    "h f" '(counsel-describe-function :wk "Describe function")
-    "h h" '(help :wk "Help")
-    "h m" '(woman :wk "Manual")
-    "h i" '(info :wk "Info")
-
-    "s i p" '(insert-urandom-password :wk "insert random password to buffer (for sops)")
-
-    "h r r" '(lambda () (interactive) (load-file (expand-file-name "~/monorepo/nix/init.el")))))
-;; Keybindings:1 ends here
-
 ;; [[file:../config/emacs.org::*Minuet][Minuet:1]]
 (use-package minuet
-  :bind
-  (("M-y" . #'minuet-complete-with-minibuffer)
-   ("C-c m" . #'minuet-show-suggestion)
-   :map minuet-active-mode-map
-   ("C-c r" . #'minuet-dismiss-suggestion)
-   ("TAB" . #'minuet-accept-suggestion))
-  :hook ((prog-mode-hook . minuet-auto-suggestion-mode))
-  :custom
-  (minuet-request-timeout 40 "Max timeout in seconds")
-  (minuet-provider 'openai-fim-compatible "FIM compatible OpenAI-like API (Ollama)")
-  (minuet-n-completions 1 "I am using ghost text so I only need one possible completion")
-  (minuet-context-window 1024 "how much context do I want?")
-  (minuet-openai-fim-compatible-options
-   '(
-     :end-point "http://localhost:11434/v1/completions"
-     :name "Ollama"
-     :api-key "TERM"
-     :template (
-                :prompt minuet--default-fim-prompt-function
-                :suffix minuet--default-fim-suffix-function)
-     :transform ()
-     :get-text-fn minuet--openai-fim-get-text-fn
-     :optional (:max-tokens 50)
-     :model "qwen2.5-coder:14b")))
+    :config
+    (setq minuet-provider 'openai-fim-compatible)
+    (setq minuet-n-completions 1)
+    (setq minuet-context-window 4096)
+    (plist-put minuet-openai-fim-compatible-options :end-point "http://localhost:11434/v1/completions")
+    ;; an arbitrary non-null environment variable as placeholder.
+    ;; For Windows users, TERM may not be present in environment variables.
+    ;; Consider using APPDATA instead.
+    (plist-put minuet-openai-fim-compatible-options :name "Ollama")
+    (plist-put minuet-openai-fim-compatible-options :api-key "nothing")
+    (plist-put minuet-openai-fim-compatible-options :model "rnj-1:latest")
+
+    (minuet-set-optional-options minuet-openai-fim-compatible-options :max_tokens 100)
+    :hook (prog-mode-hook . minuet-auto-suggestion-mode))
 ;; Minuet:1 ends here
 
 ;; [[file:../config/emacs.org::*RSS Feed][RSS Feed:1]]
@@ -1406,15 +1493,10 @@ then append the typed input to the mu4e database query."
 ;; Eww:1 ends here
 
 ;; [[file:../config/emacs.org::*Nix Mode][Nix Mode:1]]
-  (use-package nix-mode
-    :demand t
-    :mode "\\.nix\\'")
+
 ;; Nix Mode:1 ends here
 
 ;; [[file:../config/emacs.org::*Scheme][Scheme:1]]
-(use-package scheme-mode
-  :mode ("\\.sls\\'" "\\.scm\\'"))
-
 (use-package geiser
   :after scheme)
 

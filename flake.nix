@@ -83,21 +83,21 @@
         };
 
         commonModules = hostname: [
-            impermanence.nixosModules.impermanence
-            nix-topology.nixosModules.default
-            lanzaboote.nixosModules.lanzaboote
-            disko.nixosModules.disko
-            home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
-            nixos-dns.nixosModules.dns
-            {
-              nixpkgs.overlays = [ nur.overlays.default ];
-              home-manager.extraSpecialArgs = attrs // {
-                systemHostName = "${hostname}";
-              };
-              networking.hostName = "${hostname}";
-            }
-            (./. + "/systems/${hostname}/default.nix")
+          impermanence.nixosModules.impermanence
+          nix-topology.nixosModules.default
+          lanzaboote.nixosModules.lanzaboote
+          disko.nixosModules.disko
+          home-manager.nixosModules.home-manager
+          sops-nix.nixosModules.sops
+          nixos-dns.nixosModules.dns
+          {
+            nixpkgs.overlays = [ nur.overlays.default ];
+            home-manager.extraSpecialArgs = attrs // {
+              systemHostName = "${hostname}";
+            };
+            networking.hostName = "${hostname}";
+          }
+          (./. + "/systems/${hostname}/default.nix")
         ];
 
         mkHostModules = hostname:

@@ -83,6 +83,7 @@ epkgs: with epkgs; [
   platformio-mode
   projectile
   polymode
+  poetry
   rustic
   s
   sops
