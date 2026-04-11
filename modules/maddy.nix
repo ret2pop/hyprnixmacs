@@ -133,7 +133,7 @@ in
       address = [ "${name}@${config.monorepo.vars.orgHost}" ];
       inboxdir = "/var/lib/public-inbox/${name}";
       url = "https://list.${config.monorepo.vars.orgHost}/${name}";
-      watch = [ "imaps://${name}${config.monorepo.vars.orgHost}@${emailServerName}/INBOX" ];
+      watch = [ "imaps://${name}@${config.monorepo.vars.orgHost}@${emailServerName}/INBOX" ];
       coderepo = [ "${name}" ];
     }) // {
       "discussion" = {
