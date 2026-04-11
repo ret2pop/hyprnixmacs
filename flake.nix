@@ -204,7 +204,10 @@
                 name = "services-test-${hostname}";
                 nodes = {
                   "${hostname}" = { ... }: {
-                    _module.args = attrs // { isIntegrationTest = true; };
+                    _module.args = attrs // {
+                      isIntegrationTest = true;
+                      system = getSystem hostname;
+                    };
                     imports = mkHostModules hostname ++ [
                       "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
                       {
