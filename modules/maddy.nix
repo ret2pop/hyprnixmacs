@@ -98,10 +98,12 @@ in
     confinement.enable = lib.mkForce false;
     path = [ pkgs.git ];
     preStart = ''
-        mkdir -p /var/lib/public-inbox/.tmp
-        chmod 0700 /var/lib/public-inbox/.tmp
-        ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
-      '';
+mkdir -p /var/lib/public-inbox/.tmp
+chmod 0700 /var/lib/public-inbox/.tmp
+ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
+export HOME=/var/lib/public-inbox
+git config --global credential.helper "store --file /run/secrets/rendered/public-inbox-git-credentials"
+'';
     environment = {
       PUBLIC_INBOX_FORCE_IPV4 = "1";
       NETRC = config.sops.templates."public-inbox-netrc".path;
