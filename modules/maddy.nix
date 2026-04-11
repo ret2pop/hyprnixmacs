@@ -102,7 +102,6 @@ in
         mkdir -p /var/lib/public-inbox/.tmp
         chmod 0700 /var/lib/public-inbox/.tmp
         ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
-        git config --global credential.helper 'store --file /run/secrets/public-inbox-git-credentials'
       '';
     environment = {
       PUBLIC_INBOX_FORCE_IPV4 = "1";
@@ -110,6 +109,9 @@ in
       HOME = "/var/lib/public-inbox";
       TMPDIR = "/var/lib/public-inbox/.tmp";
       GIT_TERMINAL_PROMPT = "0";
+      GIT_CONFIG_COUNT = "1";
+      GIT_CONFIG_KEY_0 = "credential.helper";
+      GIT_CONFIG_VALUE_0 = "store --file /run/secrets/public-inbox-git-credentials";
     };
 
     serviceConfig = {
