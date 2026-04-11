@@ -1,5 +1,5 @@
 # [[file:../../config/nix.org::*Maddy][Maddy:1]]
-{ lib, config, options, ... }:
+{ lib, config, options, pkgs, ... }:
 let
   emailServerName = "mail.${config.monorepo.vars.orgHost}";
   serverName = "list.${config.monorepo.vars.orgHost}";
@@ -14,12 +14,22 @@ in
       };
     };
     templates = lib.mkIf config.services.public-inbox.enable {
+      "public-inbox-git-credentials" = {
+        owner = "public-inbox";
+        group = "public-inbox";
+        mode = "0400";
+        content = (builtins.concatStringsSep "\n" (builtins.map (x: 
+          "imaps://${x}%40${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}"
+        ) config.monorepo.vars.projects)) + "\n" + ''
+  imaps://discussion%40${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}'';
+      };
+
       "public-inbox-netrc" = {
         owner = "public-inbox";
         group = "public-inbox";
         mode = "0400";
-        content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine ${emailServerName} login ${x}@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
-  machine ${emailServerName} login discussion@${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
+        content = (builtins.concatStringsSep "\n" (builtins.map (x: "machine ${emailServerName} login ${x}%40${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}") config.monorepo.vars.projects)) + ''
+  machine ${emailServerName} login discussion%40${config.monorepo.vars.orgHost} password ${config.sops.placeholder."mail_monorepo_password_pi"}'';
       };
     };
   };
@@ -87,16 +97,19 @@ in
   systemd.services.public-inbox-watch = if config.services.public-inbox.enable then {
     after = [ "sops-nix.service" ];
     confinement.enable = lib.mkForce false;
+    path = [ pkgs.git ];
     preStart = ''
         mkdir -p /var/lib/public-inbox/.tmp
         chmod 0700 /var/lib/public-inbox/.tmp
         ln -sfn ${config.sops.templates."public-inbox-netrc".path} /var/lib/public-inbox/.netrc
+        git config --global credential.helper 'store --file /run/secrets/public-inbox-git-credentials'
       '';
     environment = {
       PUBLIC_INBOX_FORCE_IPV4 = "1";
       NETRC = config.sops.templates."public-inbox-netrc".path;
       HOME = "/var/lib/public-inbox";
       TMPDIR = "/var/lib/public-inbox/.tmp";
+      GIT_TERMINAL_PROMPT = "0";
     };
 
     serviceConfig = {
