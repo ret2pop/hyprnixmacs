@@ -207,6 +207,7 @@
                     _module.args = attrs // {
                       isIntegrationTest = true;
                       system = getSystem hostname;
+                      monorepoSelf = null;
                     };
                     imports = mkHostModules hostname ++ [
                       "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
