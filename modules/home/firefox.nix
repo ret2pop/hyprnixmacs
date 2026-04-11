@@ -2,7 +2,8 @@
 { lib, config, pkgs, ... }:
 {
   programs.librewolf = {
-    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    # enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    enable = false;
     package = pkgs.librewolf;
     profiles = {
       default = {

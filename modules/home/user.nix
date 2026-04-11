@@ -53,7 +53,7 @@
       graphviz jq
 
       # Apps
-      octaveFull
+      # octaveFull
       grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp wl-clipboard
 
       # Sound/media
