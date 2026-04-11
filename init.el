@@ -313,6 +313,25 @@ then append the typed input to the mu4e database query."
   (if (facep face)
       (funcall orig-fn face attribute frame inherit)
       'unspecified))
+
+(defun rp/vterm-cleanup-on-exit (buffer _event)
+  "Close windows showing BUFFER after vterm exits, then kill BUFFER."
+  (let ((buf buffer))
+    (run-at-time
+     0 nil
+     (lambda ()
+       (when (buffer-live-p buf)
+         (let ((wins (get-buffer-window-list buf nil t)))
+           (dolist (win wins)
+             (when (window-live-p win)
+               (if (one-window-p t win)
+                   ;; Can't delete the last window in a frame.
+                   ;; Switch it away from the vterm buffer instead.
+                   (with-selected-window win
+                     (switch-to-prev-buffer win 'kill))
+                 (delete-window win)))))
+         (when (buffer-live-p buf)
+           (kill-buffer buf)))))))
 ;; State:1 ends here
 
 ;; [[file:../config/emacs.org::*Random Packages][Random Packages:1]]
@@ -373,18 +392,13 @@ then append the typed input to the mu4e database query."
   (display-line-numbers-type 'relative "Relative line numbers for easy vim jumping")
   (use-short-answers t "Use y instead of yes")
   (make-backup-files nil "Don't make backups")
-  (display-fill-column-indicator-column 150 "Draw a line at 100 characters")
-  (fill-column 150)
   (line-spacing 2 "Default line spacing")
   (c-doc-comment-style '((c-mode . doxygen)
                          (c++-mode . doxygen)))
+  (fill-column 150)
 
-
-  :hook ((text-mode . visual-line-mode)
-         (prog-mode . display-line-numbers-mode)
-         (prog-mode . display-fill-column-indicator-mode)
+  :hook ((prog-mode . display-line-numbers-mode)
          (org-mode . auto-fill-mode)
-         (org-mode . display-fill-column-indicator-mode)
          (org-mode . display-line-numbers-mode))
   :config (emacs-config))
 ;; Emacs:1 ends here
@@ -411,6 +425,8 @@ then append the typed input to the mu4e database query."
   (org-edit-src-content-indentation 0)
   (org-src-tab-acts-natively t)
   (org-src-preserve-indentation t)
+  (org-hide-drawer-startup t)
+  (org-startup-folded 'showall)
 
   (TeX-PDF-mode t)
   (org-confirm-babel-evaluate nil "Don't ask to evaluate code block")
@@ -437,6 +453,7 @@ then append the typed input to the mu4e database query."
     \\setlength{\\topmargin}{1.5cm} \
     \\addtolength{\\topmargin}{-2.54cm} \
     \\usepackage{amsmath} \
+    \\usepackage{tikz-cd} \
     ")
   (org-preview-latex-image-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
   (org-latex-preview-ltxpng-directory (expand-file-name "~/.cache/ltximg/") "don't use weird cache location")
@@ -446,7 +463,7 @@ then append the typed input to the mu4e database query."
   (TeX-engine 'xetex "set xelatex as default engine")
   (preview-default-option-list '("displaymath" "textmath" "graphics") "preview latex")
   ;; (preview-image-type 'png "Use PNGs")
-  (org-preview-latex-default-process 'dvipng)
+  ;; (org-preview-latex-default-process 'imagemagick)
   (org-format-latex-options
    '(:foreground default
                  :background default
@@ -458,7 +475,6 @@ then append the typed input to the mu4e database query."
   (org-return-follows-link t "be able to follow links without mouse")
   (org-startup-indented t "Indent the headings")
   (org-image-actual-width '(300) "Cap width") 
-  (org-startup-with-latex-preview t "see latex previews on opening file")
   (org-startup-with-inline-images t "See images on opening file")
   (org-hide-emphasis-markers t "prettify org mode")
   (org-use-sub-superscripts "{}" "Only display superscripts and subscripts when enclosed in {}")
@@ -476,7 +492,6 @@ then append the typed input to the mu4e database query."
   (org-catch-invisible-edits 'show-and-error)
   (org-special-ctrl-a/e t)
   (org-insert-heading-respect-content t)
-  (org-hide-emphasis-markers t)
   (org-pretty-entities t)
   (org-agenda-tags-column 0)
   (org-ellipsis "…")
@@ -486,7 +501,28 @@ then append the typed input to the mu4e database query."
                                  (python . t)
                                  (nix . t)
                                  (scheme . t)
-                                 (latex . t))))
+                                 (latex . t)))
+  :config
+  (add-to-list 'org-preview-latex-process-alist
+               '(xetex-imagemagick
+                 :programs ("xelatex" "convert")
+                 :description "pdf > png"
+                 :message "you need to install the programs: xelatex and imagemagick."
+                 :image-input-type "pdf"
+                 :image-output-type "png"
+                 :image-size-adjust (1.0 . 1.0)
+                 :latex-compiler ("xelatex -interaction nonstopmode -output-directory %o %f")
+                 :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O")))
+                 
+  ;; Set this new process as your default
+  (setq org-preview-latex-default-process 'xetex-imagemagick)
+  (set-face-attribute 'org-document-title nil :height 1.5 :weight 'bold)
+  (set-face-attribute 'org-level-1 nil :height 1.4 :weight 'bold)
+  (set-face-attribute 'org-level-2 nil :height 1.3 :weight 'bold)
+  (set-face-attribute 'org-level-3 nil :height 1.2 :weight 'semibold)
+  (set-face-attribute 'org-level-4 nil :height 1.1 :weight 'normal)
+  (set-face-attribute 'org-level-5 nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-6 nil :height 1.0 :weight 'normal))
 
 (use-package org-tempo
   :after org)
@@ -875,6 +911,11 @@ then append the typed input to the mu4e database query."
      (efnet "irc.prison.net" "6697")
      (matrix-org "matrix.org" "8448")
      (gimp-org "irc.gimp.org" "6697"))
+
+    (general-define-key
+     "C-=" #'text-scale-increase
+     "C--" #'text-scale-decrease
+     "C-0" #'text-scale-set)
 
     (leader-key 'normal
       "o c" '(org-capture :wk "Capture")

@@ -162,7 +162,7 @@ in
                       supercollider
                       inkscape
                       kdePackages.kdenlive
-                      kicad
+                      # kicad
                     ]) else []);
 
     monorepo.profiles = {

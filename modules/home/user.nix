@@ -27,6 +27,12 @@
     username = super.monorepo.vars.userName;
     homeDirectory = "/home/${super.monorepo.vars.userName}";
     stateVersion = "24.11";
+    sessionVariables = {
+      QTWEBENGINE_FORCE_USE_GBM = 0;
+      NIXOS_OZONE_WL = 1;
+      XDG_SESSION_TYPE = "wayland";
+      XDG_CURRENT_DESKTOP = "qtile";
+    };
 
     packages = with pkgs; (if config.monorepo.profiles.graphics.enable then [
       # wikipedia
@@ -47,11 +53,11 @@
       graphviz jq
 
       # Apps
-      octaveFull
-      grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp
+      # octaveFull
+      grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp wl-clipboard
 
       # Sound/media
-      pavucontrol alsa-utils imagemagick ffmpeg helvum pulseaudio
+      pavucontrol alsa-utils imagemagick ffmpeg pulseaudio
 
       # Net
       curl rsync gitFull ungoogled-chromium devd

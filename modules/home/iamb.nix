@@ -1,8 +1,9 @@
 # [[file:../../../config/nix.org::*iamb][iamb:1]]
-{ super, lib, config, ... }:
+{ super, ... }:
 {
   programs.iamb = {
-    enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    # enable = lib.mkDefault config.monorepo.profiles.graphics.enable;
+    enable = false;
     settings = {
       default_profile = "personal";
       profiles.personal = {

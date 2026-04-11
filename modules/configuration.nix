@@ -172,6 +172,7 @@ in
       "gcm"
       "sha256"
       "sha384"
+      "uvcvideo"
     ];
 
     kernelParams = [
@@ -417,21 +418,37 @@ in
       tctiEnvironment.enable = true;
     };
 
-    auditd.enable = true;
-    audit.enable = true;
     chromiumSuidSandbox.enable = (! config.monorepo.profiles.ttyonly.enable);
     sudo.enable = true;
   };
 
   xdg.portal = {
     enable = (! config.monorepo.profiles.ttyonly.enable);
-    wlr.enable = (! config.monorepo.profiles.ttyonly.enable);
+    wlr = {
+      enable = (! config.monorepo.profiles.ttyonly.enable);
+      settings = {
+        screencast = {
+          chooser_type = "none";
+          output_name = "DP-1";
+        };
+      };
+    };
     extraPortals = with pkgs; if (! config.monorepo.profiles.ttyonly.enable) then [
       xdg-desktop-portal-gtk
       xdg-desktop-portal
-      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-wlr
     ] else [];
     config.common.default = "*";
+  };
+
+  systemd.user.services.xdg-desktop-portal-wlr = {
+    serviceConfig = {
+      Restart = lib.mkForce "on-failure";
+    };
+    environment = {
+      XDG_CURRENT_DESKTOP = "qtile";
+      XDG_SESSION_TYPE = "wayland";
+    };
   };
 
   environment.etc."gitconfig".text = ''

@@ -2,7 +2,7 @@
 { config, lib, ... }:
 {
   services.bitcoind."${config.monorepo.vars.userName}" = {
-    enable = lib.mkDefault config.monorepo.profiles.workstation.enable;
+    enable = lib.mkDefault false;
     prune = 10000;
   };
 }

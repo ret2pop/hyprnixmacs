@@ -28,9 +28,12 @@
 
       # Hints
       fonts.hints = "bold 12pt Lora";
+
+      # Rendering
+      qt.force_software_rendering = "chromium";
     };
     extraConfig = (builtins.readFile "${catppuccin-qutebrowser}/setup.py") +
-''
+                  ''
 config.load_autoconfig()
 setup(c, "mocha", True)
 '';
