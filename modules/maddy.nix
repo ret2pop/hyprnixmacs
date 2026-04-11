@@ -19,9 +19,9 @@ in
         group = "public-inbox";
         mode = "0400";
         content = (builtins.concatStringsSep "\n" (builtins.map (x: 
-          "imaps://${x}%40${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}"
+          "imaps://${x}%2540${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}"
         ) config.monorepo.vars.projects)) + "\n" + ''
-  imaps://discussion%40${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}'';
+  imaps://discussion%2540${config.monorepo.vars.orgHost}:${config.sops.placeholder."mail_monorepo_password_pi"}@${emailServerName}'';
       };
 
       "public-inbox-netrc" = {
