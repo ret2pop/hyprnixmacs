@@ -419,6 +419,7 @@ then append the typed input to the mu4e database query."
   :hook
   ((org-mode . remove-annoying-pairing))
   :custom
+  (org-log-into-drawer t)
   (org-export-allow-bind-keywords t "don't emit warnings")
   (org-confirm-babel-evaluate nil "I want to evaluate stuff when publishing")
   ;; Fix terrible indentation issues
