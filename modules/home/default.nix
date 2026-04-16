@@ -78,7 +78,6 @@ in
                     (if config.monorepo.profiles.lang-python.enable then (with pkgs; [
                       poetry
                       python3
-                      python312
                       semgrep
                       ty
                       ruff
