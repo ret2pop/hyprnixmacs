@@ -86,6 +86,7 @@
       libnotify
       htop
       minify
+      direnv
       python3Packages.adblock
 
       (pkgs.writeShellScriptBin "help"
