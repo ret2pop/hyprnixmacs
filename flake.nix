@@ -45,6 +45,10 @@
       url = "github:catppuccin/qutebrowser";
       flake = false;
     };
+    lean4-mode-src = {
+      url = "github:leanprover-community/lean4-mode";
+      flake = false;
+    };
   };
 
   outputs = {

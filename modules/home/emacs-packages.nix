@@ -13,6 +13,7 @@ epkgs: with epkgs; [
   dap-mode
   dash
   dashboard
+  envrc
   doom-themes
   doom-modeline
   indent-bars
@@ -28,6 +29,7 @@ epkgs: with epkgs; [
   engrave-faces
   enwc
   evil
+  evil-indent-plus
   evil-collection
   evil-commentary
   evil-multiedit
