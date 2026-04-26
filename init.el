@@ -847,6 +847,10 @@ then append the typed input to the mu4e database query."
     :config
     (evil-multiedit-default-keybinds))
 
+  (use-package evil-indent-plus
+    :ensure t
+    :config (evil-indent-plus-default-bindings))
+
   (use-package evil-textobj-tree-sitter
     :ensure t
     ;; Ensure Evil is loaded first so the text-object maps exist
@@ -856,12 +860,16 @@ then append the typed input to the mu4e database query."
     :bind ((:map evil-outer-text-objects-map
                  ("f" . my-treesit-outer-function)
                  ("c" . my-treesit-outer-class)
-                 ("a" . my-treesit-outer-arg))
-           
+                 ("a" . my-treesit-outer-arg)
+                 ("s" . my-treesit-outer-statement) ;; Added Statement
+                 ("b" . my-treesit-outer-block))    ;; Added Block (Great for SCSS/CSS)
+               
            (:map evil-inner-text-objects-map
                  ("f" . my-treesit-inner-function)
                  ("c" . my-treesit-inner-class)
-                 ("a" . my-treesit-inner-arg))
+                 ("a" . my-treesit-inner-arg)
+                 ("s" . my-treesit-inner-statement) ;; Added Statement
+                 ("b" . my-treesit-inner-block))    ;; Added Block
                  
            (:map evil-normal-state-map
                  ("] f" . my-treesit-goto-next-function)
@@ -872,15 +880,23 @@ then append the typed input to the mu4e database query."
     ;; 2. The Command Definitions
     :config
     ;; Link the custom names we bound above to the actual Tree-sitter closures
-    (defalias 'my-treesit-outer-function (evil-textobj-tree-sitter-get-textobj "function.outer"))
-    (defalias 'my-treesit-inner-function (evil-textobj-tree-sitter-get-textobj "function.inner"))
+    (defalias 'my-treesit-outer-function  (evil-textobj-tree-sitter-get-textobj "function.outer"))
+    (defalias 'my-treesit-inner-function  (evil-textobj-tree-sitter-get-textobj "function.inner"))
     
-    (defalias 'my-treesit-outer-class    (evil-textobj-tree-sitter-get-textobj "class.outer"))
-    (defalias 'my-treesit-inner-class    (evil-textobj-tree-sitter-get-textobj "class.inner"))
+    (defalias 'my-treesit-outer-class     (evil-textobj-tree-sitter-get-textobj "class.outer"))
+    (defalias 'my-treesit-inner-class     (evil-textobj-tree-sitter-get-textobj "class.inner"))
     
     ;; "a" is standard Vim terminology for "argument" (parameter)
-    (defalias 'my-treesit-outer-arg      (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-    (defalias 'my-treesit-inner-arg      (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+    (defalias 'my-treesit-outer-arg       (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+    (defalias 'my-treesit-inner-arg       (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+
+    ;; Added Statement definitions
+    (defalias 'my-treesit-outer-statement (evil-textobj-tree-sitter-get-textobj "statement.outer"))
+    (defalias 'my-treesit-inner-statement (evil-textobj-tree-sitter-get-textobj "statement.inner"))
+
+    ;; Added Block definitions (Targets {} blocks in SCSS, C, TS, etc.)
+    (defalias 'my-treesit-outer-block     (evil-textobj-tree-sitter-get-textobj "block.outer"))
+    (defalias 'my-treesit-inner-block     (evil-textobj-tree-sitter-get-textobj "block.inner"))
 
     ;; Navigation commands are standard interactive functions, so we wrap them cleanly
     (defun my-treesit-goto-next-function ()
@@ -898,7 +914,6 @@ then append the typed input to the mu4e database query."
     (defun my-treesit-goto-prev-class ()
       (interactive)
       (evil-textobj-tree-sitter-goto-textobj "class.outer" t)))
-
 
   (use-package general
     :after (evil evil-collection)
@@ -1086,6 +1101,10 @@ then append the typed input to the mu4e database query."
 ;; Notifications:1 ends here
 
 ;; [[file:../config/emacs.org::*LSP][LSP:1]]
+(use-package envrc
+  :demand t
+  :hook (after-init . envrc-global-mode))
+
 (use-package python
   :after lsp-mode
   :hook (python-ts-mode . lsp-deferred))
@@ -1780,8 +1799,6 @@ then append the typed input to the mu4e database query."
 ;; Pulsar:1 ends here
 
 ;; [[file:../config/emacs.org::*Lean4][Lean4:1]]
-(unless noninteractive (use-package lean4-mode
-                         :commands lean4-mode
-                         :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
-                                   :rev "76895d8939111654a472cfc617cfd43fbf5f1eb6")))
+(use-package lean4-mode
+  :commands lean4-mode)
 ;; Lean4:1 ends here
