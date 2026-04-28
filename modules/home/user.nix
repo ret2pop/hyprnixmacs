@@ -54,7 +54,7 @@
 
       # Apps
       # octaveFull
-      grim swww vim element-desktop signal-desktop signal-cli thunderbird jami imv slurp wl-clipboard
+      grim swww vim element-desktop signal-desktop signal-cli imv slurp wl-clipboard
 
       # Sound/media
       pavucontrol alsa-utils imagemagick ffmpeg pulseaudio
