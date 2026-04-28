@@ -1,5 +1,5 @@
 # [[file:../../config/nix.org::*Impermanence][Impermanence:1]]
-{ lib, config, ... }:
+{ config, pkgs, ... }:
 {
   assertions = [
     {
@@ -8,30 +8,57 @@
     }
   ];
 
-  boot.initrd.postResumeCommands = (if config.monorepo.profiles.impermanence.enable then lib.mkAfter ''
-      mkdir /btrfs_tmp
-      mount -t btrfs -n -o subvol=/ /dev/mapper/crypted /btrfs_tmp
-      if [[ -e /btrfs_tmp/root ]]; then
-          mkdir -p /btrfs_tmp/old_roots
-          timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-          mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-      fi
+  # Systemd Stage 1 replacement for postResumeCommands
+  boot.initrd.systemd.services = if config.monorepo.profiles.impermanence.enable then {
+    impermanence-root-wipe = {
+      description = "Wipe Btrfs root filesystem for impermanence";
+      wantedBy = [ "initrd.target" ];
+      
+      # Wait for the LUKS decryption of "crypted" to finish
+      after = [ "systemd-cryptsetup@crypted.service" ]; 
+      wants = [ "systemd-cryptsetup@crypted.service" ];
+      
+      # Run before the actual root filesystem is mounted
+      before = [ "sysroot.mount" ]; 
+      
+      unitConfig.DefaultDependencies = "no";
+      serviceConfig.Type = "oneshot";
+      
+      # Inject required tools into the minimal systemd initrd
+      path = with pkgs; [ 
+        coreutils 
+        util-linux 
+        btrfs-progs 
+        findutils 
+      ];
 
-      delete_subvolume_recursively() {
-          IFS=$'\n'
-          for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-              delete_subvolume_recursively "/btrfs_tmp/$i"
-          done
-          btrfs subvolume delete "$1"
-      }
+      script = ''
+        mkdir -p /btrfs_tmp
+        mount -t btrfs -n -o subvol=/ /dev/mapper/crypted /btrfs_tmp
+        
+        if [[ -e /btrfs_tmp/root ]]; then
+            mkdir -p /btrfs_tmp/old_roots
+            timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+            mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+        fi
 
-      for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
-          delete_subvolume_recursively "$i"
-      done
+        delete_subvolume_recursively() {
+            IFS=$'\n'
+            for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+                delete_subvolume_recursively "/btrfs_tmp/$i"
+            done
+            btrfs subvolume delete "$1"
+        }
 
-      btrfs subvolume create /btrfs_tmp/root
-      umount -n /btrfs_tmp
-    '' else "");
+        for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+            delete_subvolume_recursively "$i"
+        done
+
+        btrfs subvolume create /btrfs_tmp/root
+        umount -n /btrfs_tmp
+      '';
+    };
+  } else {};
 
   boot.initrd.luks.devices = (if (config.monorepo.vars.fileSystem == "btrfs") then {
     crypted = {
