@@ -36,6 +36,11 @@
                   ''
 config.load_autoconfig()
 setup(c, "mocha", True)
+
+c.content.blocking.hosts.lists.append('https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social-only/hosts')
+c.content.blocking.hosts.lists.append('https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social-only/hosts')
+c.content.blocking.hosts.lists.append('https://raw.githubusercontent.com/gieljnssns/Social-media-Blocklists/refs/heads/master/adguard-youtube.txt')
+c.content.blocking.hosts.lists.append('${../../data/youtube-blocklist}')
 '';
   };
 }
