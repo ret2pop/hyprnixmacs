@@ -50,7 +50,7 @@ in
       };
 
       rtc = {
-        use_external_ip = "66.42.84.130";
+        node_ip = "66.42.84.130";
         tcp_port = 7881;
         udp_port = 7882;
         port_range_start = 50000;
