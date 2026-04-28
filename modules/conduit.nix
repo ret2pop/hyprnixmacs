@@ -53,8 +53,6 @@ in
         node_ip = "66.42.84.130";
         tcp_port = 7881;
         udp_port = 7882;
-        port_range_start = 50000;
-        port_range_end = 60000;
       };
     };
   };

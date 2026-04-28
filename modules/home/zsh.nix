@@ -22,7 +22,6 @@
     };
 
     shellAliases = {
-      ret2pop-serve = "devd -ol ~/website_html/";
       clone-secrets = "git clone ssh://\"$1\"/home/preston/secrets \"$HOME/secrets\"";
       get-channel-id = "yt-dlp --print \"%(channel_id)s\" --playlist-end 1 \"$1\"";
       se = "sops edit";
@@ -35,9 +34,6 @@
       build-installer = "nix build $HOME/monorepo/nix#nixosConfigurations.installer.config.system.build.isoImage";
       rb = "sudo nixos-rebuild switch --flake $HOME/monorepo/nix#${systemHostName}";
       nfu = "cd ~/monorepo/nix && git add . && git commit -m \"new flake lock\" &&  nix flake update";
-      usync =  "rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/monorepo/result/ root@${super.monorepo.vars.remoteHost}:/var/www/${super.monorepo.vars.internetName}-website/";
-      usite
-      = "cd ~/src/publish-org-roam-ui && bash local.sh && rm -rf ~/website_html/graph_view; cp -r ~/src/publish-org-roam-ui/out ~/website_html/graph_view && rsync -azvP --chmod=\"Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r\" ~/website_html/ root@${super.monorepo.vars.remoteHost}:/var/www/${super.monorepo.vars.internetName}-website/";
       sai = "eval \"$(ssh-agent -s)\" && ssh-add ~/.ssh/id_ed25519 && ssh-add -l";
     };
     loginExtra = ''
