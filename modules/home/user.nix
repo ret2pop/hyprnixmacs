@@ -28,7 +28,7 @@
     homeDirectory = "/home/${super.monorepo.vars.userName}";
     stateVersion = "24.11";
     sessionVariables = {
-      QTWEBENGINE_FORCE_USE_GBM = 0;
+      QT_QPA_PLATFORM = "wayland;xcb";
       NIXOS_OZONE_WL = 1;
       XDG_SESSION_TYPE = "wayland";
       XDG_CURRENT_DESKTOP = "qtile";
@@ -41,6 +41,7 @@
       unzip
       mupdf
       zathura
+      qt6.qtwayland
 
       fzf
       # passwords
