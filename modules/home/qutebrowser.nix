@@ -26,7 +26,6 @@
       # This is the magic combination for Qtile + Wayland + Qutebrowser
       qt.args = [
         "enable-features=UseOzonePlatform"
-        "ozone-platform=wayland"
         "disable-gpu"
         "disable-software-rasterizer"
         "disable-gpu-sandbox"
