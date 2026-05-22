@@ -112,7 +112,7 @@ in
                     ]) else [])
                     ++
                     (if config.monorepo.profiles.lang-lean.enable then (with pkgs; [
-                      lean4
+                      elan
                     ]) else [])
                     ++
                     (if config.monorepo.profiles.lang-agda.enable then (with pkgs; [
