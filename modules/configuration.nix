@@ -21,9 +21,11 @@ let
 
   prodHosts = map (dom: "${config.monorepo.profiles.server.ipv4} ${dom}") allDomains;
   vmHosts = map (dom: "127.0.0.1 ${dom}") allDomains;
-  label = if builtins.pathExists labelFile
-          then lib.removeSuffix "\n" (builtins.readFile labelFile)
-          else "nolabel";
+
+  rawLabel = if builtins.pathExists labelFile
+             then lib.removeSuffix "\n" (builtins.readFile labelFile)
+             else "nolabel";
+  bootMessage = builtins.replaceStrings [ " " ] [ "-" ] rawLabel;
 in
 {
   environment.etc."wpa_supplicant.conf".text = ''
@@ -571,6 +573,6 @@ in
   i18n.defaultLocale = "en_CA.UTF-8";
   system.stateVersion = "24.11";
   # We want to label the generation after the commit message
-  system.nixos.label = "${config.networking.hostName}: ${label}";
+  system.nixos.label = "${config.networking.hostName}-${bootMessage}";
 }
 # Main Configuration:1 ends here
