@@ -264,25 +264,29 @@
             label-commit = {
               enable = true;
               name = "Label Commit";
+              always_run = true;
               description = "Label commits with same text as generation boot label";
               stages = [ "post-commit" ];
               pass_filenames = false;
               entry = "${pkgs.writeShellScript "label-commit"''
 set -e
 
+# absolute paths from the git project root
+REPO_ROOT=$(git rev-parse --show-toplevel)
+LABEL_DIR="$REPO_ROOT/data"
+LABEL_FILE="$LABEL_DIR/boot-label.txt"
+
+mkdir -p "$LABEL_DIR"
 PARENTS=$(git log -1 --format=%P)
 if [ $(echo "$PARENTS" | wc -w) -gt 1 ]; then
     exit 0
 fi
-
 COMMIT_MSG=$(git log -1 --format=%B)
-
-# Check if the file already matches to prevent an infinite amend loop
-if [ -f boot-label.txt ] && [ "$(cat boot-label.txt)" = "$COMMIT_MSG" ]; then
+if [ -f "$LABEL_FILE" ] && [ "$(cat "$LABEL_FILE")" = "$COMMIT_MSG" ]; then
     exit 0
 fi
-printf "%s" "$COMMIT_MSG" > boot-label.txt
-git add boot-label.txt
+printf "%s" "$COMMIT_MSG" > "$LABEL_FILE"
+git add "$LABEL_FILE"
 git commit --amend --no-edit --no-verify
               ''}";
             };
