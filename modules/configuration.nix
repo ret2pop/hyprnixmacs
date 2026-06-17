@@ -1,6 +1,7 @@
 # [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
 { config, pkgs, lib, system, ... }:
 let
+  labelFile = ./data/boot-label.txt;
   userGroups = [
     "nginx"
     "git"
@@ -20,6 +21,11 @@ let
 
   prodHosts = map (dom: "${config.monorepo.profiles.server.ipv4} ${dom}") allDomains;
   vmHosts = map (dom: "127.0.0.1 ${dom}") allDomains;
+
+  rawLabel = if builtins.pathExists labelFile
+             then lib.removeSuffix "\n" (builtins.readFile labelFile)
+             else "nolabel";
+  bootMessage = builtins.replaceStrings [ " " ] [ "-" ] rawLabel;
 in
 {
   environment.etc."wpa_supplicant.conf".text = ''
@@ -566,5 +572,7 @@ in
   time.timeZone = config.monorepo.vars.timeZone;
   i18n.defaultLocale = "en_CA.UTF-8";
   system.stateVersion = "24.11";
+  # We want to label the generation after the commit message
+  system.nixos.label = "${config.networking.hostName}-${bootMessage}";
 }
 # Main Configuration:1 ends here
