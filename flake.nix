@@ -260,6 +260,32 @@
   fi
                 ''}";
             };
+
+            label-commit = {
+              enable = true;
+              name = "Label Commit";
+              description = "Label commits with same text as generation boot label";
+              stages = [ "post-commit" ];
+              pass_filenames = false;
+              entry = "${pkgs.writeShellScript "label-commit"''
+set -e
+
+PARENTS=$(git log -1 --format=%P)
+if [ $(echo "$PARENTS" | wc -w) -gt 1 ]; then
+    exit 0
+fi
+
+COMMIT_MSG=$(git log -1 --format=%B)
+
+# Check if the file already matches to prevent an infinite amend loop
+if [ -f boot-label.txt ] && [ "$(cat boot-label.txt)" = "$COMMIT_MSG" ]; then
+    exit 0
+fi
+printf "%s" "$COMMIT_MSG" > boot-label.txt
+git add boot-label.txt
+git commit --amend --no-edit --no-verify
+              ''}";
+            };
           };
         };
       in
