@@ -1,1 +1,1 @@
-replace semicolons for label
+replace semicolons correctly for label
