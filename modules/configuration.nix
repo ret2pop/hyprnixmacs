@@ -25,7 +25,7 @@ let
   rawLabel = if builtins.pathExists labelFile
              then lib.removeSuffix "\n" (builtins.readFile labelFile)
              else "nolabel";
-  bootMessage = builtins.replaceStrings [ " " ] [ "-" ] rawLabel;
+  bootMessage = builtins.replaceStrings [ " " ";" ] [ "-" ] rawLabel;
 in
 {
   environment.etc."wpa_supplicant.conf".text = ''
