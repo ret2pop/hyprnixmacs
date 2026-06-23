@@ -1,7 +1,7 @@
 # [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
 { config, pkgs, lib, system, ... }:
 let
-  labelFile = ./data/boot-label.txt;
+  labelFile = ../data/boot-label.txt;
   userGroups = [
     "nginx"
     "git"

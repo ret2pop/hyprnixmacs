@@ -40,7 +40,6 @@ in
       man-pages
       man-pages-posix
       iproute2
-      silver-searcher
       ripgrep
     ]) ++
     (if (config.monorepo.vars.fileSystem == "btrfs") then with pkgs; [
