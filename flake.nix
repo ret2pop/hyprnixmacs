@@ -250,45 +250,17 @@
               name = "Prevent direct commits to main";
               description = "Blocks commits to main unless they are merge commits";
               pass_filenames = false;
-              entry = "${pkgs.writeShellScript "block-main-commits" ''
-  BRANCH=$(git branch --show-current)
-  GIT_DIR=$(git rev-parse --git-dir)
-  if [ "$BRANCH" = "main" ] && [ ! -f "$GIT_DIR/MERGE_HEAD" ]; then
-    echo "Direct commits to 'main' are blocked."
-    echo "Please commit to a feature branch and merge it into main."
-    exit 1
-  fi
-                ''}";
+              entry = "${pkgs.writeShellScript "block-main-commits" (builtins.readFile ./hooks/prevent-direct-main-commits.sh)}";
             };
 
             label-commit = {
               enable = true;
               name = "Label Commit";
               always_run = true;
-              description = "Label commits with same text as generation boot label";
+              description = "Label commits with same text as generation boot label, and separate flake lock into separate commit";
               stages = [ "post-commit" ];
               pass_filenames = false;
-              entry = "${pkgs.writeShellScript "label-commit"''
-set -e
-
-# absolute paths from the git project root
-REPO_ROOT=$(git rev-parse --show-toplevel)
-LABEL_DIR="$REPO_ROOT/data"
-LABEL_FILE="$LABEL_DIR/boot-label.txt"
-
-mkdir -p "$LABEL_DIR"
-PARENTS=$(git log -1 --format=%P)
-if [ $(echo "$PARENTS" | wc -w) -gt 1 ]; then
-    exit 0
-fi
-COMMIT_MSG=$(git log -1 --format=%B)
-if [ -f "$LABEL_FILE" ] && [ "$(cat "$LABEL_FILE")" = "$COMMIT_MSG" ]; then
-    exit 0
-fi
-printf "%s" "$COMMIT_MSG" > "$LABEL_FILE"
-git add "$LABEL_FILE"
-git commit --amend --no-edit --no-verify
-              ''}";
+              entry = "${pkgs.writeShellScript "label-commit" (builtins.readFile ./hooks/label-commit.sh)}";
             };
           };
         };

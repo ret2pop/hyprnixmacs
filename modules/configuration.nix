@@ -1,7 +1,7 @@
 # [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
 { config, pkgs, lib, system, ... }:
 let
-  labelFile = ./data/boot-label.txt;
+  labelFile = ../data/boot-label.txt;
   userGroups = [
     "nginx"
     "git"
@@ -25,7 +25,7 @@ let
   rawLabel = if builtins.pathExists labelFile
              then lib.removeSuffix "\n" (builtins.readFile labelFile)
              else "nolabel";
-  bootMessage = builtins.replaceStrings [ " " ] [ "-" ] rawLabel;
+  bootMessage = builtins.replaceStrings [ " " ";" ] [ "-" " -" ] rawLabel;
 in
 {
   environment.etc."wpa_supplicant.conf".text = ''
