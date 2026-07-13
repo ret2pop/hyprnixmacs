@@ -77,7 +77,7 @@ else
   gum style --border normal --margin "1" --padding "1 2" "Enter a password for the encrypted disk. If you're not installing a profile with an encrypted disk, you can leave this blank."
   echo "$(gum input --password)" > /tmp/secret.key
 
-  if [ -n "${1:-}" ]; then
+  if [ -n "''${1:-}" ]; then
     SYSTEM="$1"
   else
     gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select \`New\` in order to create a new system."

@@ -1,1 +1,1 @@
-add installer integration tests
+fix bad templating
