@@ -268,50 +268,64 @@
         mkInstallerTests = builtins.map (hostname:
           let
             lib = nixpkgs.lib;
-            hostPkgs = self.nixosConfigurations."${hostname}".pkgs;
+            
+            # Evaluate the target system on the host, forcing the drive to the VM's empty disk
+            targetSystemVM = self.nixosConfigurations."${hostname}".extendModules {
+              modules = [{
+                config.monorepo.vars.device = lib.mkForce "/dev/vdb";
+              }];
+            };
           in
             {
               name = "installer-e2e-${hostname}";
-              value = hostPkgs.testers.runNixOSTest {
+              value = targetSystemVM.pkgs.testers.runNixOSTest {
                 name = "installer-test-${hostname}";
                 nodes.installer = { ... }: {
                   _module.args = attrs // {
-                    # This gets passed into the installer module
                     testSystem = hostname;
+                    # Pass the pre-compiled, host-evaluated Disko script directly
+                    testDiskoScript = targetSystemVM.config.system.build.diskoScript;
                     monorepoSelf = null;
                   };
                   
                   imports = mkHostModules "installer";
                   
+                  nixpkgs.pkgs = lib.mkVMOverride targetSystemVM.pkgs;
+                  nixpkgs.config = lib.mkForce {};
+                  nixpkgs.overlays = lib.mkForce [];
+                  
+                  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                  systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+
                   virtualisation = {
                     emptyDiskImages = [ 8192 ]; 
                     memorySize = 4096;
+                    cores = 2;
                   };
-                  
-                  # Offline sandbox fix
-                  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
                 };
                 
                 testScript = ''
                   installer.start()
                   installer.wait_for_unit("multi-user.target")
 
-                  # Pre-seed the monorepo from local flake state to bypass network requirements
-                  installer.succeed("mkdir -p /home/nixos/monorepo")
-                  installer.succeed("cp -rT ${self} /home/nixos/monorepo")
+                  # Pre-seed the monorepo/nix directory
+                  installer.succeed("mkdir -p /home/nixos/monorepo/nix")
+                  installer.succeed("cp -rT ${self} /home/nixos/monorepo/nix")
                   installer.succeed("chown -R nixos:users /home/nixos/monorepo")
                   installer.succeed("chmod -R u+w /home/nixos/monorepo")
 
-                  # Re-init git (flakes strip the .git folder)
                   installer.execute("sudo -u nixos git config --global user.email 'ci@local'")
                   installer.execute("sudo -u nixos git config --global user.name 'CI'")
-                  installer.succeed("sudo -u nixos bash -c 'cd /home/nixos/monorepo && git init && git add . && git commit -m \"init\"'")
+                  installer.succeed("sudo -u nixos bash -c 'cd /home/nixos/monorepo/nix && git init && git add . && git commit -m \"init\"'")
 
-                  # The script detects testSystem via templating and skips all TUIs
                   installer.succeed("sudo -i -u nixos nix_installer >&2")
 
-                  # Assert disko ran successfully
                   installer.succeed("lsblk /dev/vdb | grep -q 'part'")
+                  installer.succeed("mountpoint -q /mnt")
+                  # todo: make this abstract
+                  installer.succeed("test -d /mnt/home/preston/monorepo/nix")
+                  # Check that the directory exists and belongs to uid 0
+                  installer.succeed("stat -c '%u' /mnt/home/preston/monorepo | grep -q '0'")
                   installer.succeed("sync")
                 '';
               };

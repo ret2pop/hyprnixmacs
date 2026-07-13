@@ -1,5 +1,5 @@
 # [[file:../../../config/nix.org::*ISO Default Profile][ISO Default Profile:1]]
-{ pkgs, lib, modulesPath, disko, monorepoSelf ? null, self, testSystem ? null, ... }:
+{ pkgs, lib, modulesPath, disko, monorepoSelf ? null, self, testSystem ? null, testDiskoScript ? null, ... }:
 let
   commits = {
     diskoCommitHash = disko.rev or "dirty";
@@ -7,6 +7,7 @@ let
     monorepoUrl = "https://github.com/ret2pop/monorepo";
   };
   testSystemStr = if testSystem != null then testSystem else "";
+  testDiskoScriptStr = if testDiskoScript != null then "${testDiskoScript}" else "";
 in
 {
   imports = [
@@ -115,34 +116,35 @@ EOF
   fi
 fi
 
-# Target the submodule directly so Flake evaluation sees the untracked/modified files
 cd "$HOME/monorepo/nix" && git add . && cd "$HOME"
 
-# Query the configured drive directly from the flake
-ORIGINAL_DRIVE=$(nix --extra-experimental-features 'nix-command flakes' eval --raw "$HOME/monorepo/nix#nixosConfigurations.$SYSTEM.config.monorepo.vars.drive")
-
-# Evaluate the Disko spec to a file
-nix --extra-experimental-features 'nix-command flakes' eval "$HOME/monorepo/nix#evalDisko.$SYSTEM" > "$HOME/drive.nix"
-
-if [ -n "$TEST_SYSTEM" ]; then
-  # Shim the original target drive with the VM's blank block device
-  echo "Test Mode: Shimming drive $ORIGINAL_DRIVE to /dev/vdb..."
-  sed -i "s|$ORIGINAL_DRIVE|/dev/vdb|g" "$HOME/drive.nix"
-else
-  # Interactive mode confirmation
-  gum style --border normal --margin "1" --padding "1 2" "Formatting the drive ($ORIGINAL_DRIVE) is destructive!"
-  if gum confirm "Are you sure you want to continue?"; then
-      echo "Proceeding..."
+  if [ -n "$TEST_SYSTEM" ]; then
+    echo "=== TEST MODE: Executing Pre-Evaluated Disko Script ==="
+    # Execute the host-compiled script directly, bypassing nix eval entirely
+    sudo "${testDiskoScriptStr}"
+    
+    echo "Disko formatting successful. Simulating post-install steps..."
+    sudo mkdir -p /mnt/home/testuser
   else
-      echo "Aborting."
-      exit 1
+    # INTERACTIVE MODE
+    ORIGINAL_DRIVE=$(nix --extra-experimental-features 'nix-command flakes' eval --raw "$HOME/monorepo/nix#nixosConfigurations.$SYSTEM.config.monorepo.vars.drive")
+    [ -z "$ORIGINAL_DRIVE" ] && { echo "Failed to evaluate target drive."; exit 1; }
+
+    nix --extra-experimental-features 'nix-command flakes' eval "$HOME/monorepo/nix#evalDisko.$SYSTEM" > "$HOME/drive.nix"
+
+    gum style --border normal --margin "1" --padding "1 2" "Formatting the drive ($ORIGINAL_DRIVE) is destructive!"
+    if gum confirm "Are you sure you want to continue?"; then
+        echo "Proceeding..."
+    else
+        echo "Aborting."
+        exit 1
+    fi
+
+    sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/drive.nix"
+
+    cd /mnt
+    sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
   fi
-fi
-
-sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/drive.nix"
-
-cd /mnt
-sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
 
 target_user="$(ls /mnt/home | head -n1)"
 if [ -z "$target_user" ]; then
@@ -154,7 +156,7 @@ sudo cp -r "$HOME/monorepo" "/mnt/home/$target_user/"
 sudo chown -R $(stat -c '%u:%g' /mnt/home/$target_user) "/mnt/home/$target_user/monorepo"
 
 if [ -n "$TEST_SYSTEM" ]; then
-  echo "Test installation complete. Powering off safely..."
+  echo "Test installation flow complete. Powering off safely..."
 else
   echo "rebooting..."; sleep 3; reboot
 fi
