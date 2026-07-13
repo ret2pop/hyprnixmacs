@@ -264,13 +264,69 @@
             };
           };
         };
+
+        mkInstallerTests = builtins.map (hostname:
+          let
+            lib = nixpkgs.lib;
+            hostPkgs = self.nixosConfigurations."${hostname}".pkgs;
+          in
+            {
+              name = "installer-e2e-${hostname}";
+              value = hostPkgs.testers.runNixOSTest {
+                name = "installer-test-${hostname}";
+                nodes.installer = { ... }: {
+                  _module.args = attrs // {
+                    # This gets passed into the installer module
+                    testSystem = hostname;
+                    monorepoSelf = null;
+                  };
+                  
+                  imports = mkHostModules "installer";
+                  
+                  virtualisation = {
+                    emptyDiskImages = [ 8192 ]; 
+                    memorySize = 4096;
+                  };
+                  
+                  # Offline sandbox fix
+                  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                };
+                
+                testScript = ''
+                  installer.start()
+                  installer.wait_for_unit("multi-user.target")
+
+                  # Pre-seed the monorepo from local flake state to bypass network requirements
+                  installer.succeed("mkdir -p /home/nixos/monorepo")
+                  installer.succeed("cp -rT ${self} /home/nixos/monorepo")
+                  installer.succeed("chown -R nixos:users /home/nixos/monorepo")
+                  installer.succeed("chmod -R u+w /home/nixos/monorepo")
+
+                  # Re-init git (flakes strip the .git folder)
+                  installer.execute("sudo -u nixos git config --global user.email 'ci@local'")
+                  installer.execute("sudo -u nixos git config --global user.name 'CI'")
+                  installer.succeed("sudo -u nixos bash -c 'cd /home/nixos/monorepo && git init && git add . && git commit -m \"init\"'")
+
+                  # The script detects testSystem via templating and skips all TUIs
+                  installer.succeed("sudo -i -u nixos nix_installer >&2")
+
+                  # Assert disko ran successfully
+                  installer.succeed("lsblk /dev/vdb | grep -q 'part'")
+                  installer.succeed("sync")
+                '';
+              };
+            }
+        );
+
+        # Filter out the installer itself so it doesn't try to install an installer
+        installerTests = builtins.listToAttrs (mkInstallerTests filterHosts);
       in
         {
           lib = {
             inherit mkHostModules;
           };
 
-          checks."${system}" = integrationTests // {
+          checks."${system}" = integrationTests // installerTests // {
             inherit pre-commit-check;
           };
 
