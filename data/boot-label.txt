@@ -1,1 +1,1 @@
-installer test works for affinity e2e flow
+add safeguards against testing systems that don't matter

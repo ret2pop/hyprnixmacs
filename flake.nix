@@ -274,92 +274,104 @@
           let
             lib = nixpkgs.lib;
             targetSystem = self.nixosConfigurations."${hostname}";
+            targetDevice = targetSystem.config.monorepo.vars.device;
             
-            # 1. Parse the lockfile directly as pure JSON data (No Context Tags!)
-            lockfile = builtins.fromJSON (builtins.readFile ./flake.lock);
+            # Use strict regex matching to identify VM drives and SD cards
+            isVirtual = builtins.match "/dev/vd[a-z]+" targetDevice != null;
+            isSdCard  = builtins.match "/dev/mmcblk[0-9]+" targetDevice != null;
+            shouldSkip = isVirtual || isSdCard;
             
-            # 2. Extract only the nodes that actually contain locked source trees
-            lockedNodes = builtins.filter (node: node ? locked) (builtins.attrValues lockfile.nodes);
-            
-            # 3. Native Schema Resolution
-            # builtins.fetchTree natively consumes the exact schema in `flake.lock`.
-            # We use removeAttrs to strip "dir" so Nix fetches the root repository 
-            # rather than looking for a sub-directory inside the builder.
-            allFlakeSources = builtins.map (node: 
-              (builtins.fetchTree (builtins.removeAttrs node.locked ["dir"])).outPath
-            ) lockedNodes;
-
-            # 4. Bundle them securely into a native Nix derivation
-            # BUG FIX: Echoing to a text file prevents "basename" collisions 
-            # while still permanently registering the paths in the VM closure.
-            flakeSourcesClosure = targetSystem.pkgs.stdenvNoCC.mkDerivation {
-              name = "flake-sources-closure";
-              dontUnpack = true;
-              srcs = allFlakeSources;
-              installPhase = ''
-                mkdir -p $out
-                echo "$srcs" > $out/dependencies.txt
-              '';
-            };
-
           in {
             name = "installer-e2e-${hostname}";
-            value = targetSystem.pkgs.testers.runNixOSTest {
-              name = "installer-e2e-${hostname}";
-              nodes.installer = { ... }: {
+            value = if shouldSkip then
+              
+              # THE BYPASS: Evaluate in milliseconds, entirely skipping QEMU.
+              targetSystem.pkgs.runCommand "installer-e2e-${hostname}-skipped" {} ''
+                echo "Skipping ${hostname}: Target device (${targetDevice}) is a virtual drive or SD card."
+                echo "This system is intended for nixos-anywhere or direct SD flashing."
+                mkdir $out
+              ''
                 
-                _module.args = {
-                  inherit (attrs) disko self;
-                  testHostname = hostname;
-                  targetDevice = targetSystem.config.monorepo.vars.device;
-                  monorepoSelf = null;
-                };
-                
-                imports = [
-                  (./. + "/systems/installer/default.nix")
-                  "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
-                  {
-                    networking.hostName = "installer";
-                    nixpkgs.pkgs = lib.mkVMOverride targetSystem.pkgs;
-                    nixpkgs.config = lib.mkForce {};
-                    nixpkgs.overlays = lib.mkForce [];
-                  }
-                ];
-                
-                # 5. Native System Injection
-                # The NixOS builder evaluates the closure and physically drops 
-                # all your flake sources into the VM before it ever boots.
-                system.extraDependencies = [
-                  targetSystem.config.system.build.toplevel
-                  flakeSourcesClosure
-                ];
+                    else
+                      
+                      # THE REAL TEST: Only evaluate the heavy lifting if it is a bare-metal NVMe/SATA host.
+                      let
+                        # 1. Parse the lockfile directly as pure JSON data
+                        lockfile = builtins.fromJSON (builtins.readFile ./flake.lock);
+                        
+                        # 2. Extract only the nodes that actually contain locked source trees
+                        lockedNodes = builtins.filter (node: node ? locked) (builtins.attrValues lockfile.nodes);
+                        
+                        # 3. Native Schema Resolution
+                        allFlakeSources = builtins.map (node: 
+                          (builtins.fetchTree (builtins.removeAttrs node.locked ["dir"])).outPath
+                        ) lockedNodes;
 
-                virtualisation = {
-                  emptyDiskImages = [ 20480 ];
-                  memorySize = 8192;
-                  cores = 4;
-                };
+                        # 4. Bundle them securely into a native Nix derivation
+                        flakeSourcesClosure = targetSystem.pkgs.stdenvNoCC.mkDerivation {
+                          name = "flake-sources-closure";
+                          dontUnpack = true;
+                          srcs = allFlakeSources;
+                          installPhase = ''
+                    mkdir -p $out
+                    echo "$srcs" > $out/dependencies.txt
+                  '';
+                        };
+                      in
+                        targetSystem.pkgs.testers.runNixOSTest {
+                          name = "installer-e2e-${hostname}";
+                          nodes.installer = { ... }: {
+                            
+                            _module.args = {
+                              inherit (attrs) disko self;
+                              testHostname = hostname;
+                              monorepoSelf = null;
+                              inherit targetDevice;
+                            };
+                            
+                            imports = [
+                              (./. + "/systems/installer/default.nix")
+                              "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
+                              {
+                                networking.hostName = "installer";
+                                nixpkgs.pkgs = lib.mkVMOverride targetSystem.pkgs;
+                                nixpkgs.config = lib.mkForce {};
+                                nixpkgs.overlays = lib.mkForce [];
+                              }
+                            ];
+                            
+                            system.extraDependencies = [
+                              targetSystem.config.system.build.toplevel
+                              flakeSourcesClosure
+                            ];
 
-                nix.settings = {
-                  substituters = lib.mkForce [ ];
-                  experimental-features = [ "nix-command" "flakes" ];
-                };
-                
-                systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
-                systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
-              };
+                            virtualisation = {
+                              emptyDiskImages = [ 20480 ];
+                              memorySize = 8192;
+                              cores = 4;
+                            };
 
-              testScript = ''
-        installer.start()
-        installer.wait_for_unit("multi-user.target")
+                            nix.settings = {
+                              substituters = lib.mkForce [ ];
+                              experimental-features = [ "nix-command" "flakes" ];
+                            };
+                            
+                            systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                            systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+                          };
 
-        # Execute the native bash script
-        installer.succeed("sudo -i -u nixos nix_installer >&2")
+                          testScript = ''
+                    installer.start()
+                    installer.wait_for_unit("multi-user.target")
 
-        installer.succeed("lsblk /dev/vdb | grep -q 'part'")
-        installer.succeed("sync")
-      '';
-            };
+                    # 1. Execute the native bash script
+                    installer.succeed("sudo -i -u nixos nix_installer >&2")
+                    # 2. Assert Drive and Configuration Logic
+                    installer.succeed("lsblk /dev/vdb | grep -q 'part'")
+                    installer.succeed("mountpoint -q /mnt")
+                    installer.succeed("sync")
+                  '';
+                        };
           }
         );
 
