@@ -1,1 +1,1 @@
-add safeguards against testing systems that don't matter
+boot label script fix
