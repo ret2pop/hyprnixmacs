@@ -1,1 +1,1 @@
-nix flake check is working now
+remove additionalPaths

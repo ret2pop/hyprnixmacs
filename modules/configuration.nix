@@ -1,5 +1,5 @@
 # [[file:../../config/nix.org::*Main Configuration][Main Configuration:1]]
-{ self, config, pkgs, lib, system, hostname, ... }:
+{ config, pkgs, lib, system, ... }:
 let
   labelFile = ../data/boot-label.txt;
   userGroups = [
@@ -72,13 +72,6 @@ in
     };
 
     security.acme.defaults.server = lib.mkForce "https://127.0.0.1:14000/dir";
-    additionalPaths = [
-      self.nixosConfigurations."${hostname}".config.system.build.toplevel
-      self.nixosConfigurations."${hostname}".config.system.build.diskoScript
-      pkgs.gitFull
-      pkgs.curl
-      pkgs.gum
-    ];
   };
 
   documentation = {
