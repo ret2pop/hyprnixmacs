@@ -1,1 +1,1 @@
-boot label script fix
+nix flake check is working now

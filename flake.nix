@@ -277,8 +277,8 @@
             targetDevice = targetSystem.config.monorepo.vars.device;
             
             # Use strict regex matching to identify VM drives and SD cards
-            isVirtual = builtins.match "/dev/vd[a-z]+" targetDevice != null;
-            isSdCard  = builtins.match "/dev/mmcblk[0-9]+" targetDevice != null;
+            isVirtual = (builtins.match "/dev/vd[a-z]+" targetDevice) != null;
+            isSdCard  = (builtins.match "/dev/mmcblk[0-9]+" targetDevice) != null;
             shouldSkip = isVirtual || isSdCard;
             
           in {
