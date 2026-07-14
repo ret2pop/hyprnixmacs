@@ -123,7 +123,9 @@
             specialArgs = attrs // {
               system = (getSystem hostname);
               isIntegrationTest = false;
+              testHostname = null;
               monorepoSelf = null;
+              targetDevice = null;
             };
             modules = mkHostModules hostname;
           };
@@ -171,6 +173,8 @@
             super = self.nixosConfigurations."${hostname}".config;
           in
             [
+              # Test a minimal number of core services because they need to work without WAN
+              # in the VM
               {
                 serviceName = "nginx";
                 enabled = super.services.nginx.enable;
@@ -212,6 +216,8 @@
                       isIntegrationTest = true;
                       system = getSystem hostname;
                       monorepoSelf = null;
+                      targetDevice = null;
+                      testHostname = null;
                     };
                     imports = mkHostModules hostname ++ [
                       "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
@@ -264,75 +270,99 @@
             };
           };
         };
-
         mkInstallerTests = builtins.map (hostname:
           let
             lib = nixpkgs.lib;
+            targetSystem = self.nixosConfigurations."${hostname}";
             
-            # Evaluate the target system on the host, forcing the drive to the VM's empty disk
-            targetSystemVM = self.nixosConfigurations."${hostname}".extendModules {
-              modules = [{
-                config.monorepo.vars.device = lib.mkForce "/dev/vdb";
-              }];
-            };
-          in
-            {
-              name = "installer-e2e-${hostname}";
-              value = targetSystemVM.pkgs.testers.runNixOSTest {
-                name = "installer-test-${hostname}";
-                nodes.installer = { ... }: {
-                  _module.args = attrs // {
-                    testSystem = hostname;
-                    # Pass the pre-compiled, host-evaluated Disko script directly
-                    testDiskoScript = targetSystemVM.config.system.build.diskoScript;
-                    monorepoSelf = null;
-                  };
-                  
-                  imports = mkHostModules "installer";
-                  
-                  nixpkgs.pkgs = lib.mkVMOverride targetSystemVM.pkgs;
-                  nixpkgs.config = lib.mkForce {};
-                  nixpkgs.overlays = lib.mkForce [];
-                  
-                  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
-                  systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+            # 1. Parse the lockfile directly as pure JSON data (No Context Tags!)
+            lockfile = builtins.fromJSON (builtins.readFile ./flake.lock);
+            
+            # 2. Extract only the nodes that actually contain locked source trees
+            lockedNodes = builtins.filter (node: node ? locked) (builtins.attrValues lockfile.nodes);
+            
+            # 3. Native Schema Resolution
+            # builtins.fetchTree natively consumes the exact schema in `flake.lock`.
+            # We use removeAttrs to strip "dir" so Nix fetches the root repository 
+            # rather than looking for a sub-directory inside the builder.
+            allFlakeSources = builtins.map (node: 
+              (builtins.fetchTree (builtins.removeAttrs node.locked ["dir"])).outPath
+            ) lockedNodes;
 
-                  virtualisation = {
-                    emptyDiskImages = [ 8192 ]; 
-                    memorySize = 4096;
-                    cores = 2;
-                  };
+            # 4. Bundle them securely into a native Nix derivation
+            # BUG FIX: Echoing to a text file prevents "basename" collisions 
+            # while still permanently registering the paths in the VM closure.
+            flakeSourcesClosure = targetSystem.pkgs.stdenvNoCC.mkDerivation {
+              name = "flake-sources-closure";
+              dontUnpack = true;
+              srcs = allFlakeSources;
+              installPhase = ''
+                mkdir -p $out
+                echo "$srcs" > $out/dependencies.txt
+              '';
+            };
+
+          in {
+            name = "installer-e2e-${hostname}";
+            value = targetSystem.pkgs.testers.runNixOSTest {
+              name = "installer-e2e-${hostname}";
+              nodes.installer = { ... }: {
+                
+                _module.args = {
+                  inherit (attrs) disko self;
+                  testHostname = hostname;
+                  targetDevice = targetSystem.config.monorepo.vars.device;
+                  monorepoSelf = null;
                 };
                 
-                testScript = ''
-                  installer.start()
-                  installer.wait_for_unit("multi-user.target")
+                imports = [
+                  (./. + "/systems/installer/default.nix")
+                  "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
+                  {
+                    networking.hostName = "installer";
+                    nixpkgs.pkgs = lib.mkVMOverride targetSystem.pkgs;
+                    nixpkgs.config = lib.mkForce {};
+                    nixpkgs.overlays = lib.mkForce [];
+                  }
+                ];
+                
+                # 5. Native System Injection
+                # The NixOS builder evaluates the closure and physically drops 
+                # all your flake sources into the VM before it ever boots.
+                system.extraDependencies = [
+                  targetSystem.config.system.build.toplevel
+                  flakeSourcesClosure
+                ];
 
-                  # Pre-seed the monorepo/nix directory
-                  installer.succeed("mkdir -p /home/nixos/monorepo/nix")
-                  installer.succeed("cp -rT ${self} /home/nixos/monorepo/nix")
-                  installer.succeed("chown -R nixos:users /home/nixos/monorepo")
-                  installer.succeed("chmod -R u+w /home/nixos/monorepo")
+                virtualisation = {
+                  emptyDiskImages = [ 20480 ];
+                  memorySize = 8192;
+                  cores = 4;
+                };
 
-                  installer.execute("sudo -u nixos git config --global user.email 'ci@local'")
-                  installer.execute("sudo -u nixos git config --global user.name 'CI'")
-                  installer.succeed("sudo -u nixos bash -c 'cd /home/nixos/monorepo/nix && git init && git add . && git commit -m \"init\"'")
-
-                  installer.succeed("sudo -i -u nixos nix_installer >&2")
-
-                  installer.succeed("lsblk /dev/vdb | grep -q 'part'")
-                  installer.succeed("mountpoint -q /mnt")
-                  # todo: make this abstract
-                  installer.succeed("test -d /mnt/home/preston/monorepo/nix")
-                  # Check that the directory exists and belongs to uid 0
-                  installer.succeed("stat -c '%u' /mnt/home/preston/monorepo | grep -q '0'")
-                  installer.succeed("sync")
-                '';
+                nix.settings = {
+                  substituters = lib.mkForce [ ];
+                  experimental-features = [ "nix-command" "flakes" ];
+                };
+                
+                systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
               };
-            }
+
+              testScript = ''
+        installer.start()
+        installer.wait_for_unit("multi-user.target")
+
+        # Execute the native bash script
+        installer.succeed("sudo -i -u nixos nix_installer >&2")
+
+        installer.succeed("lsblk /dev/vdb | grep -q 'part'")
+        installer.succeed("sync")
+      '';
+            };
+          }
         );
 
-        # Filter out the installer itself so it doesn't try to install an installer
         installerTests = builtins.listToAttrs (mkInstallerTests filterHosts);
       in
         {

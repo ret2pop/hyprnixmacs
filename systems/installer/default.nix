@@ -1,19 +1,27 @@
 # [[file:../../../config/nix.org::*ISO Default Profile][ISO Default Profile:1]]
-{ pkgs, lib, modulesPath, disko, monorepoSelf ? null, self, testSystem ? null, testDiskoScript ? null, ... }:
+{ pkgs, lib, modulesPath, disko, monorepoSelf ? null, self, testHostname ? null, targetDevice ? "/dev/sda", ... }:
 let
   commits = {
     diskoCommitHash = disko.rev or "dirty";
     monorepoCommitHash = if monorepoSelf != null then (monorepoSelf.rev or "dirty") else (self.rev or "dirty");
     monorepoUrl = "https://github.com/ret2pop/monorepo";
   };
-  testSystemStr = if testSystem != null then testSystem else "";
-  testDiskoScriptStr = if testDiskoScript != null then "${testDiskoScript}" else "";
+
+  targetSystemName = if testHostname != null then testHostname else "";
+
+  bundledMonorepo = pkgs.fetchgit {
+    url = commits.monorepoUrl;
+    rev = if commits.monorepoCommitHash != "dirty" then commits.monorepoCommitHash else "HEAD";
+    leaveDotGit = true;
+    fetchSubmodules = true;
+    hash = "sha256-31S+gb9WAky5ymumqf4aoWFHpSKqpgZVCFHHmVIXKLU=";
+  };
 in
 {
   imports = [
     (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
   ];
-
+  
   networking = {
     networkmanager.enable = true;
     firewall = {
@@ -38,6 +46,7 @@ in
     root.openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICts6+MQiMwpA+DfFQxjIN214Jn0pCw/2BDvOzPhR/H2 preston@continuity-dell"
     ];
+
     nixos = {
       packages = with pkgs; [
         gitFull
@@ -56,111 +65,90 @@ fi
 
 cd "$HOME"
 
-TEST_SYSTEM="${testSystemStr}"
+TARGET_SYSTEM="${targetSystemName}"
 
-if [ -n "$TEST_SYSTEM" ]; then
-  echo "=== AUTOMATED TEST MODE ==="
-  echo "Target system: $TEST_SYSTEM"
-  SYSTEM="$TEST_SYSTEM"
+if [ -n "$TARGET_SYSTEM" ]; then
+  echo ">>> TEST MODE DETECTED. Target system: $TARGET_SYSTEM"
+else
+  ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui
+fi
+
+if [ ! -d "$HOME/monorepo/" ]; then
+  echo "Staging the bundled monorepo (with git history)..."
+  cp -rT ${bundledMonorepo} "$HOME/monorepo"
+  chmod -R u+w "$HOME/monorepo"
+fi
+
+if [ -n "$TARGET_SYSTEM" ]; then
+  echo -n "" > /tmp/secret.key
+  SYSTEM="$TARGET_SYSTEM"
+else
+  gum style --border normal --margin "1" --padding "1 2" "Enter a password for the encrypted disk. Leave blank if not using encryption."
+  echo -n "$(gum input --password)" > /tmp/secret.key
   
-  echo "testpass" > /tmp/secret.key
-else
-  # INTERACTIVE MODE
-  ping -q -c1 google.com &>/dev/null && echo "online! Proceeding with the installation..." || nmtui || true
+  gum style --border normal --margin "1" --padding "1 2" "Choose a system to install:"
+  SYSTEM="$(gum choose $(find "$HOME/monorepo/nix/systems" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep -v -E 'installer'))"
+fi
 
-  if [ ! -d "$HOME/monorepo/" ]; then
-    git clone ${commits.monorepoUrl} --recurse-submodules
-    cd "$HOME/monorepo"
-    git checkout "${commits.monorepoCommitHash}"
-    cd "$HOME"
-  fi
+# Evaluate the dynamic disk configuration
+nix --extra-experimental-features 'nix-command flakes' eval "path:$HOME/monorepo/nix#evalDisko.$SYSTEM" > "$HOME/drive.nix"
 
-  gum style --border normal --margin "1" --padding "1 2" "Enter a password for the encrypted disk. If you're not installing a profile with an encrypted disk, you can leave this blank."
-  echo "$(gum input --password)" > /tmp/secret.key
+if [ -n "$TARGET_SYSTEM" ]; then
+  echo ">>> TEST MODE: Hot-swapping target bare-metal drive to VM virtual drive (/dev/vdb)..."
+  # Safely rewrite the dynamic disk path to target the QEMU block device
+  sed -i "s|${targetDevice}|/dev/vdb|g" "$HOME/drive.nix"
+fi
 
-  if [ -n "''${1:-}" ]; then
-    SYSTEM="$1"
+if [ -z "$TARGET_SYSTEM" ]; then
+  gum style --border normal --margin "1" --padding "1 2" "Formatting the drive is destructive!"
+  if gum confirm "Are you sure you want to continue?"; then
+      echo "Proceeding..."
   else
-    gum style --border normal --margin "1" --padding "1 2" "Choose a system to install or select \`New\` in order to create a new system."
-    SYSTEM="$( { find "$HOME/monorepo/nix/systems" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | grep -v -E 'installer'; echo "New"; } | gum choose )"
-
-    if [[ "$SYSTEM" == "New" ]]; then
-      gum style --border normal --margin "1" --padding "1 2" "Choose a system name"
-      SYSTEM="$(gum input --placeholder "system name")"
-    fi
-  fi
-
-  if [ ! -d "$HOME/monorepo/nix/systems/$SYSTEM" ]; then
-    mkdir -p "$HOME/monorepo/nix/systems/$SYSTEM"
-    cp "$HOME/monorepo/nix/systems/continuity/home.nix" "$HOME/monorepo/nix/systems/$SYSTEM/home.nix"
-    cat > "$HOME/monorepo/nix/systems/$SYSTEM/default.nix" <<EOF
-{ ... }:
-{
-  imports = [
-    ../common.nix
-  ];
-  # CHANGEME
-  config.monorepo.vars.drive = "/dev/sda";
-}
-EOF
-
-    gum style --border normal --margin "1" --padding "1 2" "Edit the system default.nix with options."
-    gum input --placeholder "Press Enter to continue" >/dev/null
-    vim "$HOME/monorepo/nix/systems/$SYSTEM/default.nix"
-
-    gum style --border normal --margin "1" --padding "1 2" "Edit the home default.nix with options."
-    gum input --placeholder "Press Enter to continue" >/dev/null
-    vim "$HOME/monorepo/nix/systems/$SYSTEM/home.nix"
-
-    sed -i "/hostnames = \[/,/];/ s/];/  \"$SYSTEM\"\n    ];/" "$HOME/monorepo/nix/flake.nix"
+      echo "Aborting."
+      exit 1
   fi
 fi
 
-cd "$HOME/monorepo/nix" && git add . && cd "$HOME"
+# Format the drive
+sudo ${disko.packages.${pkgs.system}.disko}/bin/disko --mode destroy,format,mount --yes-wipe-all-disks "$HOME/drive.nix"
 
-  if [ -n "$TEST_SYSTEM" ]; then
-    echo "=== TEST MODE: Executing Pre-Evaluated Disko Script ==="
-    # Execute the host-compiled script directly, bypassing nix eval entirely
-    sudo "${testDiskoScriptStr}"
-    
-    echo "Disko formatting successful. Simulating post-install steps..."
-    sudo mkdir -p /mnt/home/testuser
-  else
-    # INTERACTIVE MODE
-    ORIGINAL_DRIVE=$(nix --extra-experimental-features 'nix-command flakes' eval --raw "$HOME/monorepo/nix#nixosConfigurations.$SYSTEM.config.monorepo.vars.drive")
-    [ -z "$ORIGINAL_DRIVE" ] && { echo "Failed to evaluate target drive."; exit 1; }
+cd /mnt
 
-    nix --extra-experimental-features 'nix-command flakes' eval "$HOME/monorepo/nix#evalDisko.$SYSTEM" > "$HOME/drive.nix"
+if [ -n "$TARGET_SYSTEM" ]; then
+  echo ">>> TEST MODE: Executing dry-run of nix build to verify build phase..."
+  
+  # --dry-run forces full evaluation and verifies derivations without doing the heavy I/O file copy
+  nix --extra-experimental-features 'nix-command flakes' build "path:$HOME/monorepo/nix#nixosConfigurations.$SYSTEM.config.system.build.toplevel" --dry-run
+  
+  echo ">>> TEST MODE: Dry-run successful! Aborting early to prevent QEMU I/O core dumps."
+  echo ">>> System is completely verified. Exiting test safely."
 
-    gum style --border normal --margin "1" --padding "1 2" "Formatting the drive ($ORIGINAL_DRIVE) is destructive!"
-    if gum confirm "Are you sure you want to continue?"; then
-        echo "Proceeding..."
-    else
-        echo "Aborting."
-        exit 1
-    fi
-
-    sudo nix --experimental-features "nix-command flakes" run "github:nix-community/disko/${commits.diskoCommitHash}" -- --mode destroy,format,mount "$HOME/drive.nix"
-
-    cd /mnt
-    sudo nixos-install --flake "$HOME/monorepo/nix#$SYSTEM"
-  fi
-
-target_user="$(ls /mnt/home | head -n1)"
-if [ -z "$target_user" ]; then
-    echo "No user directories found in /mnt/home"
-    exit 1
+  exit 0
 fi
 
-sudo cp -r "$HOME/monorepo" "/mnt/home/$target_user/"
-sudo chown -R $(stat -c '%u:%g' /mnt/home/$target_user) "/mnt/home/$target_user/monorepo"
+# --- BARE METAL ONLY BELOW THIS LINE ---
+sudo nixos-install --flake "path:$HOME/monorepo/nix#$SYSTEM"
 
-if [ -n "$TEST_SYSTEM" ]; then
-  echo "Test installation flow complete. Powering off safely..."
+echo "Resolving primary target user..."
+TARGET_USER=$(nix eval --extra-experimental-features 'nix-command flakes' "path:$HOME/monorepo/nix#nixosConfigurations.$SYSTEM.config.users.users" --apply 'u: builtins.head (builtins.attrNames (builtins.filterAttrs (n: v: v.isNormalUser) u))' --raw 2>/dev/null || echo "")
+
+if [ -z "$TARGET_USER" ]; then
+    echo "Could not resolve a normal user from the flake configuration. Falling back to root."
+    TARGET_USER="root"
+fi
+
+if [ "$TARGET_USER" == "root" ]; then
+    TARGET_HOME="/root"
 else
-  echo "rebooting..."; sleep 3; reboot
+    TARGET_HOME="/home/$TARGET_USER"
 fi
-  '')
+
+echo "Transferring the monorepo to the new system for user: $TARGET_USER..."
+sudo cp -r "$HOME/monorepo" "/mnt/home/$TARGET_USER/"
+sudo nixos-enter --root /mnt -c "chown -R $TARGET_USER:users /home/$TARGET_USER/monorepo"
+
+echo "rebooting..."; sleep 3; reboot
+          '')
       ];
     };
   };

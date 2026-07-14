@@ -1,1 +1,1 @@
-remove dead code
+installer test works for affinity e2e flow
