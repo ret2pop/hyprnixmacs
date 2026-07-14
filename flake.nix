@@ -123,7 +123,9 @@
             specialArgs = attrs // {
               system = (getSystem hostname);
               isIntegrationTest = false;
+              testHostname = null;
               monorepoSelf = null;
+              targetDevice = null;
             };
             modules = mkHostModules hostname;
           };
@@ -171,6 +173,8 @@
             super = self.nixosConfigurations."${hostname}".config;
           in
             [
+              # Test a minimal number of core services because they need to work without WAN
+              # in the VM
               {
                 serviceName = "nginx";
                 enabled = super.services.nginx.enable;
@@ -212,6 +216,8 @@
                       isIntegrationTest = true;
                       system = getSystem hostname;
                       monorepoSelf = null;
+                      targetDevice = null;
+                      testHostname = null;
                     };
                     imports = mkHostModules hostname ++ [
                       "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
@@ -264,13 +270,119 @@
             };
           };
         };
+        mkInstallerTests = builtins.map (hostname:
+          let
+            lib = nixpkgs.lib;
+            targetSystem = self.nixosConfigurations."${hostname}";
+            targetDevice = targetSystem.config.monorepo.vars.device;
+            
+            # Use strict regex matching to identify VM drives and SD cards
+            isVirtual = (builtins.match "/dev/vd[a-z]+" targetDevice) != null;
+            isSdCard  = (builtins.match "/dev/mmcblk[0-9]+" targetDevice) != null;
+            shouldSkip = isVirtual || isSdCard;
+            
+          in {
+            name = "installer-e2e-${hostname}";
+            value = if shouldSkip then
+              
+              # THE BYPASS: Evaluate in milliseconds, entirely skipping QEMU.
+              targetSystem.pkgs.runCommand "installer-e2e-${hostname}-skipped" {} ''
+                echo "Skipping ${hostname}: Target device (${targetDevice}) is a virtual drive or SD card."
+                echo "This system is intended for nixos-anywhere or direct SD flashing."
+                mkdir $out
+              ''
+                
+                    else
+                      
+                      # THE REAL TEST: Only evaluate the heavy lifting if it is a bare-metal NVMe/SATA host.
+                      let
+                        # 1. Parse the lockfile directly as pure JSON data
+                        lockfile = builtins.fromJSON (builtins.readFile ./flake.lock);
+                        
+                        # 2. Extract only the nodes that actually contain locked source trees
+                        lockedNodes = builtins.filter (node: node ? locked) (builtins.attrValues lockfile.nodes);
+                        
+                        # 3. Native Schema Resolution
+                        allFlakeSources = builtins.map (node: 
+                          (builtins.fetchTree (builtins.removeAttrs node.locked ["dir"])).outPath
+                        ) lockedNodes;
+
+                        # 4. Bundle them securely into a native Nix derivation
+                        flakeSourcesClosure = targetSystem.pkgs.stdenvNoCC.mkDerivation {
+                          name = "flake-sources-closure";
+                          dontUnpack = true;
+                          srcs = allFlakeSources;
+                          installPhase = ''
+                    mkdir -p $out
+                    echo "$srcs" > $out/dependencies.txt
+                  '';
+                        };
+                      in
+                        targetSystem.pkgs.testers.runNixOSTest {
+                          name = "installer-e2e-${hostname}";
+                          nodes.installer = { ... }: {
+                            
+                            _module.args = {
+                              inherit (attrs) disko self;
+                              testHostname = hostname;
+                              monorepoSelf = null;
+                              inherit targetDevice;
+                            };
+                            
+                            imports = [
+                              (./. + "/systems/installer/default.nix")
+                              "${nixpkgs}/nixos/modules/misc/nixpkgs/read-only.nix"
+                              {
+                                networking.hostName = "installer";
+                                nixpkgs.pkgs = lib.mkVMOverride targetSystem.pkgs;
+                                nixpkgs.config = lib.mkForce {};
+                                nixpkgs.overlays = lib.mkForce [];
+                              }
+                            ];
+                            
+                            system.extraDependencies = [
+                              targetSystem.config.system.build.toplevel
+                              flakeSourcesClosure
+                            ];
+
+                            virtualisation = {
+                              emptyDiskImages = [ 20480 ];
+                              memorySize = 8192;
+                              cores = 4;
+                            };
+
+                            nix.settings = {
+                              substituters = lib.mkForce [ ];
+                              experimental-features = [ "nix-command" "flakes" ];
+                            };
+                            
+                            systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+                            systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+                          };
+
+                          testScript = ''
+                    installer.start()
+                    installer.wait_for_unit("multi-user.target")
+
+                    # 1. Execute the native bash script
+                    installer.succeed("sudo -i -u nixos nix_installer >&2")
+                    # 2. Assert Drive and Configuration Logic
+                    installer.succeed("lsblk /dev/vdb | grep -q 'part'")
+                    installer.succeed("mountpoint -q /mnt")
+                    installer.succeed("sync")
+                  '';
+                        };
+          }
+        );
+
+        installerTests = builtins.listToAttrs (mkInstallerTests filterHosts);
       in
         {
           lib = {
             inherit mkHostModules;
           };
 
-          checks."${system}" = integrationTests // {
+          checks."${system}" = integrationTests // installerTests // {
             inherit pre-commit-check;
           };
 

@@ -1,5 +1,5 @@
 # [[file:../../../config/nix.org::*Zsh][Zsh:1]]
-{ pkgs, systemHostName, super, ... }:
+{ pkgs, systemHostName, ... }:
 {
   programs.zsh = {
     enable = true;

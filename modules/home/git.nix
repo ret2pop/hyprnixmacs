@@ -13,17 +13,6 @@
       signByDefault = true;
     };
 
-    # alias = {
-    #   pl = "pull";
-    #   ps = "push";
-    #   co = "checkout";
-    #   c = "commit";
-    #   a = "add";
-    #   st = "status";
-    #   sw = "switch";
-    #   b = "branch";
-    # };
-
     extraConfig = {
       init.defaultBranch = "main";
 
@@ -40,15 +29,6 @@
       };
 
     };
-    # settings = {
-    #   user = {
-    #     name = super.monorepo.vars.fullName;
-    #     email = super.monorepo.vars.email;
-    #   };
-
-      
-    # };
-
     aliases = {
       pl = "pull";
       ps = "push";

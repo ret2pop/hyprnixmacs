@@ -1,1 +1,1 @@
-separate hooks into different dir
+remove additionalPaths
