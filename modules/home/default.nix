@@ -157,7 +157,7 @@ in
     }) profilesSchema;
 
     home.packages = lib.concatLists (
-      lib.mapAttrsToList (_: cfg:
+      lib.mapAttrsToList (name: cfg:
         if config.monorepo.profiles.${name}.enable then cfg.pkgs else []
       ) profilesSchema
     );
