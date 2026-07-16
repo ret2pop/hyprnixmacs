@@ -1,1 +1,1 @@
-remove comments
+add opencode; export functions for VM code

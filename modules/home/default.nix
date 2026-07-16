@@ -130,7 +130,7 @@ let
 
     agent = {
       desc = "AI agents";
-      pkgs = with pkgs; [];
+      pkgs = with pkgs; [ opencode ];
       default = config.monorepo.profiles.enable;
     };
   };

@@ -4,17 +4,22 @@
   programs.codex = {
     enable = config.monorepo.profiles.agent.enable;
     settings = {
-      model = "hf.co/mradermacher/Qwythos-9B-v2-GGUF:Q5_K_M";
-      model_provider = "ollama";
+      model_catalog_json = "~/.codex/model-catalog.local.json";
+      projects."/home/preston/monorepo".trust_level = "trusted";
+      model = "qwythos-9b";
+      model_provider = "custom_ollama";
       model_providers = {
-        ollama = {
+        custom_ollama = {
           name = "Ollama";
-          baseURL = "http://localhost:11434/v1";
-          envKey = "OLLAMA_API_KEY";
+          base_url = "http://localhost:11434/v1";
+          wire_api = "responses";
+          env_key = "OLLAMA_API_KEY";
         };
       };
-      mcp_servers = {};
     };
+  };
+  home.file.".codex/model-catalog.local.json" = {
+    source = ../../data/model-catalog.local.json;
   };
 }
 # Codex:1 ends here

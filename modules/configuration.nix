@@ -54,8 +54,8 @@ in
     virtualisation.useNixStoreImage = false;
 
     virtualisation.sharedDirectories.sops-keys = {
-      source = "/home/preston/.config/sops/age";
-      target = "/home/preston/.config/sops/age";
+      source = "/home/${config.monorepo.vars.userName}/.config/sops/age";
+      target = "/home/${config.monorepo.vars.userName}/.config/sops/age";
     };
 
     networking.extraHosts = lib.mkForce (lib.concatStringsSep "\n" vmHosts);
@@ -68,7 +68,7 @@ in
       fsType = "ext4";
     };
     systemd.services.sops-nix = {
-      unitConfig.RequiresMountsFor = "/home/preston/.config/sops/age";
+      unitConfig.RequiresMountsFor = "/home/${config.monorepo.vars.userName}/.config/sops/age";
     };
 
     security.acme.defaults.server = lib.mkForce "https://127.0.0.1:14000/dir";

@@ -18,7 +18,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -430,6 +430,7 @@
   '';
           };
 
+
           packages."${system}" = {
             zoneFiles = generate.zoneFiles dnsConfig;
             octodns = generate.octodnsConfig {
@@ -452,6 +453,12 @@
               };
             };
           };
+
+          # export helpers
+          hostnames = vars.hostnames;
+          filterHosts = filterHosts;
+          mkIntegrationTests = mkIntegrationTests;
+          mkInstallerTests = mkInstallerTests;
         };
 }
 # Flake.nix:1 ends here
