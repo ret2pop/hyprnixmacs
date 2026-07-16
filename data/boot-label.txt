@@ -1,1 +1,1 @@
-remove additionalPaths
+bump flake lock

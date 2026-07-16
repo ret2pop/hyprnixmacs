@@ -23,7 +23,6 @@
     };
     
     settings = {
-      # This is the magic combination for Qtile + Wayland + Qutebrowser
       qt.args = [
         "enable-features=UseOzonePlatform"
         "disable-gpu"
@@ -31,24 +30,20 @@
         "disable-gpu-sandbox"
       ];
       
-      # Force Qt to draw the UI in software mode so it doesn't look for OpenGL
       qt.force_software_rendering = "qt-quick"; 
 
       content.blocking.method = "both";
       fonts.default_family = "Lora";
       fonts.default_size = "12pt";
 
-      # Command/completion UI
       fonts.statusbar = "12pt Lora";
       fonts.completion.entry = "12pt Lora";
       fonts.completion.category = "bold 12pt Lora";
       fonts.prompts = "12pt Lora";
 
-      # Tabs
       fonts.tabs.selected = "12pt Lora";
       fonts.tabs.unselected = "12pt Lora";
 
-      # Hints
       fonts.hints = "bold 12pt Lora";
     };
 

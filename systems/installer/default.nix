@@ -2,7 +2,7 @@
 { pkgs, lib, modulesPath, disko, self, testHostname ? null, targetDevice ? "/dev/sda", ... }:
 let
   targetSystemName = if testHostname != null then testHostname else "";
-  bundledNix = self;
+  device = if targetDevice != null then targetDevice else "/dev/sda";
 in
 {
   imports = [
@@ -65,7 +65,7 @@ fi
 
 if [ ! -d "$HOME/nixmacs/" ]; then
   echo "Staging nixmacs (self) strictly for evaluation..."
-  cp -rT ${bundledNix} "$HOME/nixmacs"
+  cp -rT ${self} "$HOME/nixmacs"
   chmod -R u+w "$HOME/nixmacs"
 
   cd "$HOME/nixmacs"
@@ -94,7 +94,7 @@ nix --extra-experimental-features 'nix-command flakes' eval "path:$HOME/nixmacs#
 
 if [ -n "$TARGET_SYSTEM" ]; then
   echo ">>> TEST MODE: Hot-swapping target bare-metal drive to VM virtual drive (/dev/vdb)..."
-  sed -i "s|${targetDevice}|/dev/vdb|g" "$HOME/drive.nix"
+  sed -i "s|${device}|/dev/vdb|g" "$HOME/drive.nix"
 fi
 
 if [ -z "$TARGET_SYSTEM" ]; then
